@@ -5,7 +5,7 @@
   --primary: #6366f1; /* Indigo 500 */
   --primary-hover: #4f46e5; /* Indigo 600 */
   --secondary: #94a3b8; /* Slate 400 */
-  --card: rgba(30, 41, 59, 0.7); /* Slate 800 with opacity */
+  --card: #1e293b; /* Slate 800 - Solid */
   --hover: rgba(255, 255, 255, 0.1);
   --border: rgba(255, 255, 255, 0.1);
   --black: #020617; /* Slate 950 */
@@ -33,7 +33,7 @@
 
 html,
 body {
-  max-width: 100vw;
+  max-width: 100%; /* Changed from 100vw to prevent scrollbar overflow */
   overflow-x: hidden;
   height: 100%;
 }

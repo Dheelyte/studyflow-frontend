@@ -45,17 +45,17 @@ export default function LandingPage() {
       )}
 
       <header className={styles.header}>
-         <div style={{display:'flex', gap:'8px', fontWeight:'800', fontSize:'1.2rem', alignItems:'center'}}>
+         <div className={styles.headerBrand}>
             <ZapIcon size={24} fill="var(--primary)" /> StudyFlow
          </div>
-         <div style={{display:'flex', gap:'16px', alignItems:'center'}}>
+         <div className={styles.headerActions}>
              <ThemeToggle />
              <Link href="/login" style={{color:'var(--foreground)', fontWeight:'600', textDecoration:'none'}}>Log In</Link>
              <Link href="/signup" className={styles.ctaSmall}>Sign Up</Link>
          </div>
       </header>
 
-      {/* HERO SECTION */}
+      {/* 1. HERO SECTION */}
       <section className={styles.hero}>
         <FadeIn direction="up">
             <h1 className={styles.title}>Master any topic in minutes, not months.</h1>
@@ -71,46 +71,61 @@ export default function LandingPage() {
         </FadeIn>
 
         <FadeIn direction="up" delay={0.3} className={styles.heroFooter}>
-            <span className={styles.heroFooterItem}><CheckIcon size={16} /> Free to start</span>
-            <span className={styles.heroFooterItem}><CheckIcon size={16} /> No credit card</span>
-            <span className={styles.heroFooterItem}><CheckIcon size={16} /> powered by Gemini</span>
+        </FadeIn>
+
+        <FadeIn direction="up" delay={0.4} style={{marginTop: '48px', width: '100%', display: 'flex', justifyContent: 'center'}}>
+             <div style={{
+                 borderRadius: '16px', 
+                 overflow: 'hidden', 
+                 boxShadow: '0 20px 50px -10px rgba(0,0,0,0.3)', 
+                 border: '1px solid var(--border)',
+                 maxWidth: '1000px',
+                 width: '100%'
+             }}>
+                <video 
+                    autoPlay 
+                    loop 
+                    muted 
+                    playsInline 
+                    style={{width: '100%', display: 'block'}}
+                >
+                    <source src="/recording.mp4" type="video/mp4" />
+                </video>
+             </div>
         </FadeIn>
       </section>
 
-      {/* POPULAR TOPICS SECTION */}
-       <section className={styles.topicsSection}>
-           <FadeIn>
-                <h2 className={styles.sectionHeading}>Explore popular curriculums</h2>
-           </FadeIn>
-           <div className={styles.marqueeContainer} style={{marginBottom:'24px'}}>
-               <div className={styles.marqueeTrack}>
-                   {marqueeTopics.map((topic, i) => (
-                       <Link href="/dashboard" key={`${topic}-${i}-1`} className={styles.topicCard} style={{minWidth: '220px'}}>
-                           <div className={styles.topicTitle}>{topic}</div>
-                           <div className={styles.topicMeta}>
-                               <span>{40 + i} Resources</span>
-                               <span>{1200 + (i * 123)} Learners</span>
-                           </div>
-                       </Link>
-                   ))}
-               </div>
-           </div>
-           <div className={styles.marqueeContainer}>
-               <div className={styles.marqueeTrackReverse}>
-                   {marqueeTopicsReverse.map((topic, i) => (
-                       <Link href="/dashboard" key={`${topic}-${i}-2`} className={styles.topicCard} style={{minWidth: '220px'}}>
-                           <div className={styles.topicTitle}>{topic}</div>
-                           <div className={styles.topicMeta}>
-                               <span>{30 + i} Resources</span>
-                               <span>{800 + (i * 45)} Learners</span>
-                           </div>
-                       </Link>
-                   ))}
-               </div>
-           </div>
-       </section>
+      {/* 2. HOW IT WORKS SECTION */}
+      <section className={styles.howItWorks}>
+          <FadeIn>
+            <h2 className={styles.sectionHeading}>How it works</h2>
+          </FadeIn>
+          <div className={styles.stepsGrid}>
+              <FadeIn direction="up" delay={0.1} className={styles.stepCard}>
+                  <div className={styles.stepIconBg}>
+                      <SearchIcon size={32} />
+                  </div>
+                  <h3>Set your Goal</h3>
+                  <p className={styles.featureText}>Type any skill or topic, from &quot;React Hooks&quot; to &quot;Astrophysics&quot;.</p>
+              </FadeIn>
+              <FadeIn direction="up" delay={0.2} className={styles.stepCard}>
+                  <div className={styles.stepIconBg}>
+                      <ZapIcon size={32} />
+                  </div>
+                  <h3>AI Generation</h3>
+                  <p className={styles.featureText}>Our engine scrapes the best videos, articles, and quizzes to build your path.</p>
+              </FadeIn>
+              <FadeIn direction="up" delay={0.3} className={styles.stepCard}>
+                  <div className={styles.stepIconBg}>
+                      <PlayIcon size={32} />
+                  </div>
+                  <h3>Start Learning</h3>
+                  <p className={styles.featureText}>Follow the playlist, track progress, and chat with the community.</p>
+              </FadeIn>
+          </div>
+      </section>
 
-      {/* STACKED CARDS SECTION */}
+      {/* 3. WHY STUDYFLOW (STACKED CARDS) SECTION */}
       <section className={styles.stackedSection}>
         <FadeIn>
              <h2 className={styles.sectionHeading} style={{textAlign:'center'}}>Why StudyFlow?</h2>
@@ -161,7 +176,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* COMMUNITY SHOWCASE SECTION */}
+      {/* 4. LEARN BETTER TOGETHER (COMMUNITY) SECTION */}
       <section className={styles.communitySection}>
         <div className={styles.communityContent}>
             <FadeIn direction="right">
@@ -178,7 +193,7 @@ export default function LandingPage() {
             </FadeIn>
         </div>
         <div className={styles.communityVisual}>
-            <FadeIn direction="left" delay={0.2} className={styles.mockPostCard} style={{position:'absolute', top: 30, left: 20, zIndex: 2, transform: 'rotate(-2deg)', maxWidth:'320px'}}>
+            <FadeIn direction="left" delay={0.2} className={`${styles.mockPostCard} ${styles.mockPostCard1}`}>
                  <div style={{display:'flex', gap:'12px', marginBottom:'12px'}}>
                      <div style={{width:'32px', height:'32px', borderRadius:'50%', background:'linear-gradient(135deg, #6366f1, #a855f7)'}}></div>
                      <div>
@@ -194,7 +209,7 @@ export default function LandingPage() {
                       <span>💬 5</span>
                  </div>
             </FadeIn>
-            <FadeIn direction="left" delay={0.4} className={styles.mockPostCard} style={{position:'absolute', top: 140, right: 20, zIndex:1, maxWidth:'320px', transform: 'rotate(2deg)', boxShadow: '0 10px 30px -5px rgba(0,0,0,0.1)'}}>
+            <FadeIn direction="left" delay={0.4} className={`${styles.mockPostCard} ${styles.mockPostCard2}`}>
                  <div style={{display:'flex', gap:'12px', marginBottom:'12px'}}>
                      <div style={{width:'32px', height:'32px', borderRadius:'50%', background:'linear-gradient(135deg, #f59e0b, #ef4444)'}}></div>
                      <div>
@@ -209,40 +224,40 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* HOW IT WORKS SECTION */}
-      <section className={styles.howItWorks}>
-          <FadeIn>
-            <h2 className={styles.sectionHeading}>How it works</h2>
-          </FadeIn>
-          <div className={styles.stepsGrid}>
-              <FadeIn direction="up" delay={0.1} className={styles.stepCard}>
-                  <div className={styles.stepIconBg}>
-                      <SearchIcon size={32} />
-                  </div>
-                  <h3>1. Set your Goal</h3>
-                  <p className={styles.featureText}>Type any skill or topic, from &quot;React Hooks&quot; to &quot;Astrophysics&quot;.</p>
-              </FadeIn>
-              <FadeIn direction="up" delay={0.2} className={styles.stepCard}>
-                  <div className={styles.stepIconBg}>
-                      <ZapIcon size={32} />
-                  </div>
-                  <h3>2. AI Generation</h3>
-                  <p className={styles.featureText}>Our engine scrapes the best videos, articles, and quizzes to build your path.</p>
-              </FadeIn>
-              <FadeIn direction="up" delay={0.3} className={styles.stepCard}>
-                  <div className={styles.stepIconBg}>
-                      <PlayIcon size={32} />
-                  </div>
-                  <h3>3. Start Learning</h3>
-                  <p className={styles.featureText}>Follow the playlist, track progress, and chat with the community.</p>
-              </FadeIn>
-          </div>
-      </section>
+      {/* 5. POPULAR TOPICS SECTION */}
+       <section className={styles.topicsSection}>
+           <FadeIn>
+                <h2 className={styles.sectionHeading}>Endless Learning Possibilities</h2>
+           </FadeIn>
+           <div className={styles.marqueeContainer} style={{marginBottom:'24px'}}>
+               <div className={styles.marqueeTrack}>
+                   {marqueeTopics.map((topic, i) => (
+                       <Link href="/dashboard" key={`${topic}-${i}-1`} className={styles.topicCard} style={{minWidth: '220px'}}>
+                           <div className={styles.topicTitle}>{topic}</div>
+                           <div className={styles.topicMeta}>
+                               <span>{40 + i} Resources</span>
+                               <span>{1200 + (i * 123)} Learners</span>
+                           </div>
+                       </Link>
+                   ))}
+               </div>
+           </div>
+           <div className={styles.marqueeContainer}>
+               <div className={styles.marqueeTrackReverse}>
+                   {marqueeTopicsReverse.map((topic, i) => (
+                       <Link href="/dashboard" key={`${topic}-${i}-2`} className={styles.topicCard} style={{minWidth: '220px'}}>
+                           <div className={styles.topicTitle}>{topic}</div>
+                           <div className={styles.topicMeta}>
+                               <span>{30 + i} Resources</span>
+                               <span>{800 + (i * 45)} Learners</span>
+                           </div>
+                       </Link>
+                   ))}
+               </div>
+           </div>
+       </section>
 
-      {/* FAQ SECTION */}
-      <FAQSection />
-
-       {/* TESTIMONIALS SECTION */}
+       {/* 6. REVIEWS (TESTIMONIALS) SECTION */}
        <section className={styles.testimonialsSection}>
            <FadeIn>
                 <h2 className={styles.sectionHeading}>Loved by learners everywhere</h2>
@@ -290,6 +305,7 @@ export default function LandingPage() {
            </div>
        </section>
 
+      {/* 7. CTA SECTION */}
       <section className={styles.ctaSection}>
           <FadeIn direction="up" className={styles.flexColumnCentered}>
             <h2>Ready to start your flow?</h2>
@@ -298,7 +314,10 @@ export default function LandingPage() {
           </FadeIn>
       </section>
 
-      {/* MAIN FOOTER */}
+      {/* 8. FAQ SECTION */}
+      <FAQSection />
+
+      {/* 9. FOOTER */}
       <footer className={styles.mainFooter}>
           <div className={styles.footerGrid}>
               <div className={styles.footerBrand}>
@@ -359,25 +378,27 @@ function FAQSection() {
 
     return (
         <section className={styles.faqSection}>
-            <FadeIn>
-                <h2 className={styles.sectionHeading} style={{marginBottom:'40px', textAlign:'center'}}>Frequently Asked Questions</h2>
-            </FadeIn>
-            <div>
-                {questions.map((item, i) => (
-                    <FadeIn key={i} delay={0.1 * i} direction="up" className={styles.faqItem}>
-                        <button className={styles.faqQuestion} onClick={() => setOpenIndex(openIndex === i ? null : i)}>
-                            {item.q}
-                            <div style={{transform: openIndex === i ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.2s'}}>
-                                <ChevronRight size={20} />
-                            </div>
-                        </button>
-                        {openIndex === i && (
-                            <div className={styles.faqAnswer}>
-                                {item.a}
-                            </div>
-                        )}
-                    </FadeIn>
-                ))}
+            <div className={styles.faqContainer}>
+                <FadeIn>
+                    <h2 className={styles.sectionHeading} style={{marginBottom:'40px', textAlign:'center'}}>Frequently Asked Questions</h2>
+                </FadeIn>
+                <div style={{width:'100%'}}>
+                    {questions.map((item, i) => (
+                        <FadeIn key={i} delay={0.1 * i} direction="up" className={styles.faqItem} style={{width:'100%'}}>
+                            <button className={styles.faqQuestion} onClick={() => setOpenIndex(openIndex === i ? null : i)}>
+                                {item.q}
+                                <div style={{transform: openIndex === i ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.2s'}}>
+                                    <ChevronRight size={20} />
+                                </div>
+                            </button>
+                            {openIndex === i && (
+                                <div className={styles.faqAnswer}>
+                                    {item.a}
+                                </div>
+                            )}
+                        </FadeIn>
+                    ))}
+                </div>
             </div>
         </section>
     );

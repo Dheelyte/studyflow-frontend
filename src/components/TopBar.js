@@ -2,10 +2,14 @@
 import styles from './TopBar.module.css';
 import { ChevronLeft, ChevronRight } from './Icons';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
+import Link from 'next/link';
+// Theme use removed from here
 
 export default function TopBar() {
   const router = useRouter();
-
+  const { user, logout } = useAuth();
+ 
   return (
     <header className={styles.topbar}>
       <div className={styles.navigationButtons}>
@@ -17,8 +21,20 @@ export default function TopBar() {
         </button>
       </div>
       <div className={styles.authButtons}>
-        <button className={styles.signup} onClick={() => alert("Sign up coming soon!")}>Sign up</button>
-        <button className={styles.login} onClick={() => alert("Login coming soon!")}>Log in</button>
+        
+        {/* Toggle removed from here, back to sidebar */}
+
+        {user ? (
+            <div style={{display:'flex', alignItems:'center', gap:'12px'}}>
+                <span style={{fontSize:'0.9rem', fontWeight:'600'}}>Hi, {user.first_name || 'User'}</span>
+                <button className={styles.login} onClick={logout}>Log out</button>
+            </div>
+        ) : (
+            <>
+                <Link href="/signup" className={styles.signup}>Sign up</Link>
+                <Link href="/login" className={styles.login}>Log in</Link>
+            </>
+        )}
       </div>
     </header>
   );

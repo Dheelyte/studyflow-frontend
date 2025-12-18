@@ -21,6 +21,14 @@
      transform: translateY(-2px);
 }
 
+/* New container for Icon + Input to keep them together */
+.inputGroup {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    width: 100%; /* Full width on mobile */
+}
+
 .searchIconWrapper {
     padding-left: 20px;
     color: var(--secondary);
@@ -92,5 +100,15 @@
   .searchButton {
       width: 100%;
       border-radius: 12px;
+      margin-left: 0; /* Reset margin on mobile */
+  }
+
+  /* Reset padding for the input group items if needed, mostly fine */
+  .searchIconWrapper {
+      padding-left: 12px; /* Slightly less padding on mobile */
+  }
+  
+  .searchInput {
+      padding: 12px 16px; /* Adjust padding */
   }
 }

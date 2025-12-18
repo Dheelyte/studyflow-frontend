@@ -12,7 +12,8 @@ export default function CommunityPage() {
   const { 
       communities, 
       posts, 
-      createCommunity 
+      createCommunity,
+      joinCommunity
   } = useCommunity();
   
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -75,39 +76,53 @@ export default function CommunityPage() {
       </div>
 
       <div className={styles.sidebar}>
+        {/* Create Community Button - Uses new prominent style */}
+        <button className={styles.createCommunityBtn} onClick={() => setShowCreateModal(true)} style={{marginBottom: '24px'}}>
+             <PlusIcon size={18} /> Create Community
+        </button>
+
         <div className={styles.trendingCard}>
-            <h3 className={styles.cardTitle}>My Communities</h3>
+            <h3 className={styles.cardTitle}>Explore Communities</h3>
             <div className={styles.trendingList}>
-                {communities.filter(c => c.isJoined).map(c => (
+                {/* Increased slice to show more communities */}
+                {communities.filter(c => !c.isJoined).slice(0, 10).map(c => (
                      <div 
                         key={c.id} 
                         className={styles.trendingItem} 
-                        onClick={() => router.push(`/community/${c.id}`)}
                      >
-                        <span className={styles.hashtag}>{c.name}</span>
-                        <span className={styles.count}>{c.memberCount}</span>
+                        <div onClick={() => router.push(`/community/${c.id}`)} style={{cursor:'pointer', flex:1, display:'flex', alignItems:'center'}}>
+                            {/* Avatar for explore list */}
+                            <div 
+                                className={styles.exploreAvatar}
+                                style={{background: `linear-gradient(135deg, ${c.color || '#6366f1'}, ${c.color ? c.color+'dd' : '#a855f7'})`}}
+                            >
+                                {c.name.substring(0, 2).toUpperCase()}
+                            </div>
+                            <div>
+                                <span className={styles.hashtag}>{c.name}</span>
+                                <span className={styles.count}>{c.memberCount} members</span>
+                            </div>
+                        </div>
+                        <button 
+                            className={styles.joinBtn}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                joinCommunity(c.id);
+                            }}
+                        >
+                            Join
+                        </button>
                     </div>
                 ))}
-            </div>
-            
-            <button className={styles.createCommunityBtn} onClick={() => setShowCreateModal(true)}>
-             <PlusIcon size={16} /> Create Community
-            </button>
-        </div>
-
-        <div className={styles.trendingCard} style={{marginTop: '24px'}}>
-            <h3 className={styles.cardTitle}>Trending Topics</h3>
-            <div className={styles.trendingList}>
-                 <div className={styles.trendingItem}>
-                    <span className={styles.hashtag}>#ReactJs</span>
-                    <span className={styles.count}>2.4k posts</span>
-                </div>
-                 <div className={styles.trendingItem}>
-                    <span className={styles.hashtag}>#Python</span>
-                    <span className={styles.count}>1.8k posts</span>
-                </div>
+                {communities.filter(c => !c.isJoined).length === 0 && (
+                    <div style={{color:'var(--foreground-muted)', fontSize:'0.9rem', padding:'8px'}}>
+                        You have joined all communities!
+                    </div>
+                )}
             </div>
         </div>
+        
+        {/* Removed Trending Topics Card */}
       </div>
 
     </div>
