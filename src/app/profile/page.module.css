@@ -1,0 +1,314 @@
+.page {
+  padding: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* Header Section */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--border);
+}
+
+.avatarContainer {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.avatarRing {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  z-index: 0;
+}
+
+.avatar {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--card);
+  border: 4px solid var(--background);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--foreground);
+  z-index: 1;
+  overflow: hidden;
+}
+
+.levelBadge {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: var(--primary);
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 12px;
+    z-index: 2;
+    border: 2px solid var(--background);
+}
+
+.userInfo {
+  flex: 1;
+}
+
+.name {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.handle {
+  color: var(--secondary);
+  font-size: 1rem;
+  margin-bottom: 16px;
+}
+
+.bio {
+    color: var(--foreground-muted);
+    max-width: 600px;
+    line-height: 1.5;
+}
+
+.editBtn {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.editBtn:hover {
+    background: var(--border);
+}
+
+/* Stats Section */
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px;
+}
+
+.statCard {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.statIcon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.05);
+}
+
+.statContent {
+    display: flex;
+    flex-direction: column;
+}
+
+.statValue {
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+.statLabel {
+    color: var(--secondary);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+/* Heatmap Section */
+.heatmapSection {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+}
+
+.sectionTitle {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.heatmapContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.monthLabels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--secondary);
+    padding: 0 4px;
+}
+
+.heatmapGrid {
+    display: grid;
+    grid-template-columns: repeat(53, 1fr); /* Approx weeks */
+    gap: 4px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+}
+
+/* Adjust grid for specific days if needed, currently just boxes */
+
+.heatBox {
+    width: 100%;
+    aspect-ratio: 1; /* Keep it square */
+    border-radius: 2px;
+    background: var(--border);
+}
+
+/* Ensure minimum size */
+@media (min-width: 768px) {
+    .heatBox {
+        min-width: 10px;
+    }
+}
+
+.heatBox.l1 { background: rgba(99, 102, 241, 0.2); }
+.heatBox.l2 { background: rgba(99, 102, 241, 0.5); }
+.heatBox.l3 { background: rgba(99, 102, 241, 0.8); }
+.heatBox.l4 { background: #6366f1; }
+
+/* Active Flows */
+.flowsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+}
+
+.flowCard {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.flowCard:hover {
+    transform: translateY(-4px);
+    border-color: var(--primary);
+}
+
+.flowHeader {
+    height: 100px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    color: white;
+}
+
+.flowBody {
+    padding: 20px;
+}
+
+.flowTitle {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.flowMeta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--secondary);
+}
+
+.progressBar {
+    height: 4px;
+    background: var(--border);
+    margin-top: 16px;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 2px;
+}
+
+.headerInfo {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.identity {
+    display: flex;
+    flex-direction: column;
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding-bottom: 24px;
+    }
+
+    .headerInfo {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        gap: 12px;
+    }
+
+    .identity {
+        align-items: center;
+    }
+
+    .userInfo {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .bio {
+        text-align: center;
+        margin-top: 12px;
+    }
+    
+    .editBtn {
+        width: 100%;
+        max-width: 200px;
+        justify-content: center;
+    }
+}

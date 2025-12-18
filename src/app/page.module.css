@@ -367,6 +367,7 @@
     background: var(--background);
     max-width: 1200px;
     margin: 0 auto;
+    overflow: hidden; /* Prevent marquee overflow */
 }
 
 .topicsGrid {
@@ -465,6 +466,7 @@
 /* Infinite Marquee */
 .marqueeContainer {
     width: 100%;
+    max-width: 100%;
     overflow: hidden;
     position: relative;
     mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
@@ -632,6 +634,11 @@
         flex-direction: column;
         text-align: center;
     }
+
+   .stackedCardVisual {
+       width: 100%;
+       margin-top: 24px;
+   }
 }
 
 .stackedCardInfo {
@@ -653,6 +660,10 @@
 .faqSection {
     padding: 100px 24px;
     background: var(--card);
+    width: 100%;
+}
+
+.faqContainer {
     max-width: 800px;
     margin: 0 auto;
 }
@@ -660,6 +671,7 @@
 .faqItem {
     border-bottom: 1px solid var(--border);
     margin-bottom: 16px;
+    width: 100%;
 }
 
 .faqQuestion {
@@ -689,18 +701,80 @@
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* FAQ Fix via cat */
-.faqSection {
-    padding: 100px 24px;
-    background: var(--card);
-    max-width: 800px;
-    margin: 0 auto;
-    width: 100%;
-    box-sizing: border-box;
+/* Post Cards Positioning (Desktop) */
+.mockPostCard1 {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 1;
+    transform: rotate(-2deg);
+    max-width: 320px;
 }
 
-.faqItem {
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 16px;
-    width: 100%;
+.mockPostCard2 {
+    position: absolute;
+    top: 140px;
+    left: 140px;
+    z-index: 2;
+    transform: rotate(2deg);
+    max-width: 320px;
+    box-shadow: 0 10px 30px -5px rgba(0,0,0,0.2);
+}
+
+/* Post Cards Mobile Stacking Fixed for Aesthetics & Robustness */
+@media (max-width: 768px) {
+    .communityVisual {
+        height: auto;
+        min-height: 0;
+        padding: 40px 0;
+        flex-direction: column;
+        gap: 32px;
+        display: flex;
+        align-items: center;
+    }
+    
+    .mockPostCard1, .mockPostCard2 {
+        position: relative;
+        top: auto;
+        left: auto;
+        transform: none;
+        margin: 0 auto;
+        width: 85%;
+        max-width: 350px;
+    }
+
+    .mockPostCard1 {
+        transform: rotate(-3deg);
+        z-index: 1;
+    }
+
+    .mockPostCard2 {
+        transform: rotate(2deg);
+        z-index: 2;
+    }
+}
+
+/* Header Refactor & Mobile Fix */
+.headerBrand {
+  display: flex;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 1.2rem;
+  align-items: center;
+}
+
+.headerActions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 16px 20px; /* Reduced from 24px 40px */
+  }
+  
+  .headerActions {
+    gap: 8px; /* Reduced from 16px */
+  }
 }

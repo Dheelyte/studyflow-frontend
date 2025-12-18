@@ -3,12 +3,14 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import styles from './Sidebar.module.css';
-import { HomeIcon, LibraryIcon, PlusIcon, ZapIcon, ChevronLeft, ChevronRight, XIcon, LaptopIcon, UsersIcon, ChevronDown, ChevronUp } from './Icons';
+import { HomeIcon, LibraryIcon, PlusIcon, ZapIcon, ChevronLeft, ChevronRight, XIcon, LaptopIcon, UsersIcon, UserIcon, ChevronDown, ChevronUp, SunIcon, MoonIcon } from './Icons';
 import { useTheme } from './ThemeProvider';
+import { useAuth } from '@/context/AuthContext';
 
 export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse, isMobile }) {
-  const { theme, setTheme } = useTheme();
   const router = useRouter();
+  const { user, logout } = useAuth();
+  const { theme, setTheme } = useTheme();
   
   // Accordion States (Expanded by default)
   const [isLibraryOpen, setIsLibraryOpen] = useState(true);
@@ -35,16 +37,17 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
       else setTheme('system');
   };
 
-  const getThemeLabel = () => {
-      if (theme === 'system') return ' System';
-      if (theme === 'light') return ' Light Mode';
-      return ' Dark Mode';
-  };
-
   const getThemeIcon = () => {
-      if (theme === 'system') return <LaptopIcon size={18} />;
-      if (theme === 'light') return '☀️'; 
-      return '🌙'; 
+      if (theme === 'system') return <LaptopIcon size={14} />;
+      if (theme === 'light') return <SunIcon size={14} />; 
+      return <MoonIcon size={14} />; 
+  };
+  
+  // Close sidebar on mobile when a link is clicked
+  const handleNavClick = () => {
+      if (isMobile && onClose) {
+          onClose();
+      }
   };
 
   const sidebarClasses = `${styles.sidebar} ${isCollapsed ? styles.collapsed : ''} ${isOpen ? styles.open : ''}`;
@@ -55,7 +58,7 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
         {isMobile && isOpen && (
             <div 
                 style={{
-                    position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 45, backdropFilter: 'blur(4px)'
+                    position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 990, backdropFilter: 'blur(4px)'
                 }}
                 onClick={onClose}
             />
@@ -69,38 +72,70 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
           )}
 
           {!isMobile && (
-              <button className={styles.toggleCollapseBtn} onClick={onToggleCollapse}>
-                  {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
-              </button>
+              <>
+                {/* Collapse Button (Original Position - Floating on Edge) */}
+                <button className={styles.toggleCollapseBtn} onClick={onToggleCollapse} title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}>
+                    {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+                </button>
+
+                {/* Theme Toggle Button (Next to Collapse Button) */}
+                <button 
+                  className={styles.toggleCollapseBtn}
+                  onClick={handleToggleTheme}
+                  title="Cycle Theme"
+                  style={{
+                      top: '56px', /* Positioned below the collapse button (20px + 24px + gap) */
+                  }}
+                >
+                   {getThemeIcon()}
+                </button>
+              </>
           )}
 
           <nav className={styles.navContainer}>
-            <div className={styles.logo}>
+            <Link href="/" className={styles.logo} style={{textDecoration: 'none'}}>
               <ZapIcon size={28} fill="var(--primary)" /> <span>StudyFlow</span>
-            </div>
+            </Link>
              
-            <Link href="/dashboard" className={styles.navItem}>
+            <Link href="/dashboard" className={styles.navItem} onClick={handleNavClick}>
               <HomeIcon />
               <span>Home</span>
             </Link>
 
+            {/* Profile Link */}
+            <Link href="/profile" className={styles.navItem} onClick={handleNavClick}>
+                <UserIcon />
+                <span>Profile</span>
+             </Link>
+
             {/* Library Accordion */}
             {isCollapsed ? (
-                 <Link href="/library" className={styles.navItem} title="Library">
+                 <Link href="/library" className={styles.navItem} title="Library" onClick={handleNavClick}>
                      <LibraryIcon />
                  </Link>
             ) : (
                 <>
                     <div 
                         className={`${styles.navItem} ${isLibraryOpen ? styles.active : ''}`} 
-                        onClick={() => setIsLibraryOpen(!isLibraryOpen)}
-                        style={{cursor: 'pointer', justifyContent: 'space-between'}}
+                        style={{cursor: 'pointer', justifyContent: 'space-between', paddingRight:'8px', marginTop: '0'}}
                     >
-                        <div style={{display:'flex', gap:'16px', alignItems:'center'}}>
+                        {/* Parent Click Link */}
+                        <Link href="/library" style={{display:'flex', gap:'16px', alignItems:'center', textDecoration:'none', color:'inherit', flex:1}} onClick={handleNavClick}>
                             <LibraryIcon />
                             <span>Library</span>
+                        </Link>
+                        
+                        {/* Toggle Icon Button */}
+                        <div 
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                setIsLibraryOpen(!isLibraryOpen);
+                            }}
+                            style={{padding:'4px', display:'flex', alignItems:'center'}}
+                        >
+                            {isLibraryOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                         </div>
-                        {isLibraryOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                     </div>
                     {isLibraryOpen && (
                         <div style={{
@@ -113,7 +148,7 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
                             marginLeft: '0'
                         }}>
                              {yourFlows.slice(0, 2).map(flow => (
-                                <Link href={`/playlist/${flow.id}`} key={flow.id} className={styles.playlistItem} style={{padding: '8px 12px'}}>
+                                <Link href={`/playlist/${flow.id}`} key={flow.id} className={styles.playlistItem} style={{padding: '8px 12px'}} onClick={handleNavClick}>
                                     <div className={styles.playlistImage} style={{ background: flow.color, width:'28px', height:'28px', borderRadius:'6px' }}></div>
                                     <div className={styles.playlistInfo}>
                                         <div className={styles.playlistName} style={{fontSize:'0.85rem'}}>{flow.title}</div>
@@ -121,7 +156,7 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
                                     </div>
                                 </Link>
                             ))}
-                            <Link href="/library" className={styles.seeAllBtn} style={{padding:'8px 12px', color:'var(--primary)', fontWeight:'600', fontSize:'0.85rem'}}>
+                            <Link href="/library" className={styles.seeAllBtn} style={{padding:'8px 12px', color:'var(--primary)', fontWeight:'600', fontSize:'0.85rem'}} onClick={handleNavClick}>
                                 See All
                             </Link>
                         </div>
@@ -131,24 +166,35 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
 
             {/* Community Accordion */}
              {isCollapsed ? (
-                 <Link href="/community" className={styles.navItem} title="Community">
+                 <Link href="/community" className={styles.navItem} title="Community" onClick={handleNavClick}>
                      <UsersIcon />
                  </Link>
             ) : (
                 <>
                     <div 
                         className={`${styles.navItem} ${isCommunityOpen ? styles.active : ''}`} 
-                        onClick={() => setIsCommunityOpen(!isCommunityOpen)}
-                        style={{cursor: 'pointer', justifyContent: 'space-between'}}
+                        style={{cursor: 'pointer', justifyContent: 'space-between', paddingRight:'8px'}}
                     >
-                        <div style={{display:'flex', gap:'16px', alignItems:'center'}}>
+                        {/* Parent Click Link */}
+                        <Link href="/community" style={{display:'flex', gap:'16px', alignItems:'center', textDecoration:'none', color:'inherit', flex:1}} onClick={handleNavClick}>
                             <UsersIcon />
                             <span>Community</span>
+                        </Link>
+
+                        {/* Toggle Icon Button */}
+                        <div 
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                setIsCommunityOpen(!isCommunityOpen);
+                            }}
+                             style={{padding:'4px', display:'flex', alignItems:'center'}}
+                        >
+                            {isCommunityOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                         </div>
-                        {isCommunityOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                     </div>
                     {isCommunityOpen && (
-                         <div style={{
+                        <div style={{
                             paddingLeft:'0', 
                             marginTop:'0', 
                             marginBottom:'16px', 
@@ -158,7 +204,7 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
                             marginLeft: '0'
                         }}>
                             {yourCommunities.slice(0, 2).map((comm) => (
-                                <Link href={`/community/${comm.id}`} key={comm.id} className={styles.playlistItem} style={{padding: '8px 12px'}}>
+                                <Link href={`/community/${comm.id}`} key={comm.id} className={styles.playlistItem} style={{padding: '8px 12px'}} onClick={handleNavClick}>
                                     <div className={styles.playlistImage} style={{ 
                                         background: 'transparent', 
                                         border: `1px solid ${comm.color}`,
@@ -175,7 +221,7 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
                                     </div>
                                 </Link>
                             ))}
-                            <Link href="/community" className={styles.seeAllBtn} style={{padding:'8px 12px', color:'var(--primary)', fontWeight:'600', fontSize:'0.85rem'}}>
+                            <Link href="/community" className={styles.seeAllBtn} style={{padding:'8px 12px', color:'var(--primary)', fontWeight:'600', fontSize:'0.85rem'}} onClick={handleNavClick}>
                                 See All
                             </Link>
                         </div>
@@ -186,14 +232,17 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
           </nav>
 
           <div className={styles.footer}>
-            <div className={styles.authButtons}>
-                <Link href="/login" className={styles.loginBtn}>Log In</Link>
-                <Link href="/signup" className={styles.signupBtn}>Sign Up</Link>
-            </div>
-            <button className={styles.themeToggle} onClick={handleToggleTheme} title="Click to cycle themes">
-                {getThemeIcon()}
-                <span>{getThemeLabel()}</span>
-            </button>
+             
+            {!user ? (
+                <div className={styles.authButtons}>
+                    <Link href="/login" className={styles.loginBtn} onClick={handleNavClick}>Log In</Link>
+                    <Link href="/signup" className={styles.signupBtn} onClick={handleNavClick}>Sign Up</Link>
+                </div>
+            ) : (
+               <div className={styles.authButtons}>
+                    <button onClick={() => { logout(); handleNavClick(); }} className={styles.loginBtn} style={{width:'100%', cursor:'pointer'}}>Log Out</button>
+               </div>
+            )}
           </div>
         </aside>
     </>

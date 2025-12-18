@@ -45,10 +45,10 @@ export default function LandingPage() {
       )}
 
       <header className={styles.header}>
-         <div style={{display:'flex', gap:'8px', fontWeight:'800', fontSize:'1.2rem', alignItems:'center'}}>
+         <div className={styles.headerBrand}>
             <ZapIcon size={24} fill="var(--primary)" /> StudyFlow
          </div>
-         <div style={{display:'flex', gap:'16px', alignItems:'center'}}>
+         <div className={styles.headerActions}>
              <ThemeToggle />
              <Link href="/login" style={{color:'var(--foreground)', fontWeight:'600', textDecoration:'none'}}>Log In</Link>
              <Link href="/signup" className={styles.ctaSmall}>Sign Up</Link>
@@ -193,7 +193,7 @@ export default function LandingPage() {
             </FadeIn>
         </div>
         <div className={styles.communityVisual}>
-            <FadeIn direction="left" delay={0.2} className={styles.mockPostCard} style={{position:'absolute', top: 20, left: 20, zIndex: 1, transform: 'rotate(-2deg)', maxWidth:'320px'}}>
+            <FadeIn direction="left" delay={0.2} className={`${styles.mockPostCard} ${styles.mockPostCard1}`}>
                  <div style={{display:'flex', gap:'12px', marginBottom:'12px'}}>
                      <div style={{width:'32px', height:'32px', borderRadius:'50%', background:'linear-gradient(135deg, #6366f1, #a855f7)'}}></div>
                      <div>
@@ -209,7 +209,7 @@ export default function LandingPage() {
                       <span>💬 5</span>
                  </div>
             </FadeIn>
-            <FadeIn direction="left" delay={0.4} className={styles.mockPostCard} style={{position:'absolute', top: 140, left: 140, zIndex: 2, transform: 'rotate(2deg)', maxWidth:'320px', boxShadow: '0 10px 30px -5px rgba(0,0,0,0.2)'}}>
+            <FadeIn direction="left" delay={0.4} className={`${styles.mockPostCard} ${styles.mockPostCard2}`}>
                  <div style={{display:'flex', gap:'12px', marginBottom:'12px'}}>
                      <div style={{width:'32px', height:'32px', borderRadius:'50%', background:'linear-gradient(135deg, #f59e0b, #ef4444)'}}></div>
                      <div>
@@ -378,25 +378,27 @@ function FAQSection() {
 
     return (
         <section className={styles.faqSection}>
-            <FadeIn>
-                <h2 className={styles.sectionHeading} style={{marginBottom:'40px', textAlign:'center'}}>Frequently Asked Questions</h2>
-            </FadeIn>
-            <div style={{width:'100%'}}>
-                {questions.map((item, i) => (
-                    <FadeIn key={i} delay={0.1 * i} direction="up" className={styles.faqItem} style={{width:'100%'}}>
-                        <button className={styles.faqQuestion} onClick={() => setOpenIndex(openIndex === i ? null : i)}>
-                            {item.q}
-                            <div style={{transform: openIndex === i ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.2s'}}>
-                                <ChevronRight size={20} />
-                            </div>
-                        </button>
-                        {openIndex === i && (
-                            <div className={styles.faqAnswer}>
-                                {item.a}
-                            </div>
-                        )}
-                    </FadeIn>
-                ))}
+            <div className={styles.faqContainer}>
+                <FadeIn>
+                    <h2 className={styles.sectionHeading} style={{marginBottom:'40px', textAlign:'center'}}>Frequently Asked Questions</h2>
+                </FadeIn>
+                <div style={{width:'100%'}}>
+                    {questions.map((item, i) => (
+                        <FadeIn key={i} delay={0.1 * i} direction="up" className={styles.faqItem} style={{width:'100%'}}>
+                            <button className={styles.faqQuestion} onClick={() => setOpenIndex(openIndex === i ? null : i)}>
+                                {item.q}
+                                <div style={{transform: openIndex === i ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.2s'}}>
+                                    <ChevronRight size={20} />
+                                </div>
+                            </button>
+                            {openIndex === i && (
+                                <div className={styles.faqAnswer}>
+                                    {item.a}
+                                </div>
+                            )}
+                        </FadeIn>
+                    ))}
+                </div>
             </div>
         </section>
     );

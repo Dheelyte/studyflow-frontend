@@ -4,7 +4,7 @@ import { createContext, useContext, useState } from 'react';
 const CommunityContext = createContext();
 
 export function CommunityProvider({ children }) {
-  // Mock Initial Data
+  // Mock Initial Data - Expanded for "Explore" list
   const [communities, setCommunities] = useState([
     { id: 'react', name: 'React Mastery', description: 'Everything React, Next.js and hooks.', memberCount: 1205, isJoined: true, tags: ['Frontend', 'JS'] },
     { id: 'python', name: 'Pythonistas', description: 'Data Science, ML, and Django.', memberCount: 890, isJoined: false, tags: ['Backend', 'AI'] },
@@ -19,7 +19,15 @@ export function CommunityProvider({ children }) {
     { id: 'gamedev', name: 'Game Dev', description: 'Unity, Unreal, and Godot.', memberCount: 3400, isJoined: true, tags: ['Gaming', 'C#'] },
     { id: 'cyber', name: 'Cybersecurity', description: 'Pentesting, InfoSec, and Cryptography.', memberCount: 2300, isJoined: true, tags: ['Security', 'Hacking'] },
     { id: 'mobile', name: 'Mobile Dev', description: 'Swift, Kotlin, and React Native.', memberCount: 8900, isJoined: true, tags: ['Mobile', 'App'] },
-    { id: 'career', name: 'Career Growth', description: 'Resume reviews and interview prep.', memberCount: 15000, isJoined: true, tags: ['Jobs', 'Advice'] }
+    { id: 'career', name: 'Career Growth', description: 'Resume reviews and interview prep.', memberCount: 15000, isJoined: true, tags: ['Jobs', 'Advice'] },
+    // New additions for Explore list
+    { id: 'dotnet', name: '.NET Developers', description: 'C#, ASP.NET Core, and Azure.', memberCount: 4100, isJoined: false, tags: ['Backend', 'MS'] },
+    { id: 'flutter', name: 'Flutter Devs', description: 'Build beautiful native apps.', memberCount: 6700, isJoined: false, tags: ['Mobile'] },
+    { id: 'agile', name: 'Agile & Scrum', description: 'Project management methodologies.', memberCount: 2100, isJoined: false, tags: ['Management'] },
+    { id: 'devops', name: 'DevOps Culture', description: 'CI/CD pipelines and automation.', memberCount: 5500, isJoined: false, tags: ['Ops'] },
+    { id: 'vue', name: 'Vue.js Vixens', description: 'The progressive framework community.', memberCount: 3800, isJoined: false, tags: ['Frontend'] },
+    { id: 'go', name: 'Golang Gophers', description: 'Simple, reliable, and efficient software.', memberCount: 4900, isJoined: false, tags: ['Backend'] },
+    { id: 'sql', name: 'SQL Masters', description: 'Database design and optimization.', memberCount: 7200, isJoined: false, tags: ['Data'] }
   ]);
 
   const [posts, setPosts] = useState([

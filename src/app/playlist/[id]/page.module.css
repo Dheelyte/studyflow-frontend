@@ -98,7 +98,8 @@
 .controls {
   display: flex;
   justify-content: center;
-  gap: 24px;
+  align-items: center;
+  gap: 16px; 
   margin-bottom: 24px;
   z-index: 1;
   position: relative;
@@ -124,6 +125,27 @@
   background-color: var(--primary-hover);
   transform: translateY(-2px);
   box-shadow: 0 20px 30px -10px rgba(79, 70, 229, 0.6);
+}
+
+.iconButton {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--secondary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.iconButton:hover {
+    color: var(--foreground);
+    background: var(--hover);
+    transform: translateY(-2px);
+    border-color: var(--primary);
 }
 
 .progressContainer {
@@ -269,5 +291,9 @@
     .listHeader > :nth-child(3), .listHeader > :nth-child(4),
     .resource > :nth-child(3), .resource > :nth-child(4) {
         display: none; /* Hide type and duration on mobile for simplicity */
+    }
+    
+    .controls {
+        flex-wrap: wrap; 
     }
 }

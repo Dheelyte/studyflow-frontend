@@ -50,18 +50,21 @@ export default function IntegratedSearchBar({ redirect = false, onSearch }) {
 
     return (
         <div className={styles.integratedSearchBar}>
-            <div className={styles.searchIconWrapper}>
-                <SearchIcon size={24} />
+            {/* Group Input and Icon together for mobile alignment */}
+            <div className={styles.inputGroup}>
+                <div className={styles.searchIconWrapper}>
+                    <SearchIcon size={24} />
+                </div>
+                
+                <input 
+                    type="text" 
+                    className={styles.searchInput} 
+                    placeholder="What do you want to learn today?" 
+                    value={themeQuery}
+                    onChange={(e) => setQuery(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleStart()}
+                />
             </div>
-            
-            <input 
-                type="text" 
-                className={styles.searchInput} 
-                placeholder="What do you want to learn today?" 
-                value={themeQuery}
-                onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleStart()}
-            />
 
             <div className={styles.divider}></div>
 

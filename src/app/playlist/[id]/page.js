@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import styles from './page.module.css';
-import { PlayIcon, ClockIcon, ChevronDown, ChevronUp, ZapIcon } from '@/components/Icons';
+import { PlayIcon, ClockIcon, ChevronDown, ChevronUp, ZapIcon, HeartIcon, ShareIcon, MenuIcon } from '@/components/Icons';
 
 export default function PlaylistPage({ params }) {
     const searchParams = useSearchParams();
@@ -39,13 +39,23 @@ export default function PlaylistPage({ params }) {
     ];
 
     const [expandedModules, setExpandedModules] = useState({ 1: true, 2: true, 3: true });
+    // isStarted state: initially false (hides progress bar, shows "Start Learning")
+    const [isStarted, setIsStarted] = useState(false);
+    
+    // Mock state for liking
+    const [isLiked, setIsLiked] = useState(false);
 
     const toggleModule = (id) => {
         setExpandedModules(prev => ({ ...prev, [id]: !prev[id] }));
     };
 
     const handlePlay = () => {
-        alert("Starting your learning journey! (This would open the first resource)");
+        if (!isStarted) {
+            setIsStarted(true);
+            // In a real app, maybe trigger an API call to mark as started
+        } else {
+            alert("Resuming your learning journey!");
+        }
     };
 
     // Calculate Completion (Mock logic)
@@ -85,19 +95,39 @@ export default function PlaylistPage({ params }) {
             <div className={styles.controls}>
                 <button className={styles.playButton} onClick={handlePlay}>
                     <PlayIcon size={24} fill="white" />
-                    Continue Learning
+                    {isStarted ? "Continue Learning" : "Start Learning"}
+                </button>
+                
+                <button 
+                  className={styles.iconButton} 
+                  onClick={() => setIsLiked(!isLiked)}
+                  title={isLiked ? "Remove from Library" : "Save to Library"}
+                  style={{ color: isLiked ? 'var(--primary)' : 'inherit' }}
+                >
+                    <HeartIcon fill={isLiked ? "currentColor" : "none"} />
+                </button>
+                
+                <button className={styles.iconButton} title="Share Playlist">
+                    <ShareIcon />
+                </button>
+                
+                <button className={styles.iconButton} title="More Options">
+                    <MenuIcon />
                 </button>
             </div>
             
-            <div className={styles.progressContainer}>
-                <div className={styles.progressLabel}>
-                    <span>Playlist Progress</span>
-                    <span>{completionPercentage}% completed</span>
+            {/* Progress Bar only shown if started */}
+            {isStarted && (
+                <div className={styles.progressContainer}>
+                    <div className={styles.progressLabel}>
+                        <span>Playlist Progress</span>
+                        <span>{completionPercentage}% completed</span>
+                    </div>
+                    <div className={styles.progressBarBg}>
+                        <div className={styles.progressBarFill} style={{ width: `${completionPercentage}%` }}></div>
+                    </div>
                 </div>
-                <div className={styles.progressBarBg}>
-                    <div className={styles.progressBarFill} style={{ width: `${completionPercentage}%` }}></div>
-                </div>
-            </div>
+            )}
 
             <div className={styles.content}>
                 <div className={styles.listHeader}>
