@@ -6,86 +6,100 @@ import { useRouter } from 'next/navigation';
 
 const AuthContext = createContext();
 
+const IS_LOGGED_IN_KEY = 'studyspotify_is_logged_in';
+
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const router = useRouter();
 
-  useEffect(() => {
-    checkUser();
-  }, []);
+    useEffect(() => {
+        checkUser();
+    }, []);
 
-  const checkUser = async () => {
-    try {
-      const { data } = await auth.getMe();
-      setUser(data);
-    } catch (error) {
-      // Not logged in or session expired
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const checkUser = async () => {
+        // Optimization: Don't check server if we know we aren't logged in
+        const isLoggedIn = localStorage.getItem(IS_LOGGED_IN_KEY);
 
-  const login = async (credentials) => {
-    await auth.login(credentials);
-    return checkUser();
-  };
+        // Explicitly check for the string 'true'
+        if (isLoggedIn !== 'true') {
+            setUser(null);
+            setLoading(false);
+            return;
+        }
 
-  const register = async (userData) => {
-    return auth.register(userData);
-  };
+        try {
+            const { data } = await auth.getMe();
+            setUser(data);
+            // Ensure key is set if successful
+            localStorage.setItem(IS_LOGGED_IN_KEY, 'true');
+        } catch (error) {
+            // Not logged in or session expired
+            console.warn("Session expired or invalid:", error);
+            setUser(null);
+            localStorage.removeItem(IS_LOGGED_IN_KEY);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  const logout = async () => {
-    try {
-      await auth.logout();
-    } catch(e) {
-      console.error('Logout failed', e);
-    }
-    setUser(null);
-    router.push('/login');
-  };
+    const login = async (credentials) => {
+        await auth.login(credentials);
+        localStorage.setItem(IS_LOGGED_IN_KEY, 'true');
+        return checkUser();
+    };
 
-  const requestPasswordReset = (email) => auth.requestPasswordReset(email);
-  const verifyResetCode = (data) => auth.verifyResetCode(data);
-  const resetPassword = (data) => auth.resetPassword(data);
-  const changePassword = (data) => auth.changePassword(data);
+    const register = async (userData) => {
+        // Register typically doesn't auto-login in this flow, usually redirects to login
+        return auth.register(userData);
+    };
 
-  const updateUser = async (data) => {
-      const response = await auth.updateProfile(data);
-      // Backend returns updated user object in response.data or directly depending on implementation, 
-      // but assuming it returns the updated user or we should re-fetch.
-      // Ideally, the PUT response contains the updated user resource.
-      // If handleResponse returns { data: user } or just user.
-      // Based on api.js handleResponse, it returns the parsed JSON. 
-      // Let's assume response.data is the user.
-      const updatedUser = response.data || response; 
-      setUser(prev => ({ ...prev, ...updatedUser }));
-      return updatedUser; 
-  };
+    const logout = async () => {
+        try {
+            await auth.logout();
+        } catch (e) {
+            console.error('Logout failed', e);
+        }
+        setUser(null);
+        localStorage.removeItem(IS_LOGGED_IN_KEY);
+        router.push('/login');
+    };
 
-  const value = {
-    user,
-    loading,
-    login,
-    register,
-    logout,
-    requestPasswordReset,
-    verifyResetCode,
-    resetPassword,
-    changePassword,
-    updateUser,
-    checkUser,
-    isAuthenticated: !!user,
-  };
+    const requestPasswordReset = (email) => auth.requestPasswordReset(email);
+    const verifyResetCode = (data) => auth.verifyResetCode(data);
+    const resetPassword = (data) => auth.resetPassword(data);
+    const changePassword = (data) => auth.changePassword(data);
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+    const updateUser = async (data) => {
+        const response = await auth.updateProfile(data);
+        // Backend returns updated user object
+        const updatedUser = response.data || response;
+        setUser(prev => ({ ...prev, ...updatedUser }));
+        return updatedUser;
+    };
+
+    const value = {
+        user,
+        loading,
+        login,
+        register,
+        logout,
+        requestPasswordReset,
+        verifyResetCode,
+        resetPassword,
+        changePassword,
+        updateUser,
+        checkUser,
+        isAuthenticated: !!user,
+    };
+
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return context;
 };

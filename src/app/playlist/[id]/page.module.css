@@ -183,6 +183,7 @@
 .content {
     max-width: 1000px;
     margin: 0 auto;
+    padding: 0 24px; /* Added padding to prevent edge touching */
     /* Removed unified background to allow separation */
 }
 
