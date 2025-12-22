@@ -1,12 +1,11 @@
 "use client";
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useCommunity } from '@/components/CommunityContext';
 import PostCard from '@/components/PostCard';
 import CreatePost from '@/components/CreatePost';
 import { ChevronLeft } from '@/components/Icons';
 import Link from 'next/link';
 import styles from '../page.module.css'; 
-// CommunityStories removed per user request
 
 export default function CommunityDetail({ params }) {
     const { slug } = React.use(params);
@@ -14,8 +13,16 @@ export default function CommunityDetail({ params }) {
 }
 
 function CommunityDetailContent({ slug }) {
-  const { getCommunity, posts, createPost, joinCommunity, leaveCommunity } = useCommunity();
+  const { getCommunity, posts, createPost, joinCommunity, leaveCommunity, fetchCommunityPosts, fetchCommunityDetails } = useCommunity();
   const community = getCommunity(slug);
+  
+  // Fetch posts AND details (for member count) when entering the community
+  useEffect(() => {
+      if (slug) {
+         fetchCommunityPosts(slug);
+         fetchCommunityDetails(slug);
+      }
+  }, [slug, fetchCommunityPosts, fetchCommunityDetails]);
   
   if (!community) {
       return (
@@ -24,13 +31,18 @@ function CommunityDetailContent({ slug }) {
                  <Link href="/community" className={styles.backBtn}>
                     <ChevronLeft size={16} /> Back to Hub
                 </Link>
-                <div style={{padding: 40, textAlign:'center'}}>Community not found</div>
+                <div style={{padding: 40, textAlign:'center'}}>
+                    Loading community data... (ID: {slug})
+                    <br/><br/>
+                    <Link href="/community" style={{color:'var(--primary)'}}>Go back</Link>
+                </div>
             </div>
         </div>
       );
   }
 
-  const communityPosts = posts.filter(p => p.communityId === slug);
+  // Filter posts for this community
+  const communityPosts = (posts || []).filter(p => p.community_id == slug || p.communityId == slug);
 
   return (
     <div className={styles.page}>
@@ -57,7 +69,7 @@ function CommunityDetailContent({ slug }) {
                          color: 'white',
                          flexShrink: 0
                      }}>
-                         {community.name.substring(0,2).toUpperCase()}
+                         {community.name ? community.name.substring(0,2).toUpperCase() : '??'}
                      </div>
 
                      <div style={{flex:1}}>
@@ -70,7 +82,7 @@ function CommunityDetailContent({ slug }) {
                                 <button 
                                     className={styles.createBtn} 
                                     style={{width:'auto', padding:'8px 24px'}}
-                                    onClick={() => leaveCommunity(slug)}
+                                    onClick={() => leaveCommunity(community.id)}
                                 >
                                     Joined
                                 </button>
@@ -78,14 +90,21 @@ function CommunityDetailContent({ slug }) {
                                 <button 
                                     className={styles.createBtn} 
                                     style={{width:'auto', background:'var(--primary)', color:'white', border:'none', padding:'8px 24px'}} 
-                                    onClick={() => joinCommunity(slug)}
+                                    onClick={() => joinCommunity(community.id)}
                                 >
                                     Join
                                 </button>
                             )}
                          </div>
                          <div style={{marginTop: '16px', display:'flex', gap:'8px'}}>
-                             {community.tags.map(t => (
+                             {/* Display Member Count Here */}
+                             <span style={{fontSize:'0.9rem', fontWeight:'600', color:'var(--foreground)'}}>
+                                {community.memberCount !== undefined ? community.memberCount : '...'} <span style={{fontWeight:'400', color:'var(--secondary)'}}>Members</span>
+                             </span>
+                             
+                             <span style={{color:'var(--border)'}}>|</span>
+                             
+                             {community.tags && community.tags.map(t => (
                                  <span key={t} style={{fontSize:'0.8rem', background:'rgba(255,255,255,0.05)', padding:'4px 8px', borderRadius:'6px'}}>#{t}</span>
                              ))}
                          </div>
@@ -93,7 +112,7 @@ function CommunityDetailContent({ slug }) {
                  </div>
             </div>
 
-            <CreatePost onPost={(content) => createPost(content, slug)} />
+            <CreatePost onPost={(data) => createPost(data, community.id)} />
 
             <div className={styles.feed}>
                 {communityPosts.length === 0 ? (
@@ -112,7 +131,8 @@ function CommunityDetailContent({ slug }) {
                 <h3 className={styles.cardTitle}>About Community</h3>
                 <p style={{color:'var(--secondary)', lineHeight:'1.5'}}>{community.description}</p>
                 <div style={{marginTop:'16px', display:'flex', gap:'8px', alignItems:'center', color:'var(--secondary)'}}>
-                    <span style={{fontWeight:'700', color:'var(--foreground)'}}>{community.memberCount}</span> Members
+                     {/* Redundant Member count but sidebar usually has it too */}
+                    <span style={{fontWeight:'700', color:'var(--foreground)'}}>{community.memberCount || 0}</span> Members
                 </div>
              </div>
          </div>

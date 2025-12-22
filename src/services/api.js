@@ -1,98 +1,120 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
 
-/**
- * Handle API responses and throw errors for non-200 status codes.
- * @param {Response} response
- */
-async function handleResponse(response) {
-    if (response.status === 204) return null;
-
-    const text = await response.text();
-    const data = text ? JSON.parse(text) : {};
-
-    if (!response.ok) {
-        const error = new Error(data.detail || data.message || 'API Error');
-        error.status = response.status;
-        error.data = data;
-        throw error;
-    }
-
-    return data;
-}
-
-/**
- * Generic fetch wrapper with default headers and credentials (cookies).
- */
 async function apiFetch(endpoint, options = {}) {
-    const url = `${API_URL}${endpoint}`;
-
+    const { headers, ...rest } = options;
     const config = {
-        ...options,
         headers: {
             'Content-Type': 'application/json',
-            ...options.headers,
+            ...headers,
         },
-        // Important for sending/receiving HTTP-only cookies
-        credentials: 'include',
+        ...rest,
     };
 
-    const response = await fetch(url, config);
-    return handleResponse(response);
+    // Auto-include credentials (cookies)
+    config.credentials = 'include';
+
+    const response = await fetch(`${API_URL}${endpoint}`, config);
+    if (!response.ok) {
+        // Handle common errors like 401
+        if (response.status === 401) {
+             console.warn("Unauthorized access");
+             // window.location.href = '/login'; // Optional: redirect
+        }
+        throw new Error(`API Error: ${response.statusText}`);
+    }
+    
+    // safe parsing
+    try {
+        return await response.json();
+    } catch {
+        return null; // For 204 No Content
+    }
 }
 
-// Authentication
 export const auth = {
-    register: (userData) => apiFetch('/auth/register', {
+    login: (email, password) => apiFetch('/auth/login', {
         method: 'POST',
-        body: JSON.stringify(userData),
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ username: email, password }),
     }),
-
-    login: (credentials) => apiFetch('/auth/login', {
-        method: 'POST',
-        body: JSON.stringify(credentials),
-    }),
-
-    logout: () => apiFetch('/auth/logout', {
-        method: 'POST',
-        body: JSON.stringify({}),
-    }),
-
-    getMe: () => apiFetch('/users/me'),
-
-    requestPasswordReset: (email) => apiFetch('/auth/request-password-reset', {
-        method: 'POST',
-        body: JSON.stringify({ email }),
-    }),
-
-    verifyResetCode: (data) => apiFetch('/auth/verify-reset-code', {
+    register: (data) => apiFetch('/auth/register', {
         method: 'POST',
         body: JSON.stringify(data),
     }),
+    logout: () => apiFetch('/auth/logout', { method: 'POST' }),
+    me: () => apiFetch('/users/me'),
+};
 
-    resetPassword: (data) => apiFetch('/auth/reset-password', {
+export const communities = {
+    list: (params) => {
+        const searchParams = new URLSearchParams(params);
+        return apiFetch(`/communities/?${searchParams.toString()}`);
+    },
+    getMyCommunities: () => apiFetch('/communities/my-communities'),
+    getExplore: () => apiFetch('/communities/explore'),
+    get: (id) => apiFetch(`/communities/${id}`),
+    create: (data) => apiFetch('/communities/', {
         method: 'POST',
         body: JSON.stringify(data),
     }),
-
-    changePassword: (data) => apiFetch('/users/change-password', {
-        method: 'POST',
-        body: JSON.stringify(data),
-    }),
-
-    updateProfile: (data) => apiFetch('/users/me', {
+    update: (id, data) => apiFetch(`/communities/${id}`, {
         method: 'PUT',
         body: JSON.stringify(data),
     }),
+    delete: (id) => apiFetch(`/communities/${id}`, {
+        method: 'DELETE',
+    }),
+    join: (id) => apiFetch(`/communities/${id}/join`, {
+        method: 'POST',
+    }),
+    leave: (id) => apiFetch(`/communities/${id}/leave`, {
+        method: 'POST',
+    }),
 };
 
-export const curriculum = {
-    generate: (params) => {
+export const posts = {
+    create: (data) => apiFetch('/posts/', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    }),
+    list: (communityId, params) => {
         const searchParams = new URLSearchParams(params);
-        return apiFetch(`/generate-curriculum?${searchParams.toString()}`);
-    }
+        return apiFetch(`/posts/${communityId}/posts?${searchParams.toString()}`);
+    },
+    getFeed: (params) => {
+        const searchParams = new URLSearchParams(params);
+        return apiFetch(`/posts/feed?${searchParams.toString()}`);
+    },
+    getExploreFeed: (params) => {
+        const searchParams = new URLSearchParams(params);
+        return apiFetch(`/posts/explore?${searchParams.toString()}`);
+    },
+    get: (id) => apiFetch(`/posts/${id}`),
+    update: (id, data) => apiFetch(`/posts/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+    }),
+    delete: (id) => apiFetch(`/posts/${id}`, {
+        method: 'DELETE',
+    }),
 };
 
-export default {
-    auth,
-    curriculum,
+export const comments = {
+    create: (data) => apiFetch('/comments/', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    }),
+    list: (postId, params) => {
+        const searchParams = new URLSearchParams(params);
+        return apiFetch(`/comments/post/${postId}?${searchParams.toString()}`);
+    },
+    update: (id, data) => apiFetch(`/comments/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+    }),
+    delete: (id) => apiFetch(`/comments/${id}`, {
+        method: 'DELETE',
+    }),
 };
+
+export default { auth, communities, posts, comments };

@@ -6,11 +6,17 @@ import styles from './CommunityStories.module.css';
 import { useCommunity } from './CommunityContext';
 
 export default function CommunityStories() {
-  const { communities } = useCommunity();
+  const { communities, user, loading } = useCommunity();
   const scrollRef = useRef(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   
-  const joinedCommunities = communities.filter(c => c.isJoined);
+  // If user is logged in, show joined communities.
+  // If user is guest, show explore/trending communities.
+  const displayCommunities = user 
+      ? communities.filter(c => c.isJoined)
+      : communities.filter(c => !c.isJoined); 
+      
+  const title = user ? "Your Communities" : "Explore Communities";
   
   const scroll = (direction) => {
     if (scrollRef.current) {
@@ -34,7 +40,6 @@ export default function CommunityStories() {
     const container = scrollRef.current;
     if (container) {
       container.addEventListener('scroll', handleScroll);
-      // Initial check
       handleScroll();
     }
 
@@ -46,21 +51,18 @@ export default function CommunityStories() {
   }, []);
 
   return (
-    // Increased marginBottom (spacing to posts)
-    // Removed gap from container to better control label spacing
-    // Added marginTop to separate from page title
-    <div style={{display:'flex', flexDirection:'column', gap:'12px', marginBottom: '24px', marginTop: '16px'}}>
+    <div style={{display:'flex', flexDirection:'column', gap:'12px', marginBottom: '16px', marginTop: '8px'}}>
         <div style={{
             fontSize: '0.9rem', 
             color: 'var(--foreground)', 
             fontWeight: '700',
             marginLeft: '4px'
         }}>
-           Your Communities
+           {loading ? "Loading..." : title}
         </div>
 
         <div className={styles.container}>
-            {showLeftArrow && (
+            {showLeftArrow && !loading && (
                 <button 
                     className={`${styles.navBtn} ${styles.navBtnLeft}`} 
                     onClick={() => scroll('left')}
@@ -72,32 +74,55 @@ export default function CommunityStories() {
 
             <div className={styles.storiesRail} ref={scrollRef}>
             
-            {joinedCommunities.map(community => (
-                <Link href={`/community/${community.id}`} key={community.id} className={styles.storyItem}>
-                <div className={`${styles.ringContainer} ${styles.joined}`}>
-                    <div className={styles.avatar}>
-                        {community.name.substring(0, 2).toUpperCase()}
+            {loading ? (
+                 // Skeletons
+                 Array.from({ length: 8 }).map((_, i) => (
+                    <div key={i} className={styles.storyItem} style={{pointerEvents: 'none'}}>
+                        <div className={styles.ringContainer} style={{border:'2px solid var(--border)', background: 'var(--card)'}}>
+                             <div className={styles.avatar} style={{background: 'var(--border)', animation: 'pulse 1.5s infinite'}}></div>
+                        </div>
+                        <div style={{width: '60px', height:'10px', background:'var(--border)', borderRadius:'4px', marginTop:'8px', animation: 'pulse 1.5s infinite'}}></div>
                     </div>
-                </div>
-                <span className={styles.name}>{community.name}</span>
-                </Link>
-            ))}
+                 ))
+            ) : (
+                <>
+                    {displayCommunities.map(community => (
+                        <Link href={`/community/${community.id}`} key={community.id} className={styles.storyItem}>
+                        <div className={`${styles.ringContainer} ${user ? styles.joined : styles.discover}`}>
+                            <div className={styles.avatar}>
+                                {community.name.substring(0, 2).toUpperCase()}
+                            </div>
+                        </div>
+                        <span className={styles.name}>{community.name}</span>
+                        </Link>
+                    ))}
 
-            {joinedCommunities.length === 0 && (
-                <div style={{padding:'12px', color:'var(--foreground-muted)', fontSize:'0.9rem'}}>
-                    Join a community to see it here!
-                </div>
+                    {displayCommunities.length === 0 && (
+                        <div style={{padding:'12px', color:'var(--foreground-muted)', fontSize:'0.9rem'}}>
+                            {user ? "Join a community to see it here!" : "No communities found."}
+                        </div>
+                    )}
+                </>
             )}
             </div>
 
-            <button 
-                className={`${styles.navBtn} ${styles.navBtnRight}`} 
-                onClick={() => scroll('right')}
-                aria-label="Scroll Right"
-            >
-                <ChevronRight size={20} />
-            </button>
+            {!loading && (
+                <button 
+                    className={`${styles.navBtn} ${styles.navBtnRight}`} 
+                    onClick={() => scroll('right')}
+                    aria-label="Scroll Right"
+                >
+                    <ChevronRight size={20} />
+                </button>
+            )}
         </div>
+        <style jsx global>{`
+            @keyframes pulse {
+                0% { opacity: 0.6; }
+                50% { opacity: 0.3; }
+                100% { opacity: 0.6; }
+            }
+        `}</style>
     </div>
   );
 }
