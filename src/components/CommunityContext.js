@@ -28,10 +28,15 @@ export function CommunityProvider({ children }) {
   const [isFetchingPosts, setIsFetchingPosts] = useState(false);
 
   // Memoized fetch logic
+  const postsFetchIdRef = useRef(0);
+
   const fetchPosts = useCallback(async (type, id = null, reset = false) => {
       const state = pageState.current;
       
+      // Prevent concurrent loads unless resetting (which force-restarts)
       if (!reset && (state.loading || !state.hasMore)) return;
+      
+      const currentId = ++postsFetchIdRef.current;
       
       state.loading = true;
       setIsFetchingPosts(true); 
@@ -41,7 +46,8 @@ export function CommunityProvider({ children }) {
           state.hasMore = true;
           state.type = type;
           state.id = id;
-          setPosts([]); 
+          // Optimistically clear posts? Maybe better to wait for data to prevent flash
+          // setPosts([]); 
       }
       
       try {
@@ -55,6 +61,9 @@ export function CommunityProvider({ children }) {
           } else if (type === 'community') {
               res = await postApi.list(id, { skip: state.skip, limit });
           }
+
+          // Race condition check: if a new request started, ignore this one
+          if (currentId !== postsFetchIdRef.current) return;
           
           // Helper to safely format user logic if missing
           const processed = (res || []).map(p => ({
@@ -70,14 +79,24 @@ export function CommunityProvider({ children }) {
           
           setPosts(prev => reset ? processed : [...prev, ...processed]);
           
-          state.skip += limit;
+          // Correctly set skip based on CURRENT fetch, not purely incremental
+          if (reset) {
+              state.skip = limit;
+          } else {
+              state.skip += limit;
+          }
+          
           state.hasMore = (res || []).length === limit;
           
       } catch (e) {
-          console.error("Fetch posts failed", e);
+          if (currentId === postsFetchIdRef.current) {
+               console.error("Fetch posts failed", e);
+          }
       } finally {
-          state.loading = false;
-          setIsFetchingPosts(false);
+          if (currentId === postsFetchIdRef.current) {
+              state.loading = false;
+              setIsFetchingPosts(false);
+          }
       }
   }, []);
 

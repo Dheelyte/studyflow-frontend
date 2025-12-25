@@ -7,8 +7,9 @@ import CreateCommunityModal from '@/components/CreateCommunityModal';
 import CommunityStories from '@/components/CommunityStories';
 import { useCommunity } from '@/components/CommunityContext';
 import { PlusIcon } from '@/components/Icons';
+import useIntersectionObserver from '@/hooks/useIntersectionObserver';
+import Spinner from '@/components/Spinner';
 
-// Post Skeleton Component
 const PostSkeleton = () => (
     <div style={{
         background: 'var(--card)',
@@ -42,7 +43,7 @@ export default function CommunityPage() {
       fetchExploreFeed,
       loadMorePosts,
       loadingPosts,
-      loading, // Global loading for communities
+      loading, 
       requireAuth
   } = useCommunity();
   
@@ -52,7 +53,6 @@ export default function CommunityPage() {
   const router = useRouter();
 
   useEffect(() => {
-      // PROACTIVELY wait for loading to complete to avoid false negatives on auth
       if (!loading && !initialized) {
            if (user) {
               setFeedTab('feed');
@@ -65,7 +65,6 @@ export default function CommunityPage() {
       }
   }, [user, loading, initialized, fetchUserFeed, fetchExploreFeed]);
 
-  // If user state changes later (e.g. login), switch tabs
   useEffect(() => {
      if (user && feedTab === 'explore' && !initialized) {
          setFeedTab('feed');
@@ -73,22 +72,15 @@ export default function CommunityPage() {
      }
   }, [user]);
 
-  useEffect(() => {
-    const handleScroll = () => {
-        const scrollTop = window.scrollY || document.documentElement.scrollTop;
-        const scrollHeight = document.documentElement.scrollHeight;
-        const clientHeight = document.documentElement.clientHeight;
-
-        if (scrollTop + clientHeight >= scrollHeight - 200) {
-            if (!loadingPosts) {
-                loadMorePosts();
-            }
-        }
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [loadMorePosts, loadingPosts]);
+  const loadMoreRef = useIntersectionObserver({
+      onIntersect: () => {
+          if (!loadingPosts && loadMorePosts) {
+              loadMorePosts();
+          }
+      },
+      enabled: !loadingPosts && posts.length > 0,
+      rootMargin: '200px'
+  });
 
   const handleCreateCommunity = (data) => {
       const newSlug = createCommunity(data);
@@ -150,7 +142,6 @@ export default function CommunityPage() {
          />
       )}
       
-      {/* Floating Action Button */}
       {user && (
           <button className={styles.fab} onClick={() => setShowCreateModal(true)} title="Create Community">
               <PlusIcon size={24} />
@@ -163,10 +154,8 @@ export default function CommunityPage() {
             <p className={styles.subtitle}>Discover new groups and share your progress.</p>
         </div>
 
-        {/* Improved Horizontal List (Visible to all) */}
         <CommunityStories />
 
-        {/* Tabs */}
         <div className={styles.tabs}>
             {user && (
                 <button 
@@ -184,7 +173,6 @@ export default function CommunityPage() {
             </button>
         </div>
 
-        {/* Feed Content */}
         <div className={styles.feed}>
              {(loadingPosts || !initialized) && posts.length === 0 ? (
                 Array.from({ length: 3 }).map((_, i) => <PostSkeleton key={i} />)
@@ -203,17 +191,27 @@ export default function CommunityPage() {
                     )}
                 </>
             )}
-             {/* Infinite Scroll Loader */}
-            {loadingPosts && posts.length > 0 && (
-                <div style={{textAlign:'center', padding:'20px', color:'var(--secondary)'}}>Loading more...</div>
-            )}
+             <div ref={loadMoreRef} style={{height:'20px', margin:'20px 0'}}>
+                {loadingPosts && posts.length > 0 && (
+                    <div style={{textAlign:'center', padding:'20px', color:'var(--secondary)', display:'flex', justifyContent:'center'}}>
+                        <Spinner />
+                    </div>
+                )}
+            </div>
         </div>
       </div>
 
-      {/* Right Sidebar (Desktop) */}
       <div className={styles.sidebar}>
          <ExploreSidebar />
       </div>
+
+      <style jsx global>{`
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 0.3; }
+            100% { opacity: 0.6; }
+        }
+      `}</style>
     </div>
   );
 }

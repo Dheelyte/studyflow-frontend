@@ -2,13 +2,17 @@
 import React, { useState, useEffect } from 'react';
 import { HeartIcon, MessageSquareIcon, ShareIcon } from './Icons';
 import SimpleRichTextEditor from './SimpleRichTextEditor';
-import { comments as commentApi } from '@/services/api';
+import { comments as commentApi, posts as postsApi } from '@/services/api';
 import { useCommunity } from '@/components/CommunityContext';
 
 const COMMENT_LIMIT = 5;
 
-export default function PostCard({ id, author, time, content, likes: initialLikes, comments: initialComments, liked: initialLiked, commentsCount: initialCount }) {
+export default function PostCard({ id, author, time, content, likes: initialLikesProp, likes_count, comments: initialComments, liked: initialLikedProp, liked_by_user, commentsCount: initialCount }) {
     const { requireAuth } = useCommunity(); // Use auth helper
+
+    // Fallback for backward compatibility or different API shapes
+    const initialLikes = likes_count !== undefined ? likes_count : initialLikesProp;
+    const initialLiked = liked_by_user !== undefined ? liked_by_user : initialLikedProp;
     
     const [likes, setLikes] = useState(initialLikes);
     const [liked, setLiked] = useState(initialLiked);
@@ -31,14 +35,17 @@ export default function PostCard({ id, author, time, content, likes: initialLike
     const [newComment, setNewComment] = useState('');
 
     const toggleLike = () => {
-        // Require Auth
-        requireAuth(() => {
+        requireAuth(async () => {
+            const originalLikes = likes;
+            const originalLiked = liked;
             if (liked) {
                 setLikes(likes - 1);
                 setLiked(false);
+                try { await postsApi.unlike(id); } catch(e) { console.error('Failed to unlike', e); setLikes(originalLikes); setLiked(originalLiked); }
             } else {
                 setLikes(likes + 1);
                 setLiked(true);
+                try { await postsApi.like(id); } catch(e) { console.error('Failed to like', e); setLikes(originalLikes); setLiked(originalLiked); }
             }
         });
     };

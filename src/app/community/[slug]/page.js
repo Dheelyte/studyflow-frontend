@@ -6,6 +6,8 @@ import CreatePost from '@/components/CreatePost';
 import { ChevronLeft } from '@/components/Icons';
 import Link from 'next/link';
 import styles from '../page.module.css'; 
+import useIntersectionObserver from '@/hooks/useIntersectionObserver';
+import Spinner from '@/components/Spinner';
 
 // Shared Post Skeleton
 const PostSkeleton = () => (
@@ -34,7 +36,7 @@ export default function CommunityDetail({ params }) {
 }
 
 function CommunityDetailContent({ slug }) {
-  const { user, getCommunity, posts, createPost, joinCommunity, leaveCommunity, fetchCommunityPosts, fetchCommunityDetails, loadingPosts } = useCommunity();
+  const { user, getCommunity, posts, createPost, joinCommunity, leaveCommunity, fetchCommunityPosts, fetchCommunityDetails, loadingPosts, hasMorePosts, loadMorePosts } = useCommunity();
   const community = getCommunity(slug);
   
   // Fetch posts AND details (for member count) when entering the community
@@ -45,6 +47,16 @@ function CommunityDetailContent({ slug }) {
       }
   }, [slug, fetchCommunityPosts, fetchCommunityDetails]);
   
+  const loadMoreRef = useIntersectionObserver({
+      onIntersect: () => {
+        if (!loadingPosts && hasMorePosts()) {
+            loadMorePosts();
+        }
+      },
+      enabled: !loadingPosts && hasMorePosts(),
+      rootMargin: '200px'
+  });
+
   if (!community) {
       return (
         <div className={styles.page}>
@@ -179,7 +191,12 @@ function CommunityDetailContent({ slug }) {
                                 No posts yet in this community. Be the first!
                             </div>
                         ) : (
-                            communityPosts.map(post => <PostCard key={post.id} {...post} />)
+                            <>
+                                {communityPosts.map(post => <PostCard key={post.id} {...post} />)}
+                                <div ref={loadMoreRef} style={{height:'20px', margin:'20px 0'}}>
+                                    {loadingPosts && <div style={{textAlign:'center', color:'var(--secondary)', display:'flex', justifyContent:'center'}}><Spinner /></div>}
+                                </div>
+                            </>
                         )}
                     </>
                 )}

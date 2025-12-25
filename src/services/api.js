@@ -97,6 +97,8 @@ export const posts = {
     delete: (id) => apiFetch(`/posts/${id}`, {
         method: 'DELETE',
     }),
+    like: (id) => apiFetch(`/posts/${id}/like`, { method: 'POST' }),
+    unlike: (id) => apiFetch(`/posts/${id}/like`, { method: 'DELETE' }),
 };
 
 export const comments = {
@@ -117,4 +119,12 @@ export const comments = {
     }),
 };
 
-export default { auth, communities, posts, comments };
+export const curriculum = {
+    generate: (params) => {
+        const searchParams = new URLSearchParams(params);
+        return apiFetch("/generate-curriculum/?" + searchParams.toString());
+    },
+    get: (id) => apiFetch(`/playlists/${id}`),
+};
+
+export default { auth, communities, posts, comments, curriculum };
