@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import Sidebar from './Sidebar';
 import MobileHeader from './MobileHeader';
 import styles from './ClientLayout.module.css';
+import { CommunityProvider } from './CommunityContext';
 
 export default function ClientLayout({ children }) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -48,23 +49,25 @@ export default function ClientLayout({ children }) {
   }
 
   return (
-    <div className={containerClass}>
-      {!isAuthPage && (
-          <Sidebar 
-            isCollapsed={!isMobile && isSidebarCollapsed} 
-            isOpen={isMobile && isMobileSidebarOpen}
-            onClose={closeMobileSidebar}
-            onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            isMobile={isMobile}
-          />
-      )}
-      
-      <div className={styles.mainWrapper}>
-        {!isAuthPage && <MobileHeader onMenuClick={toggleSidebar} />}
-        <main className={styles.contentScroll}>
-            {children}
-        </main>
-      </div>
-    </div>
+    <CommunityProvider>
+        <div className={containerClass}>
+        {!isAuthPage && (
+            <Sidebar 
+                isCollapsed={!isMobile && isSidebarCollapsed} 
+                isOpen={isMobile && isMobileSidebarOpen}
+                onClose={closeMobileSidebar}
+                onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                isMobile={isMobile}
+            />
+        )}
+        
+        <div className={styles.mainWrapper}>
+            {!isAuthPage && <MobileHeader onMenuClick={toggleSidebar} />}
+            <main className={styles.contentScroll}>
+                {children}
+            </main>
+        </div>
+        </div>
+    </CommunityProvider>
   );
 }

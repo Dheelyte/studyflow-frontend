@@ -6,11 +6,13 @@ import styles from './Sidebar.module.css';
 import { HomeIcon, LibraryIcon, PlusIcon, ZapIcon, ChevronLeft, ChevronRight, XIcon, LaptopIcon, UsersIcon, UserIcon, ChevronDown, ChevronUp, SunIcon, MoonIcon } from './Icons';
 import { useTheme } from './ThemeProvider';
 import { useAuth } from '@/context/AuthContext';
+import { useCommunity } from './CommunityContext';
 
 export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse, isMobile }) {
   const router = useRouter();
   const { user, logout } = useAuth();
   const { theme, setTheme } = useTheme();
+  const { communities = [] } = useCommunity() || {};
   
   // Accordion States (Expanded by default)
   const [isLibraryOpen, setIsLibraryOpen] = useState(true);
@@ -24,12 +26,37 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
       { id: 4, title: 'System Design', progress: '10% Complete', color: 'linear-gradient(135deg, #f59e0b, #f97316)' },
   ];
 
-  const yourCommunities = [
-      { id: 'react', name: 'React Mastery', members: '12.4k', color: '#6366f1' },
-      { id: 'python', name: 'Python Devs', members: '8.2k', color: '#eab308' },
-      { id: 'design', name: 'UI/UX Design', members: '5.1k', color: '#ec4899' },
-      { id: 'web3', name: 'Web3 Builders', members: '3.3k', color: '#8b5cf6' },
-  ];
+  // Helper to generate consistent colors based on ID/Name
+  const getCommunityColor = (id) => {
+      const str = String(id);
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+          hash = str.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      const colors = ['#6366f1', '#eab308', '#ec4899', '#8b5cf6', '#10b981', '#f59e0b', '#3b82f6', '#ef4444'];
+      return colors[Math.abs(hash) % colors.length];
+  };
+
+  const formatMembers = (count) => {
+      if (!count) return '0 members';
+      if (count >= 1000) return `${(count / 1000).toFixed(1)}k members`;
+      return `${count} members`;
+  };
+
+  // Determine which communities to show
+  // If Logged In: Show Joined Communities. If none joined, maybe show Explore? 
+  // Requirement: "replace ... with communities gotten from the communities the user is a member of, or explore communities if the user is unauthenticated"
+  // If authenticated but joined 0, showing empty list is technically correct per requirement "communities the user is a member of".
+  // However, falling back to explore if empty might be better UX, but strictly following prompt:
+  // Authenticated -> filtered by isJoined.
+  // Unauthenticated -> Explore (all/top).
+  
+  const sidebarCommunities = user 
+      ? (communities || []).filter(c => c.isJoined)
+      : (communities || []);
+
+  // Limit to top 5 for sidebar to prevent overflow
+  const displayedCommunities = sidebarCommunities.slice(0, 2);
 
   const handleToggleTheme = () => {
       if (theme === 'system') setTheme('light');
@@ -203,26 +230,35 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
                             gap:'8px',
                             marginLeft: '0'
                         }}>
-                            {yourCommunities.slice(0, 2).map((comm) => (
+                            {/* Dynamically rendered communities */}
+                            {displayedCommunities.length > 0 ? displayedCommunities.map((comm) => {
+                                const commColor = getCommunityColor(comm.id);
+                                return (
                                 <Link href={`/community/${comm.id}`} key={comm.id} className={styles.playlistItem} style={{padding: '8px 12px'}} onClick={handleNavClick}>
                                     <div className={styles.playlistImage} style={{ 
                                         background: 'transparent', 
-                                        border: `1px solid ${comm.color}`,
+                                        border: `1px solid ${commColor}`,
                                         width:'28px', height:'28px',
                                         borderRadius: '50%',
                                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        color: comm.color, fontWeight: '700', fontSize: '0.8rem'
+                                        color: commColor, fontWeight: '700', fontSize: '0.8rem'
                                     }}>
-                                        {comm.name.substring(0,1)}
+                                        {comm.name ? comm.name.substring(0,1) : '#'}
                                     </div>
                                     <div className={styles.playlistInfo}>
-                                        <div className={styles.playlistName} style={{fontSize:'0.85rem'}}>{comm.name}</div>
-                                        <div className={styles.playlistMeta} style={{fontSize:'0.75rem'}}>{comm.members}</div>
+                                        <div className={styles.playlistName} style={{fontSize:'0.85rem'}}>{comm.name || 'Community'}</div>
+                                        <div className={styles.playlistMeta} style={{fontSize:'0.75rem'}}>{formatMembers(comm.memberCount)}</div>
                                     </div>
                                 </Link>
-                            ))}
+                                );
+                            }) : (
+                                <div style={{padding: '8px 12px', fontSize: '0.8rem', color: 'var(--text-muted)'}}>
+                                    {user ? "No joined communities" : "Loading..."}
+                                </div>
+                            )}
+
                             <Link href="/community" className={styles.seeAllBtn} style={{padding:'8px 12px', color:'var(--primary)', fontWeight:'600', fontSize:'0.85rem'}} onClick={handleNavClick}>
-                                See All
+                                {user ? "Manage Communities" : "Explore All"}
                             </Link>
                         </div>
                     )}
