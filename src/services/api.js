@@ -34,8 +34,8 @@ async function apiFetch(endpoint, options = {}) {
 export const auth = {
     login: (email, password) => apiFetch('/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ username: email, password }),
+        // Default apiFetch header is application/json
+        body: JSON.stringify({ email, password }),
     }),
     register: (data) => apiFetch('/auth/register', {
         method: 'POST',

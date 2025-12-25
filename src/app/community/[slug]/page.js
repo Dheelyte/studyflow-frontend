@@ -7,13 +7,34 @@ import { ChevronLeft } from '@/components/Icons';
 import Link from 'next/link';
 import styles from '../page.module.css'; 
 
+// Shared Post Skeleton
+const PostSkeleton = () => (
+    <div style={{
+        marginBottom:'16px', 
+        padding:'24px', 
+        border:'1px solid var(--border)', 
+        borderRadius:'16px', 
+        background:'var(--card)'
+    }}>
+        <div style={{display:'flex', gap:'12px', marginBottom:'16px'}}>
+            <div style={{width:'40px', height:'40px', borderRadius:'50%', background:'var(--border)', animation:'pulse 1.5s infinite'}}></div>
+            <div style={{flex:1}}>
+                 <div style={{width:'30%', height:'14px', background:'var(--border)', borderRadius:'4px', marginBottom:'6px', animation:'pulse 1.5s infinite'}}></div>
+                 <div style={{width:'20%', height:'12px', background:'var(--border)', borderRadius:'4px', animation:'pulse 1.5s infinite'}}></div>
+            </div>
+        </div>
+        <div style={{width:'100%', height:'16px', background:'var(--border)', borderRadius:'4px', marginBottom:'8px', animation:'pulse 1.5s infinite'}}></div>
+        <div style={{width:'80%', height:'16px', background:'var(--border)', borderRadius:'4px', animation:'pulse 1.5s infinite'}}></div>
+    </div>
+);
+
 export default function CommunityDetail({ params }) {
     const { slug } = React.use(params);
     return <CommunityDetailContent slug={slug} />;
 }
 
 function CommunityDetailContent({ slug }) {
-  const { getCommunity, posts, createPost, joinCommunity, leaveCommunity, fetchCommunityPosts, fetchCommunityDetails } = useCommunity();
+  const { user, getCommunity, posts, createPost, joinCommunity, leaveCommunity, fetchCommunityPosts, fetchCommunityDetails, loadingPosts } = useCommunity();
   const community = getCommunity(slug);
   
   // Fetch posts AND details (for member count) when entering the community
@@ -28,15 +49,49 @@ function CommunityDetailContent({ slug }) {
       return (
         <div className={styles.page}>
             <div className={styles.mainColumn}>
-                 <Link href="/community" className={styles.backBtn}>
+                 <div style={{
+                     display: 'flex', 
+                     alignItems: 'center', 
+                     gap: '8px', 
+                     marginBottom: '24px', 
+                     color: 'var(--secondary)',
+                     fontSize: '0.9rem'
+                 }}>
                     <ChevronLeft size={16} /> Back to Hub
-                </Link>
-                <div style={{padding: 40, textAlign:'center'}}>
-                    Loading community data... (ID: {slug})
-                    <br/><br/>
-                    <Link href="/community" style={{color:'var(--primary)'}}>Go back</Link>
-                </div>
+                 </div>
+
+                 {/* Header Skeleton */}
+                 <div className={styles.header} style={{borderBottom: '1px solid var(--border)', paddingBottom: '24px', marginBottom: '24px'}}>
+                     <div style={{display:'flex', gap:'24px', alignItems:'center'}}>
+                         <div style={{width:'80px', height:'80px', borderRadius:'50%', background:'var(--border)', animation:'pulse 1.5s infinite'}}></div>
+                         <div style={{flex:1}}>
+                             <div style={{width:'40%', height:'24px', background:'var(--border)', borderRadius:'6px', marginBottom:'12px', animation:'pulse 1.5s infinite'}}></div>
+                             <div style={{width:'70%', height:'16px', background:'var(--border)', borderRadius:'6px', animation:'pulse 1.5s infinite'}}></div>
+                         </div>
+                     </div>
+                 </div>
+
+                 {/* Post Skeletons */}
+                 {Array.from({length: 3}).map((_, i) => <PostSkeleton key={i} />)}
             </div>
+            
+            {/* Sidebar Skeleton */}
+            <div className={styles.sidebar}>
+                 <div className={styles.trendingCard} style={{height:'180px', padding:'24px'}}>
+                     <div style={{width:'50%', height:'20px', background:'var(--border)', borderRadius:'4px', marginBottom:'20px', animation:'pulse 1.5s infinite'}}></div>
+                     <div style={{width:'100%', height:'14px', background:'var(--border)', borderRadius:'4px', marginBottom:'10px', animation:'pulse 1.5s infinite'}}></div>
+                     <div style={{width:'90%', height:'14px', background:'var(--border)', borderRadius:'4px', marginBottom:'10px', animation:'pulse 1.5s infinite'}}></div>
+                     <div style={{width:'60%', height:'14px', background:'var(--border)', borderRadius:'4px', animation:'pulse 1.5s infinite'}}></div>
+                 </div>
+            </div>
+
+            <style jsx global>{`
+                @keyframes pulse {
+                    0% { opacity: 0.6; }
+                    50% { opacity: 0.3; }
+                    100% { opacity: 0.6; }
+                }
+            `}</style>
         </div>
       );
   }
@@ -112,15 +167,21 @@ function CommunityDetailContent({ slug }) {
                  </div>
             </div>
 
-            <CreatePost onPost={(data) => createPost(data, community.id)} />
+            {user && <CreatePost onPost={(data) => createPost(data, community.id)} />}
 
             <div className={styles.feed}>
-                {communityPosts.length === 0 ? (
-                    <div style={{textAlign: 'center', padding: '40px', color: 'var(--secondary)'}}>
-                        No posts yet in this community. Be the first!
-                    </div>
+                {loadingPosts && communityPosts.length === 0 ? (
+                    Array.from({length: 3}).map((_, i) => <PostSkeleton key={i} />)
                 ) : (
-                    communityPosts.map(post => <PostCard key={post.id} {...post} />)
+                    <>
+                        {communityPosts.length === 0 ? (
+                            <div style={{textAlign: 'center', padding: '40px', color: 'var(--secondary)'}}>
+                                No posts yet in this community. Be the first!
+                            </div>
+                        ) : (
+                            communityPosts.map(post => <PostCard key={post.id} {...post} />)
+                        )}
+                    </>
                 )}
             </div>
          </div>

@@ -110,7 +110,7 @@
 .feed {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 14px;
   padding-bottom: 40px;
 }
 
@@ -226,4 +226,69 @@
 .joinBtn:hover {
     background: var(--primary);
     color: white;
+}
+
+/* Horizontal List Styles */
+.horizontalSection {
+    margin-bottom: 24px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.horizontalSection::-webkit-scrollbar {
+    display: none;
+}
+
+.horizontalSection {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.horizontalList {
+    display: flex;
+    gap: 12px;
+}
+
+.horizontalItem {
+    min-width: 100px;
+    max-width: 100px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.horizontalItem:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-color: var(--primary);
+}
+
+.horizontalAvatar {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 8px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.horizontalName {
+    font-size: 0.8rem;
+    font-weight: 600;
+    line-height: 1.2;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
 }

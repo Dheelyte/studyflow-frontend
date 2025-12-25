@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { communities as communityApi, posts as postApi, auth as authApi } from '@/services/api';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 const CommunityContext = createContext();
 
@@ -9,8 +10,11 @@ export function CommunityProvider({ children }) {
   const [communities, setCommunities] = useState([]);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null); // Auth State
+  const { user } = useAuth(); // Use centralized Auth state
   const router = useRouter();
+
+  // Track the latest fetch ID to prevent race conditions
+  const fetchIdRef = useRef(0);
 
   // Pagination Refs
   const pageState = useRef({
@@ -93,18 +97,14 @@ export function CommunityProvider({ children }) {
   };
 
   const fetchData = useCallback(async () => {
+    // Increment ID to mark start of new fetch
+    const currentFetchId = ++fetchIdRef.current;
+    
     try {
         setLoading(true);
         
-        // Check Auth First
-        let currentUser = null;
-        try {
-            currentUser = await authApi.me();
-            setUser(currentUser);
-        } catch (e) {
-            // Not logged in or error
-            setUser(null);
-        }
+        // Use the user from closure/prop (AuthContext)
+        const currentUser = user;
 
         const promises = [];
         
@@ -119,6 +119,12 @@ export function CommunityProvider({ children }) {
         }
 
         const results = await Promise.all(promises);
+        
+        // If a newer fetch started, abandon this one
+        if (currentFetchId !== fetchIdRef.current) return;
+        
+        // Process new data
+        let newCommunities = [];
         
         if (currentUser) {
             const [exploreRes, myRes] = results;
@@ -137,25 +143,49 @@ export function CommunityProvider({ children }) {
                 tags: c.tags || []
             }));
 
-            setCommunities([...myMapped, ...exploreMapped]);
+            newCommunities = [...myMapped, ...exploreMapped];
         } else {
             // Unauthenticated - just one list (mapped as not joined)
             const allRes = results[0];
-            const allMapped = (allRes || []).map(c => ({
+            newCommunities = (allRes || []).map(c => ({
                 ...c,
                 isJoined: false,
                 memberCount: c.member_count || 0,
                 tags: c.tags || []
             }));
-            setCommunities(allMapped);
         }
 
+        console.log("fetchData new communities:", newCommunities);
+
+        setCommunities(prev => {
+            const existingMap = new Map(prev.map(c => [c.id, c]));
+            
+            const merged = newCommunities.map(nc => {
+                const existing = existingMap.get(nc.id);
+                if (existing) {
+                    const useExistingCount = (nc.memberCount === 0 && existing.memberCount > 0);
+                    return {
+                        ...existing, 
+                        ...nc, 
+                        memberCount: useExistingCount ? existing.memberCount : nc.memberCount
+                    };
+                }
+                return nc;
+            });
+            
+            return merged;
+        });
+
     } catch (err) {
-        console.error("Failed to load community data", err);
+        if (currentFetchId === fetchIdRef.current) {
+             console.error("Failed to load community data", err);
+        }
     } finally {
-        setLoading(false);
+        if (currentFetchId === fetchIdRef.current) {
+            setLoading(false);
+        }
     }
-  }, []);
+  }, [user]); // user is dependency now
 
   useEffect(() => {
     fetchData();
@@ -241,12 +271,17 @@ export function CommunityProvider({ children }) {
       try {
           const detail = await communityApi.get(id);
           if (detail) {
+               console.log("Fetched detail:", detail);
+               const count = detail.member_count ?? detail.memberCount;
+               
                setCommunities(prev => {
                    const exists = prev.find(c => c.id == id);
+                   const safeCount = count !== undefined ? count : (exists ? exists.memberCount : 0);
+                   
                    if (exists) {
-                       return prev.map(c => c.id == id ? { ...c, ...detail, memberCount: detail.member_count, isJoined: detail.is_member } : c);
+                       return prev.map(c => c.id == id ? { ...c, ...detail, memberCount: safeCount, isJoined: detail.is_member } : c);
                    } else {
-                        return [...prev, { ...detail, memberCount: detail.member_count, isJoined: detail.is_member }];
+                        return [...prev, { ...detail, memberCount: safeCount, isJoined: detail.is_member }];
                    }
                });
                return detail;
@@ -261,7 +296,7 @@ export function CommunityProvider({ children }) {
     <CommunityContext.Provider value={{ 
         communities, 
         posts, 
-        user,  // Expose User
+        user,  // Expose User from AuthContext
         joinCommunity, 
         leaveCommunity, 
         createCommunity,

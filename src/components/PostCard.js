@@ -170,7 +170,7 @@ export default function PostCard({ id, author, time, content, likes: initialLike
             border: '1px solid var(--border)',
             borderRadius: '16px',
             padding: '24px',
-            marginBottom: '16px'
+            marginBottom: '0px'
         }}>
            <div style={{display:'flex', gap:'12px', marginBottom:'16px'}}>
                <div style={{width:'40px', height:'40px', borderRadius:'50%', background:'linear-gradient(135deg, #ccc, #999)'}}></div>

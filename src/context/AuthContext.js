@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 const AuthContext = createContext();
 
 const IS_LOGGED_IN_KEY = 'studyspotify_is_logged_in';
+const USER_DATA_KEY = 'studyspotify_user_data';
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
@@ -14,7 +15,16 @@ export function AuthProvider({ children }) {
     const router = useRouter();
 
     useEffect(() => {
-        checkUser();
+        // Load cached user data if available
+        const cachedUser = localStorage.getItem(USER_DATA_KEY);
+        if (cachedUser) {
+            try {
+                setUser(JSON.parse(cachedUser));
+            } catch (e) {
+                console.error('Failed to parse cached user data', e);
+            }
+        }
+        setLoading(false);
     }, []);
 
     const checkUser = async () => {
@@ -29,8 +39,13 @@ export function AuthProvider({ children }) {
         }
 
         try {
-            const { data } = await auth.getMe();
-            setUser(data);
+            // FIX: Changed authentic.getMe() to auth.me()
+            const response = await auth.me(); 
+            // Handle response structure depending on if apiFetch returns { data: user } or just user
+            const userData = response.data || response;
+            
+            setUser(userData);
+            localStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
             // Ensure key is set if successful
             localStorage.setItem(IS_LOGGED_IN_KEY, 'true');
         } catch (error) {
@@ -38,13 +53,15 @@ export function AuthProvider({ children }) {
             console.warn("Session expired or invalid:", error);
             setUser(null);
             localStorage.removeItem(IS_LOGGED_IN_KEY);
+        localStorage.removeItem(USER_DATA_KEY);
         } finally {
             setLoading(false);
         }
     };
 
     const login = async (credentials) => {
-        await auth.login(credentials);
+        const { email, password } = credentials;
+        await auth.login(email, password);
         localStorage.setItem(IS_LOGGED_IN_KEY, 'true');
         return checkUser();
     };
@@ -62,6 +79,7 @@ export function AuthProvider({ children }) {
         }
         setUser(null);
         localStorage.removeItem(IS_LOGGED_IN_KEY);
+        localStorage.removeItem(USER_DATA_KEY);
         router.push('/login');
     };
 
@@ -74,7 +92,11 @@ export function AuthProvider({ children }) {
         const response = await auth.updateProfile(data);
         // Backend returns updated user object
         const updatedUser = response.data || response;
-        setUser(prev => ({ ...prev, ...updatedUser }));
+        setUser(prev => {
+            const newUser = { ...prev, ...updatedUser };
+            localStorage.setItem(USER_DATA_KEY, JSON.stringify(newUser));
+            return newUser;
+        });
         return updatedUser;
     };
 

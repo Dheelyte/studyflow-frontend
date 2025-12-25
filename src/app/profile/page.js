@@ -1,12 +1,12 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './page.module.css';
 import { ZapIcon, StarIcon, TrophyIconSimple, TrendingUpIcon } from '@/components/Icons';
 import { useAuth } from '@/context/AuthContext';
 import EditProfileModal from '@/components/EditProfileModal';
 
 export default function ProfilePage() {
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, checkUser } = useAuth();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   // Mock Data for missing backend fields
@@ -39,7 +39,15 @@ export default function ProfilePage() {
   const monthLabels = getLast12Months();
 
   // Generate mock heatmap data (365 days)
-  const heatmapData = Array.from({ length: 365 }, () => Math.floor(Math.random() * 5)); 
+  const [heatmapData, setHeatmapData] = useState(Array(365).fill(0));
+
+  useEffect(() => {
+    setHeatmapData(Array.from({ length: 365 }, () => Math.floor(Math.random() * 5)));
+  }, []);
+
+  useEffect(() => {
+    checkUser();
+  }, [checkUser]); 
 
   // Defaults if user is null or missing fields
   const defaultName = "Delight Gbolahan";
