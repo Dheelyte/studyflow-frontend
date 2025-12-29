@@ -5,79 +5,181 @@ import { curriculum } from "@/services/api";
 import styles from "./page.module.css";
 import { PlayIcon, ClockIcon, ChevronDown, ChevronUp, ZapIcon, HeartIcon, ShareIcon, MenuIcon, CheckCircleIcon, BookOpenIcon, VideoIcon } from "@/components/Icons";
 
+// Helper to normalize API response to existing component state structure
+const normalizePlaylistData = (apiData) => {
+    if (!apiData) return null;
+
+    let totalResources = 0;
+    let completedResources = 0;
+    let foundNextUp = false;
+
+    const modules = (apiData.modules || []).map(m => {
+        let moduleResourcesTotal = 0;
+        let moduleResourcesCompleted = 0;
+
+        const lessons = (m.lessons || []).map(l => ({
+            lesson_title: l.title,
+            estimated_time: l.estimated_time || "1 hour", // Fallback if missing
+            resources: (l.resources || []).map(r => {
+                totalResources++;
+                moduleResourcesTotal++;
+
+                if (r.is_completed) {
+                    completedResources++;
+                    moduleResourcesCompleted++;
+                }
+
+                let isNextUp = false;
+                if (!r.is_completed && !foundNextUp) {
+                    isNextUp = true;
+                    foundNextUp = true;
+                }
+
+                return {
+                    resource_id: r.id, // Ensure we have an ID for scrolling
+                    label: r.title,
+                    type: r.type,
+                    description: r.description,
+                    resource_url: r.url,
+                    is_completed: r.is_completed,
+                    isNextUp: isNextUp
+                };
+            })
+        }));
+
+        const isComplete = moduleResourcesTotal > 0 && moduleResourcesTotal === moduleResourcesCompleted;
+
+        return {
+            module_id: m.id,
+            module_title: m.title,
+            lessons: lessons,
+            is_module_completed: isComplete
+        };
+    });
+
+    const completionPercentage = totalResources > 0
+        ? Math.round((completedResources / totalResources) * 100)
+        : 0;
+
+    return {
+        _raw: apiData, // Keep raw data for safe updates if needed
+        curriculum_title: apiData.title,
+        overview: apiData.description || "No description available.",
+        modules: modules,
+        learning_objectives: apiData.objectives || [], // Handle null objectives
+        completionPercentage, // Add calculated progress
+        isStarted: completedResources > 0, // Auto-start if there is progress
+        nextUpId: foundNextUp ? "next-up-resource" : null // Helper for scrolling
+    };
+};
+
 export default function PlaylistPage({ params }) {
+    // Unwrap params for Next.js 15+ where params is a Promise
+    const resolvedParams = React.use(params);
+    const playlistId = resolvedParams?.id;
     const searchParams = useSearchParams();
 
     const [curriculumData, setCurriculumData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [expandedModules, setExpandedModules] = useState({});
-    // isStarted state: initially false (hides progress bar, shows "Start Learning")
+
+    // Derived state for UI, usually would be in the data object or separate
+    const [completionPercentage, setCompletionPercentage] = useState(0);
     const [isStarted, setIsStarted] = useState(false);
 
-    // Mock state for liking
+    // Mock state for liking (could be real if API supported it)
     const [isLiked, setIsLiked] = useState(false);
     const [highlightResource, setHighlightResource] = useState(false);
 
-    // Ref to track if we have already fetched for the current topic to prevent double-fetch in StrictMode
-    const fetchedTopicRef = useRef(null);
+    // Ref to track if we have already fetched
+    const fetchedRef = useRef(null);
 
     useEffect(() => {
         const fetchCurriculum = async () => {
             const topic = searchParams.get("topic");
 
-            if (!topic) {
-                // If no topic is provided, stop loading. 
-                // in a real app check for params.id to load saved playlist
+            // Key to identify if we are fetching the same thing
+            const fetchKey = playlistId ? `id-${playlistId}` : (topic ? `topic-${topic}` : null);
+
+            if (!fetchKey) {
                 setLoading(false);
                 return;
             }
 
-            // Prevent double fetch if we already fetched this topic
-            if (fetchedTopicRef.current === topic) {
-                return;
-            }
-            fetchedTopicRef.current = topic;
+            if (fetchedRef.current === fetchKey) return;
+            fetchedRef.current = fetchKey;
 
             try {
                 setLoading(true);
-                const params = {
-                    topic,
-                    experience_level: searchParams.get("experience_level") || "Beginner",
-                    duration: searchParams.get("duration") || "4 weeks"
-                };
+                let data = null;
 
-                console.log("Fetching curriculum with params:", params);
-                const data = await curriculum.generate(params);
-                console.log("Curriculum Response Data:", data);
+                if (playlistId) {
+                    // console.log("Fetching by ID:", playlistId);
+                    const response = await curriculum.get(playlistId);
+                    // Normalize the response
+                    data = normalizePlaylistData(response);
+
+                    // Set derived state from normalized data
+                    if (data) {
+                        setCompletionPercentage(data.completionPercentage);
+                        if (data.isStarted) setIsStarted(true);
+                    }
+
+                } else if (topic) {
+                    // Existing topic-based generation...
+                    const genParams = {
+                        topic,
+                        experience_level: searchParams.get("experience_level") || "Beginner",
+                        duration: searchParams.get("duration") || "4 weeks"
+                    };
+                    // console.log("Generating curriculum:", genParams);
+                    const response = await curriculum.generate(genParams);
+                    // The generator API returns a structure closer to our internal state, usually.
+                    // But if we want consistency, we might assume generate returns the OLD format 
+                    // which is what 'data' was assigned to directly before.
+                    // Let's assume generate returns the structure we were already using.
+                    data = response;
+                }
 
                 if (!data || !data.modules) {
-                    throw new Error("Invalid curriculum data format received");
+                    throw new Error("Invalid playlist data received");
                 }
 
                 setCurriculumData(data);
 
-                // Expand first module by default if available
+                // Auto-expand module containing "Next Up" or first module
                 if (data.modules && data.modules.length > 0) {
-                    // Use module_id if present, otherwise use index 0
-                    const firstId = data.modules[0].module_id !== undefined ? data.modules[0].module_id : 0;
-                    setExpandedModules({ [firstId]: true });
+                    let moduleToExpand = data.modules[0].module_id !== undefined ? data.modules[0].module_id : 0;
+
+                    // Find module with Next Up resource
+                    for (const m of data.modules) {
+                        if (m.lessons) {
+                            for (const l of m.lessons) {
+                                if (l.resources && l.resources.some(r => r.isNextUp)) {
+                                    moduleToExpand = m.module_id;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    setExpandedModules({ [moduleToExpand]: true });
                 }
+
             } catch (err) {
                 console.error("Failed to fetch curriculum:", err);
                 setError(err.message || "Failed to load curriculum");
-                // Reset ref on error to allow retry
-                fetchedTopicRef.current = null;
+                fetchedRef.current = null;
             } finally {
                 setLoading(false);
             }
         };
 
         fetchCurriculum();
-    }, [searchParams]);
+    }, [playlistId, searchParams]);
 
     const toggleModule = (id) => {
-        console.log("Toggling module:", id);
         setExpandedModules(prev => ({ ...prev, [id]: !prev[id] }));
     };
 
@@ -86,32 +188,85 @@ export default function PlaylistPage({ params }) {
             setIsStarted(true);
         }
 
-        // Ensure first module is expanded
-        if (curriculumData && curriculumData.modules && curriculumData.modules.length > 0) {
-            const firstId = curriculumData.modules[0].module_id !== undefined ? curriculumData.modules[0].module_id : 0;
-            setExpandedModules(prev => ({ ...prev, [firstId]: true }));
-        }
-
-        // Scroll and highlight
+        // Scroll to Next Up or First Resource
         setTimeout(() => {
+            const nextUpResource = document.getElementById("next-up-resource");
             const firstResource = document.getElementById("first-resource");
-            if (firstResource) {
-                firstResource.scrollIntoView({ behavior: "smooth", block: "center" });
+            const target = nextUpResource || firstResource;
+
+            if (target) {
+                target.scrollIntoView({ behavior: "smooth", block: "center" });
                 setHighlightResource(true);
-                setTimeout(() => setHighlightResource(false), 4500); // Remove highlight after user has definitely seen it
+                setTimeout(() => setHighlightResource(false), 4500);
             }
         }, 100);
     };
 
-    // Calculate Completion (Mock logic)
-    const completionPercentage = 0; // Example value
+    // Updated handler with redundancy check
+    const handleResourceClick = async (resourceId, url, isCompleted, e) => {
+        // e.preventDefault(); // Optional: decide if we want to block navigation until complete. Usually unsafe for UX.
+
+        // Check if already completed to avoid redundant calls
+        if (isCompleted) {
+            // console.log("Resource already completed, skipping API call:", resourceId);
+            return;
+        }
+
+        try {
+            // console.log("Marking resource complete:", resourceId);
+            const response = await curriculum.completeResource(resourceId);
+
+            if (response && response.is_completed) {
+                // Update local state without full refetch
+                setCurriculumData(prev => {
+                    if (!prev || !prev._raw) return prev;
+
+                    // Create deep clone of raw data to mutate
+                    const newRaw = JSON.parse(JSON.stringify(prev._raw));
+
+                    // Find the resource in raw data
+                    let found = false;
+                    for (const m of newRaw.modules || []) {
+                        for (const l of m.lessons || []) {
+                            for (const r of l.resources || []) {
+                                if (r.id === resourceId) {
+                                    r.is_completed = true;
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            if (found) break;
+                        }
+                        if (found) break;
+                    }
+
+                    if (found) {
+                        return normalizePlaylistData(newRaw);
+                    }
+                    return prev;
+                });
+            }
+
+        } catch (err) {
+            console.error("Failed to mark resource complete:", err);
+            // Non-blocking error
+        }
+    };
+
+    // Sync completion percentage when data changes
+    useEffect(() => {
+        if (curriculumData) {
+            setCompletionPercentage(curriculumData.completionPercentage);
+        }
+    }, [curriculumData]);
+
 
     if (loading) {
         return (
             <div className={styles.container} style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={{ color: 'var(--text-primary)', textAlign: 'center' }}>
-                    <div className={styles.loadingSpinner}></div> {/* Assuming global spinner or just text */}
-                    <h2>Generating your personalized curriculum...</h2>
+                    <div className={styles.loadingSpinner}></div>
+                    <h2>{playlistId ? "Loading your playlist..." : "Generating your personalized curriculum..."}</h2>
                     <p>This may take a few seconds.</p>
                 </div>
             </div>
@@ -186,17 +341,13 @@ export default function PlaylistPage({ params }) {
                 <button className={styles.iconButton} title="Share Playlist">
                     <ShareIcon />
                 </button>
-
-                {/* 
-                  Removed More Options button as requested
-                */}
             </div>
 
             {/* Progress Bar only shown if started */}
             {isStarted && (
                 <div className={styles.progressContainer}>
                     <div className={styles.progressLabel}>
-                        {/* ... existing progress UI kept simple for now */}
+                        {/* Display real completion percentage */}
                         <span>Playlist Progress</span>
                         <span>{completionPercentage}% completed</span>
                     </div>
@@ -208,8 +359,8 @@ export default function PlaylistPage({ params }) {
 
             <div className={styles.content}>
 
-                {/* Learning Objectives Section */}
-                {curriculumData.learning_objectives && (
+                {/* Learning Objectives Section - Filter out nulls/empty */}
+                {curriculumData.learning_objectives && curriculumData.learning_objectives.length > 0 && (
                     <div className={styles.objectivesSection}>
                         <h2 className={styles.sectionTitle}>What You'll Learn</h2>
                         <ul className={styles.objectivesList}>
@@ -226,13 +377,19 @@ export default function PlaylistPage({ params }) {
                 <div className={styles.modulesContainer}>
                     <h2 className={styles.sectionTitle}>Curriculum Content</h2>
                     {curriculumData.modules && curriculumData.modules.map((module, mIdx) => {
-                        // Robust ID handling: prefer module_id, fallback to index
                         const uniqueId = module.module_id !== undefined ? module.module_id : mIdx;
 
                         return (
                             <div key={uniqueId} className={styles.module}>
-                                <div className={styles.moduleHeader} onClick={() => toggleModule(uniqueId)}>
-                                    <span className={styles.moduleTitle}>{module.module_title}</span>
+                                {/* Apply conditional class for completed module header */}
+                                <div
+                                    className={`${styles.moduleHeader} ${module.is_module_completed ? styles.completedModuleHeader : ''}`}
+                                    onClick={() => toggleModule(uniqueId)}
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <span className={styles.moduleTitle}>{module.module_title}</span>
+                                        {module.is_module_completed && <CheckCircleIcon size={20} fill="#10b981" />}
+                                    </div>
                                     {expandedModules[uniqueId] ? <ChevronUp /> : <ChevronDown />}
                                 </div>
 
@@ -243,16 +400,19 @@ export default function PlaylistPage({ params }) {
                                                 <div className={styles.lessonHeader}>
                                                     <h3 className={styles.lessonTitle}>{lesson.lesson_title}</h3>
                                                     <span className={styles.lessonDuration}>
-                                                        <ClockIcon size={14} /> {lesson.estimated_time}
+                                                        {lesson.estimated_time && <><ClockIcon size={14} /> {lesson.estimated_time}</>}
                                                     </span>
                                                 </div>
-
-                                                {/* Removed Topics List as requested */}
 
                                                 <div className={styles.resourcesList}>
                                                     {lesson.resources && lesson.resources.map((resource, rIdx) => {
                                                         const firstId = curriculumData.modules[0]?.module_id !== undefined ? curriculumData.modules[0].module_id : 0;
                                                         const isFirstResource = uniqueId === firstId && lessonIdx === 0 && rIdx === 0;
+
+                                                        // ID for scrolling
+                                                        let elementId = null;
+                                                        if (resource.isNextUp) elementId = "next-up-resource";
+                                                        else if (isFirstResource) elementId = "first-resource";
 
                                                         return (
                                                             <a
@@ -260,16 +420,33 @@ export default function PlaylistPage({ params }) {
                                                                 target="_blank"
                                                                 rel="noopener noreferrer"
                                                                 key={rIdx}
-                                                                id={isFirstResource ? "first-resource" : null}
-                                                                className={`${styles.resourceCard} ${isFirstResource && highlightResource ? styles.highlight : ""}`}
+                                                                id={elementId}
+                                                                // Apply conditional class for completed resources
+                                                                className={`
+                                                                    ${styles.resourceCard} 
+                                                                    ${resource.is_completed ? styles.completedResource : ''}
+                                                                    ${isFirstResource && highlightResource ? styles.highlight : ""} 
+                                                                    ${resource.isNextUp ? styles.nextUpResource : ""} 
+                                                                    ${resource.isNextUp && highlightResource ? styles.highlight : ""}
+                                                                `}
+                                                                // UPDATED: Pass is_completed to handler
+                                                                onClick={(e) => handleResourceClick(resource.resource_id, resource.resource_url, resource.is_completed, e)}
+                                                                style={{
+                                                                    // Override inline opacity and border if needed, or rely on classes
+                                                                }}
                                                             >
+                                                                {resource.isNextUp && <div className={styles.nextUpBadge}>Next Up</div>}
+
                                                                 <div className={styles.resourceIcon}>
                                                                     {resource.type === "Video" ? <VideoIcon size={20} /> : <BookOpenIcon size={20} />}
                                                                 </div>
                                                                 <div className={styles.resourceInfo}>
                                                                     <div className={styles.resourceHeaderRow}>
-                                                                        <span className={styles.resourceLabel}>{resource.label}</span>
-                                                                        <span className={styles.resourceTypeBadge}>{resource.type}</span>
+                                                                        <div className={styles.resourceTitleGroup}>
+                                                                            <span className={styles.resourceLabel}>{resource.label}</span>
+                                                                            <span className={styles.resourceTypeBadge}>{resource.type}</span>
+                                                                        </div>
+                                                                        {resource.is_completed && <div className={styles.completedIcon}><CheckCircleIcon size={20} fill="#10b981" /></div>}
                                                                     </div>
                                                                     <p className={styles.resourceDescription}>{resource.description}</p>
                                                                 </div>

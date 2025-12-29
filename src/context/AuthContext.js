@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { auth } from '@/services/api';
 import { useRouter } from 'next/navigation';
 
@@ -27,7 +27,7 @@ export function AuthProvider({ children }) {
         setLoading(false);
     }, []);
 
-    const checkUser = async () => {
+    const checkUser = useCallback(async () => {
         // Optimization: Don't check server if we know we aren't logged in
         const isLoggedIn = localStorage.getItem(IS_LOGGED_IN_KEY);
 
@@ -57,21 +57,21 @@ export function AuthProvider({ children }) {
         } finally {
             setLoading(false);
         }
-    };
+    }, [setUser, setLoading]);
 
-    const login = async (credentials) => {
+    const login = useCallback(async (credentials) => {
         const { email, password } = credentials;
         await auth.login(email, password);
         localStorage.setItem(IS_LOGGED_IN_KEY, 'true');
         return checkUser();
-    };
+    }, [checkUser]);
 
-    const register = async (userData) => {
+    const register = useCallback(async (userData) => {
         // Register typically doesn't auto-login in this flow, usually redirects to login
         return auth.register(userData);
-    };
+    }, []);
 
-    const logout = async () => {
+    const logout = useCallback(async () => {
         try {
             await auth.logout();
         } catch (e) {
@@ -81,14 +81,14 @@ export function AuthProvider({ children }) {
         localStorage.removeItem(IS_LOGGED_IN_KEY);
         localStorage.removeItem(USER_DATA_KEY);
         router.push('/login');
-    };
+    }, [router, setUser]);
 
-    const requestPasswordReset = (email) => auth.requestPasswordReset(email);
-    const verifyResetCode = (data) => auth.verifyResetCode(data);
-    const resetPassword = (data) => auth.resetPassword(data);
-    const changePassword = (data) => auth.changePassword(data);
+    const requestPasswordReset = useCallback((email) => auth.requestPasswordReset(email), []);
+    const verifyResetCode = useCallback((data) => auth.verifyResetCode(data), []);
+    const resetPassword = useCallback((data) => auth.resetPassword(data), []);
+    const changePassword = useCallback((data) => auth.changePassword(data), []);
 
-    const updateUser = async (data) => {
+    const updateUser = useCallback(async (data) => {
         const response = await auth.updateProfile(data);
         // Backend returns updated user object
         const updatedUser = response.data || response;
@@ -98,7 +98,7 @@ export function AuthProvider({ children }) {
             return newUser;
         });
         return updatedUser;
-    };
+    }, [setUser]);
 
     const value = {
         user,

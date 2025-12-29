@@ -175,7 +175,9 @@
 
 .heatmapGrid {
     display: grid;
-    grid-template-columns: repeat(53, 1fr); /* Approx weeks */
+    grid-template-columns: repeat(53, 1fr);
+    grid-template-rows: repeat(7, 1fr);
+    grid-auto-flow: column; /* Approx weeks */
     gap: 4px;
     overflow-x: auto;
     padding-bottom: 8px;

@@ -1,12 +1,18 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { curriculum } from "@/services/api";
 import styles from "./page.module.css";
+import { useAuth } from "@/context/AuthContext";
+import { useRedirectState } from "@/hooks/useRedirectState";
 import { PlayIcon, ClockIcon, ChevronDown, ChevronUp, ZapIcon, HeartIcon, ShareIcon, MenuIcon, CheckCircleIcon, BookOpenIcon, VideoIcon } from "@/components/Icons";
 
 export default function CurriculumPage() {
     const searchParams = useSearchParams();
+    const router = useRouter();
+    const pathname = usePathname();
+    const { user } = useAuth();
+    const { saveState, restoreState } = useRedirectState();
 
     const [curriculumData, setCurriculumData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -14,6 +20,7 @@ export default function CurriculumPage() {
     const [expandedModules, setExpandedModules] = useState({});
     // isStarted state: initially false (hides progress bar, shows "Start Learning")
     const [isStarted, setIsStarted] = useState(false);
+    const [isCreating, setIsCreating] = useState(false);
 
     // Mock state for liking
     const [isLiked, setIsLiked] = useState(false);
@@ -25,6 +32,30 @@ export default function CurriculumPage() {
     useEffect(() => {
         const fetchCurriculum = async () => {
             const topic = searchParams.get("topic");
+
+            // Check for restored state first
+            // We strip the topic check initially because if we have state, we might not need to strictly validate topic params against current URL if we trust the state,
+            // but it's safer to still check topic or matches. 
+            // However, the restoreState clears the state, so it's a one-time check.
+            const restoredState = restoreState('curriculum_data');
+            if (restoredState && restoredState.data) {
+                console.log("Restoring curriculum from state");
+                setCurriculumData(restoredState.data);
+                
+                // Expand first module by default if available (same logic as below)
+                 if (restoredState.data.modules && restoredState.data.modules.length > 0) {
+                    const firstId = restoredState.data.modules[0].module_id !== undefined ? restoredState.data.modules[0].module_id : 0;
+                    setExpandedModules({ [firstId]: true });
+                }
+                
+                // IMPORTANT: Update the ref so subsequent renders (e.g. Strict Mode) don't try to fetch again
+                if (topic) {
+                     fetchedTopicRef.current = topic;
+                }
+
+                setLoading(false);
+                return;
+            }
 
             if (!topic) {
                 // If no topic is provided, stop loading. 
@@ -73,33 +104,59 @@ export default function CurriculumPage() {
         };
 
         fetchCurriculum();
-    }, [searchParams]);
+    }, [searchParams, restoreState]);
 
     const toggleModule = (id) => {
         console.log("Toggling module:", id);
         setExpandedModules(prev => ({ ...prev, [id]: !prev[id] }));
     };
 
-    const handlePlay = () => {
-        if (!isStarted) {
-            setIsStarted(true);
+    const handlePlay = async () => {
+        if (!user) {
+            saveState('curriculum_data', curriculumData);
+            const redirectUrl = encodeURIComponent(`${pathname}?${searchParams.toString()}`);
+            router.push(`/login?redirect=${redirectUrl}`);
+            return;
         }
 
-        // Ensure first module is expanded
-        if (curriculumData && curriculumData.modules && curriculumData.modules.length > 0) {
-            const firstId = curriculumData.modules[0].module_id !== undefined ? curriculumData.modules[0].module_id : 0;
-            setExpandedModules(prev => ({ ...prev, [firstId]: true }));
-        }
-
-        // Scroll and highlight
-        setTimeout(() => {
-            const firstResource = document.getElementById("first-resource");
-            if (firstResource) {
-                firstResource.scrollIntoView({ behavior: "smooth", block: "center" });
-                setHighlightResource(true);
-                setTimeout(() => setHighlightResource(false), 4500); // Remove highlight after user has definitely seen it
+        // If already started, just scroll (or if we want to support "Continue Learning" not creating new playlist every time? 
+        // User request implies creating it. Let's assume correct behavior is to create if not already tracking?)
+        // Actually, if we are purely "Starting", we create. If "Continuing" (isStarted=true) we might just scroll?
+        // But the user prompt says: "When a logged in clicks 'Continue Learning', send ... to create a playlist".
+        // This suggests we might even do it on Continue? But that would duplicate playlists.
+        // Let's assume we do it once. But for now, let's implement the creation logic.
+        
+        try {
+            setIsCreating(true);
+            const payload = {
+                title: curriculumData.curriculum_title,
+                level: searchParams.get("experience_level") || "Beginner",
+                timeline: searchParams.get("duration") || "4 weeks",
+                description: curriculumData.overview,
+                objectives: curriculumData.learning_objectives || [],
+                content: curriculumData
+            };
+            
+            console.log("Creating playlist with payload", payload);
+            const response = await curriculum.createPlaylist(payload);
+            
+            if (response && response.id) {
+                 // Redirect to the new playlist page
+                 router.push(`/playlist/${response.id}`);
+            } else {
+                 console.error("Created playlist but got no ID", response);
+                 // Fallback behavior if API fails or returns unexpected?
+                 // For now, let's just do the old behavior if it fails to redirect?
+                 // Or maybe alert?
+                 alert("Failed to create playlist. Checking console.");
             }
-        }, 100);
+            
+        } catch (e) {
+            console.error("Failed to create playlist", e);
+            alert("Failed to save playlist. Please try again.");
+        } finally {
+            setIsCreating(false);
+        }
     };
 
     // Calculate Completion (Mock logic)
@@ -168,9 +225,9 @@ export default function CurriculumPage() {
             </div>
 
             <div className={styles.controls}>
-                <button className={styles.playButton} onClick={handlePlay}>
+                <button className={styles.playButton} onClick={handlePlay} disabled={isCreating}>
                     <PlayIcon size={24} fill="white" />
-                    {isStarted ? "Continue Learning" : "Start Learning"}
+                    {isCreating ? "Creating Playlist..." : (isStarted ? "Continue Learning" : "Start Learning")}
                 </button>
 
                 <button

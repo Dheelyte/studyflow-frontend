@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import styles from './Sidebar.module.css';
@@ -7,24 +7,63 @@ import { HomeIcon, LibraryIcon, PlusIcon, ZapIcon, ChevronLeft, ChevronRight, XI
 import { useTheme } from './ThemeProvider';
 import { useAuth } from '@/context/AuthContext';
 import { useCommunity } from './CommunityContext';
+import { curriculum } from '@/services/api';
 
 export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse, isMobile }) {
   const router = useRouter();
   const { user, logout } = useAuth();
   const { theme, setTheme } = useTheme();
-  const { communities = [] } = useCommunity() || {};
+  const { communities = [], fetchInitialData } = useCommunity() || {};
+
+  // Trigger initial fetch when Sidebar mounts
+  useEffect(() => {
+      if (fetchInitialData) {
+          fetchInitialData();
+      }
+  }, [fetchInitialData]);
   
   // Accordion States (Expanded by default)
   const [isLibraryOpen, setIsLibraryOpen] = useState(true);
   const [isCommunityOpen, setIsCommunityOpen] = useState(true);
 
-  // Mock Data
-  const yourFlows = [
-      { id: 1, title: 'Learn React', progress: '45% Complete', color: 'linear-gradient(135deg, #6366f1, #a855f7)' },
-      { id: 2, title: 'Data Science', progress: 'Just Started', color: 'linear-gradient(135deg, #3b82f6, #06b6d4)' },
-      { id: 3, title: 'UX Principles', progress: 'Module 2', color: 'linear-gradient(135deg, #10b981, #34d399)' },
-      { id: 4, title: 'System Design', progress: '10% Complete', color: 'linear-gradient(135deg, #f59e0b, #f97316)' },
-  ];
+  // Playlist State
+  const [playlists, setPlaylists] = useState([]);
+
+  useEffect(() => {
+    const fetchPlaylists = async () => {
+        if (!user) {
+            setPlaylists([]);
+            return;
+        }
+        try {
+            const response = await curriculum.getMyPlaylists();
+            if (Array.isArray(response)) {
+                const colors = [
+                    'linear-gradient(135deg, #6366f1, #a855f7)', 
+                    'linear-gradient(135deg, #3b82f6, #06b6d4)', 
+                    'linear-gradient(135deg, #10b981, #34d399)', 
+                    'linear-gradient(135deg, #f59e0b, #fbbf24)', 
+                    'linear-gradient(135deg, #ec4899, #f472b6)' 
+                ];
+
+                const mapped = response.map((item, index) => ({
+                    id: item.id,
+                    title: item.playlist?.title || "Untitled",
+                    progress: "In Progress", // Mock
+                    color: colors[index % colors.length],
+                    link: `/playlist/${item.playlist?.id || 1}`
+                }));
+                // We only show top 3 in sidebar usually? Or slice.
+                setPlaylists(mapped);
+            }
+        } catch (error) {
+           console.error("Sidebar playlist fetch error", error);
+        }
+    };
+
+    fetchPlaylists();
+  }, [user?.id]);
+
 
   // Helper to generate consistent colors based on ID/Name
   const getCommunityColor = (id) => {
@@ -43,20 +82,12 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
       return `${count} members`;
   };
 
-  // Determine which communities to show
-  // If Logged In: Show Joined Communities. If none joined, maybe show Explore? 
-  // Requirement: "replace ... with communities gotten from the communities the user is a member of, or explore communities if the user is unauthenticated"
-  // If authenticated but joined 0, showing empty list is technically correct per requirement "communities the user is a member of".
-  // However, falling back to explore if empty might be better UX, but strictly following prompt:
-  // Authenticated -> filtered by isJoined.
-  // Unauthenticated -> Explore (all/top).
-  
   const sidebarCommunities = user 
       ? (communities || []).filter(c => c.isJoined)
       : (communities || []);
 
-  // Limit to top 5 for sidebar to prevent overflow
   const displayedCommunities = sidebarCommunities.slice(0, 2);
+  const displayedPlaylists = playlists.slice(0, 3); // Show top 3
 
   const handleToggleTheme = () => {
       if (theme === 'system') setTheme('light');
@@ -70,7 +101,6 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
       return <MoonIcon size={14} />; 
   };
   
-  // Close sidebar on mobile when a link is clicked
   const handleNavClick = () => {
       if (isMobile && onClose) {
           onClose();
@@ -81,7 +111,6 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
 
   return (
     <>
-        {/* Mobile Backdrop */}
         {isMobile && isOpen && (
             <div 
                 style={{
@@ -100,18 +129,16 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
 
           {!isMobile && (
               <>
-                {/* Collapse Button (Original Position - Floating on Edge) */}
                 <button className={styles.toggleCollapseBtn} onClick={onToggleCollapse} title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}>
                     {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
                 </button>
 
-                {/* Theme Toggle Button (Next to Collapse Button) */}
                 <button 
                   className={styles.toggleCollapseBtn}
                   onClick={handleToggleTheme}
                   title="Cycle Theme"
                   style={{
-                      top: '56px', /* Positioned below the collapse button (20px + 24px + gap) */
+                      top: '56px', 
                   }}
                 >
                    {getThemeIcon()}
@@ -129,7 +156,6 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
               <span>Home</span>
             </Link>
 
-            {/* Profile Link */}
             <Link href="/profile" className={styles.navItem} onClick={handleNavClick}>
                 <UserIcon />
                 <span>Profile</span>
@@ -146,13 +172,11 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
                         className={`${styles.navItem} ${isLibraryOpen ? styles.active : ''}`} 
                         style={{cursor: 'pointer', justifyContent: 'space-between', paddingRight:'8px', marginTop: '0'}}
                     >
-                        {/* Parent Click Link */}
                         <Link href="/library" style={{display:'flex', gap:'16px', alignItems:'center', textDecoration:'none', color:'inherit', flex:1}} onClick={handleNavClick}>
                             <LibraryIcon />
                             <span>Library</span>
                         </Link>
                         
-                        {/* Toggle Icon Button */}
                         <div 
                             onClick={(e) => {
                                 e.stopPropagation();
@@ -174,8 +198,8 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
                             gap:'8px',
                             marginLeft: '0'
                         }}>
-                             {yourFlows.slice(0, 2).map(flow => (
-                                <Link href={`/playlist/${flow.id}`} key={flow.id} className={styles.playlistItem} style={{padding: '8px 12px'}} onClick={handleNavClick}>
+                             {displayedPlaylists.length > 0 && displayedPlaylists.map(flow => (
+                                <Link href={flow.link} key={flow.id} className={styles.playlistItem} style={{padding: '8px 12px'}} onClick={handleNavClick}>
                                     <div className={styles.playlistImage} style={{ background: flow.color, width:'28px', height:'28px', borderRadius:'6px' }}></div>
                                     <div className={styles.playlistInfo}>
                                         <div className={styles.playlistName} style={{fontSize:'0.85rem'}}>{flow.title}</div>
@@ -183,9 +207,12 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
                                     </div>
                                 </Link>
                             ))}
-                            <Link href="/library" className={styles.seeAllBtn} style={{padding:'8px 12px', color:'var(--primary)', fontWeight:'600', fontSize:'0.85rem'}} onClick={handleNavClick}>
-                                See All
-                            </Link>
+                            
+                             {displayedPlaylists.length > 0 && (
+                                <Link href="/library" className={styles.seeAllBtn} style={{padding:'8px 12px', color:'var(--primary)', fontWeight:'600', fontSize:'0.85rem'}} onClick={handleNavClick}>
+                                    See All
+                                </Link>
+                             )}
                         </div>
                     )}
                 </>
@@ -202,13 +229,11 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
                         className={`${styles.navItem} ${isCommunityOpen ? styles.active : ''}`} 
                         style={{cursor: 'pointer', justifyContent: 'space-between', paddingRight:'8px'}}
                     >
-                        {/* Parent Click Link */}
                         <Link href="/community" style={{display:'flex', gap:'16px', alignItems:'center', textDecoration:'none', color:'inherit', flex:1}} onClick={handleNavClick}>
                             <UsersIcon />
                             <span>Community</span>
                         </Link>
 
-                        {/* Toggle Icon Button */}
                         <div 
                             onClick={(e) => {
                                 e.stopPropagation();
@@ -230,8 +255,8 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
                             gap:'8px',
                             marginLeft: '0'
                         }}>
-                            {/* Dynamically rendered communities */}
-                            {displayedCommunities.length > 0 ? displayedCommunities.map((comm) => {
+                            {/* Dynamically rendered communities - Only render if not empty */}
+                            {displayedCommunities.length > 0 && displayedCommunities.map((comm) => {
                                 const commColor = getCommunityColor(comm.id);
                                 return (
                                 <Link href={`/community/${comm.id}`} key={comm.id} className={styles.playlistItem} style={{padding: '8px 12px'}} onClick={handleNavClick}>
@@ -251,15 +276,14 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
                                     </div>
                                 </Link>
                                 );
-                            }) : (
-                                <div style={{padding: '8px 12px', fontSize: '0.8rem', color: 'var(--text-muted)'}}>
-                                    {user ? "No joined communities" : "Loading..."}
-                                </div>
+                            })}
+                            
+                            {/* Only show 'Manage/Explore' if there are communities to show, per user request to be 'empty' otherwise */}
+                            {displayedCommunities.length > 0 && (
+                                <Link href="/community" className={styles.seeAllBtn} style={{padding:'8px 12px', color:'var(--primary)', fontWeight:'600', fontSize:'0.85rem'}} onClick={handleNavClick}>
+                                    {user ? "Manage Communities" : "Explore All"}
+                                </Link>
                             )}
-
-                            <Link href="/community" className={styles.seeAllBtn} style={{padding:'8px 12px', color:'var(--primary)', fontWeight:'600', fontSize:'0.85rem'}} onClick={handleNavClick}>
-                                {user ? "Manage Communities" : "Explore All"}
-                            </Link>
                         </div>
                     )}
                 </>

@@ -44,7 +44,8 @@ export default function CommunityPage() {
       loadMorePosts,
       loadingPosts,
       loading, 
-      requireAuth
+      requireAuth,
+      fetchExploreCommunities
   } = useCommunity();
   
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -57,6 +58,8 @@ export default function CommunityPage() {
            if (user) {
               setFeedTab('feed');
               fetchUserFeed(true);
+              // Lazy fetch explore communities for the sidebar "Explore" list
+              if (fetchExploreCommunities) fetchExploreCommunities();
           } else {
               setFeedTab('explore');
               fetchExploreFeed(true);

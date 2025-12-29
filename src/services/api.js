@@ -17,12 +17,12 @@ async function apiFetch(endpoint, options = {}) {
     if (!response.ok) {
         // Handle common errors like 401
         if (response.status === 401) {
-             console.warn("Unauthorized access");
-             // window.location.href = '/login'; // Optional: redirect
+            console.warn("Unauthorized access");
+            // window.location.href = '/login'; // Optional: redirect
         }
         throw new Error(`API Error: ${response.statusText}`);
     }
-    
+
     // safe parsing
     try {
         return await response.json();
@@ -43,6 +43,30 @@ export const auth = {
     }),
     logout: () => apiFetch('/auth/logout', { method: 'POST' }),
     me: () => apiFetch('/users/me'),
+    updateProfile: (data) => apiFetch('/users/me', {
+        method: 'PUT',
+        body: JSON.stringify(data)
+    }),
+    requestPasswordReset: (email) => apiFetch('/auth/forgot-password', {
+        method: 'POST',
+        body: JSON.stringify({ email }),
+    }),
+    verifyResetCode: (data) => apiFetch('/auth/verify-reset-code', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    }),
+    resetPassword: (data) => apiFetch('/auth/reset-password', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    }),
+    changePassword: (data) => apiFetch('/auth/change-password', {
+        method: 'POST',
+        body: JSON.stringify(data)
+    })
+};
+
+export const users = {
+    getMyActivity: () => apiFetch('/users/my-activity'),
 };
 
 export const communities = {
@@ -122,9 +146,17 @@ export const comments = {
 export const curriculum = {
     generate: (params) => {
         const searchParams = new URLSearchParams(params);
-        return apiFetch("/generate-curriculum/?" + searchParams.toString());
+        return apiFetch("/generate-curriculum?" + searchParams.toString());
     },
     get: (id) => apiFetch(`/playlists/${id}`),
+    getMyPlaylists: () => apiFetch('/playlists'),
+    completeResource: (resourceId) => apiFetch(`/resource/${resourceId}/complete`, {
+        method: 'POST'
+    }),
+    createPlaylist: (data) => apiFetch('/playlists', {
+        method: 'POST',
+        body: JSON.stringify(data)
+    }),
 };
 
-export default { auth, communities, posts, comments, curriculum };
+export default { auth, users, communities, posts, comments, curriculum };

@@ -1,93 +1,100 @@
-
 .container {
-  padding-bottom: 80px;
+    padding-bottom: 80px;
 }
 
 .headerBg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 400px;
-  background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
-  z-index: 0;
-  pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 400px;
+    background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+    z-index: 0;
+    pointer-events: none;
 }
 
 .header {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 32px;
-  padding: 60px 32px 40px 32px;
-  text-align: center;
-  z-index: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    padding: 60px 32px 40px 32px;
+    text-align: center;
+    z-index: 1;
 }
 
 .playlistImage {
-  width: 160px;
-  height: 160px;
-  background: linear-gradient(135deg, #6366f1, #a855f7);
-  box-shadow: 0 20px 50px -10px rgba(99, 102, 241, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 24px;
-  font-size: 4rem;
-  color: white;
-  animation: float 6s ease-in-out infinite;
+    width: 160px;
+    height: 160px;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    box-shadow: 0 20px 50px -10px rgba(99, 102, 241, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 24px;
+    font-size: 4rem;
+    color: white;
+    animation: float 6s ease-in-out infinite;
 }
 
 @keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-    100% { transform: translateY(0px); }
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
 }
 
 .playlistInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  align-items: center;
-  max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    max-width: 800px;
 }
 
 .type {
-  font-size: 0.85rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  color: var(--primary);
-  background: rgba(99, 102, 241, 0.1);
-  padding: 6px 12px;
-  border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--primary);
+    background: rgba(99, 102, 241, 0.1);
+    padding: 6px 12px;
+    border-radius: 20px;
 }
 
 .title {
-  font-size: 3.5rem;
-  font-weight: 900;
-  line-height: 1.1;
-  background: linear-gradient(135deg, var(--foreground) 0%, var(--secondary) 100%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+    font-size: 3.5rem;
+    font-weight: 900;
+    line-height: 1.1;
+    background: linear-gradient(135deg, var(--foreground) 0%, var(--secondary) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .description {
-  font-size: 1.1rem;
-  color: var(--secondary);
-  line-height: 1.6;
+    font-size: 1.1rem;
+    color: var(--secondary);
+    line-height: 1.6;
 }
 
 .meta {
-  font-size: 0.9rem;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  color: var(--secondary);
-  margin-top: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    color: var(--secondary);
+    margin-top: 8px;
 }
 
 .metaItem {
@@ -97,35 +104,35 @@
 }
 
 .controls {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 16px; 
-  margin-bottom: 24px;
-  z-index: 1;
-  position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    z-index: 1;
+    position: relative;
 }
 
 .playButton {
-  padding: 16px 48px;
-  background-color: var(--primary);
-  color: white;
-  border-radius: 32px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
+    padding: 16px 48px;
+    background-color: var(--primary);
+    color: white;
+    border-radius: 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
 }
 
 .playButton:hover {
-  background-color: var(--primary-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 20px 30px -10px rgba(79, 70, 229, 0.6);
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 20px 30px -10px rgba(79, 70, 229, 0.6);
 }
 
 .iconButton {
@@ -183,17 +190,16 @@
 .content {
     max-width: 1000px;
     margin: 0 auto;
-    padding: 0 24px; /* Added padding to prevent edge touching */
-    /* Removed unified background to allow separation */
+    padding: 0 24px;
 }
 
 /* Learning Objectives */
 .objectivesSection {
     padding: 32px;
     border: 1px solid var(--border);
-    background: rgba(99, 102, 241, 0.02); /* Slight tint */
+    background: rgba(99, 102, 241, 0.02);
     border-radius: 16px;
-    margin-bottom: 48px; /* Added spacing from curriculum */
+    margin-bottom: 48px;
 }
 
 .sectionTitle {
@@ -235,14 +241,13 @@
 .modulesContainer .sectionTitle {
     padding: 0;
     margin-bottom: 24px;
-    /* Removed padding to let it stand on its own */
 }
 
 .module {
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 16px;
-    margin-bottom: 24px; /* Separate modules */
+    margin-bottom: 24px;
     overflow: hidden;
 }
 
@@ -260,7 +265,12 @@
 }
 
 .moduleHeader:hover {
-    background-color: rgba(255,255,255,0.02);
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+.completedModuleHeader {
+    background-color: rgba(16, 185, 129, 0.05);
+    border-left: 4px solid #10b981;
 }
 
 .moduleTitle {
@@ -269,13 +279,13 @@
 
 .moduleContent {
     padding: 0 32px 32px 32px;
-    border-top: 1px solid var(--border); /* Visually separate header from content when expanded */
+    border-top: 1px solid var(--border);
     padding-top: 24px;
 }
 
 /* Lessons */
 .lesson {
-    background: rgba(255, 255, 255, 0.01); /* Very subtle background */
+    background: rgba(255, 255, 255, 0.01);
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 20px;
@@ -317,7 +327,7 @@
 
 .topicsLabel {
     font-size: 0.85rem;
-    color: var(--secondary); /* Ensure visibility */
+    color: var(--secondary);
     font-weight: 500;
     margin-top: 4px;
 }
@@ -351,7 +361,8 @@
     display: flex;
     gap: 16px;
     padding: 16px;
-    background: rgba(99, 102, 241, 0.05); /* Lighter background for better contrast */
+    background: rgba(99, 102, 241, 0.05);
+    /* Lighter background for better contrast */
     border: 1px solid rgba(99, 102, 241, 0.2);
     border-radius: 12px;
     text-decoration: none;
@@ -365,6 +376,40 @@
     transform: translateY(-2px);
 }
 
+.completedResource {
+    background: rgba(16, 185, 129, 0.05);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.completedResource:hover {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.5);
+}
+
+.nextUpResource {
+    background: rgba(99, 102, 241, 0.1);
+    border: 2px solid var(--primary);
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+    position: relative;
+    overflow: visible;
+}
+
+.nextUpBadge {
+    position: absolute;
+    top: -10px;
+    right: 16px;
+    background: var(--primary);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 2;
+}
+
 /* Highlight Animation */
 @keyframes pulseHighlight {
     0% {
@@ -372,11 +417,13 @@
         border-color: rgba(99, 102, 241, 0.8);
         background: rgba(99, 102, 241, 0.2);
     }
+
     70% {
         box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
         border-color: rgba(99, 102, 241, 0.3);
         background: rgba(99, 102, 241, 0.1);
     }
+
     100% {
         box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
         border-color: rgba(99, 102, 241, 0.3);
@@ -402,28 +449,45 @@
 
 .resourceHeaderRow {
     display: flex;
-    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.resourceTitleGroup {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.completedIcon {
+    color: #10b981;
+    /* Green for checkmarks */
+    margin-left: auto;
+    /* Push to far right */
+    display: flex;
     align-items: center;
 }
 
 .resourceLabel {
     font-weight: 600;
     font-size: 0.95rem;
-    color: var(--foreground); /* Fixed Contrast: Was white, now theme foreground */
+    color: var(--foreground);
 }
 
 .resourceTypeBadge {
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: var(--primary); /* Use primary color for visibility */
+    color: var(--primary);
     background: rgba(99, 102, 241, 0.1);
     padding: 2px 8px;
     border-radius: 4px;
 }
 
 .resourceDescription {
-    color: var(--secondary); /* Fixed Contrast: Was rgba white, now theme secondary */
+    color: var(--secondary);
     font-size: 0.85rem;
     margin: 0;
     line-height: 1.4;
@@ -431,11 +495,11 @@
 
 @media (max-width: 768px) {
     .header {
-        padding: 40px 16px;
+        padding: 40px 32px;
         flex-direction: column;
         align-items: flex-start;
     }
-    
+
     .playlistImage {
         width: 180px;
         height: 180px;
@@ -445,16 +509,28 @@
     .title {
         font-size: 2.5rem;
     }
-    
-    .objectivesSection, .moduleHeader, .moduleContent {
+
+    .objectivesSection,
+    .moduleHeader,
+    .moduleContent {
         padding: 24px 16px;
     }
-    
+
     .lesson {
         padding: 16px;
     }
-    
+
+    /* UPDATED: Add padding to controls on mobile */
     .controls {
-        flex-wrap: wrap; 
+        flex-wrap: wrap;
+        padding: 0 24px;
+        width: 100%;
+        gap: 12px;
+        /* Reduce gap slightly if needed for wrap */
+    }
+
+    /* UPDATED: Add padding to progress container on mobile */
+    .progressContainer {
+        padding: 0 24px;
     }
 }

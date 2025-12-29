@@ -1,6 +1,6 @@
 "use client";
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { GoogleIcon, GitHubIcon } from "@/components/Icons";
 import styles from './page.module.css';
 import { useAuth } from '@/context/AuthContext';
@@ -8,6 +8,8 @@ import { useState } from 'react';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get('redirect');
   const { login } = useAuth();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -24,7 +26,7 @@ export default function LoginPage() {
 
     try {
         await login({ email, password });
-        router.push('/dashboard');
+        router.push(redirect || '/dashboard');
     } catch (err) {
         setError(err.message || 'Login failed');
     } finally {

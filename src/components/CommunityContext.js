@@ -129,8 +129,7 @@ export function CommunityProvider({ children }) {
         
         // Determine which community list to fetch based on auth
         if (currentUser) {
-            // Authenticated: fetch Explore recommended + My Communities
-             promises.push(communityApi.getExplore().catch(e => []));
+            // Authenticated: ONLY fetch My Communities for the Sidebar
              promises.push(communityApi.getMyCommunities().catch(e => []));
         } else {
              // Unauthenticated: fetch All Communities list
@@ -146,15 +145,9 @@ export function CommunityProvider({ children }) {
         let newCommunities = [];
         
         if (currentUser) {
-            const [exploreRes, myRes] = results;
+            const [myRes] = results;
             
-            const exploreMapped = (exploreRes || []).map(c => ({
-                ...c,
-                isJoined: false, 
-                memberCount: c.member_count || 0,
-                tags: c.tags || []
-            }));
-
+            // We only have My Communities now
             const myMapped = (myRes || []).map(c => ({
                 ...c,
                 isJoined: true, 
@@ -162,7 +155,7 @@ export function CommunityProvider({ children }) {
                 tags: c.tags || []
             }));
 
-            newCommunities = [...myMapped, ...exploreMapped];
+            newCommunities = [...myMapped];
         } else {
             // Unauthenticated - just one list (mapped as not joined)
             const allRes = results[0];
@@ -206,9 +199,31 @@ export function CommunityProvider({ children }) {
     }
   }, [user]); // user is dependency now
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+
+
+  const fetchExploreCommunities = useCallback(async () => {
+    // Only needed if we want to fill the "Explore" list for authenticated users
+    if (!user) return; 
+
+    try {
+        const exploreRes = await communityApi.getExplore();
+        const exploreMapped = (exploreRes || []).map(c => ({
+            ...c,
+            isJoined: false, 
+            memberCount: c.member_count || 0,
+            tags: c.tags || []
+        }));
+        
+        setCommunities(prev => {
+             // Merge avoids duplicates
+            const existingIds = new Set(prev.map(c => c.id));
+            const distinctNew = exploreMapped.filter(c => !existingIds.has(c.id));
+            return [...prev, ...distinctNew];
+        });
+    } catch (e) {
+        console.error("Failed to fetch explore communities", e);
+    }
+  }, [user]);
 
   const joinCommunity = async (id) => {
     requireAuth(async () => {
@@ -313,7 +328,8 @@ export function CommunityProvider({ children }) {
 
   return (
     <CommunityContext.Provider value={{ 
-        communities, 
+        communities,
+        fetchInitialData: fetchData, 
         posts, 
         user,  // Expose User from AuthContext
         joinCommunity, 
@@ -322,6 +338,7 @@ export function CommunityProvider({ children }) {
         createPost,
         getCommunity,
         fetchCommunityDetails,
+        fetchExploreCommunities,
         fetchUserFeed,       
         fetchExploreFeed,    
         fetchCommunityPosts, 
