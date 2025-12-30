@@ -3,7 +3,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { curriculum } from "@/services/api";
 import styles from "./page.module.css";
-import { PlayIcon, ClockIcon, ChevronDown, ChevronUp, ZapIcon, HeartIcon, ShareIcon, MenuIcon, CheckCircleIcon, BookOpenIcon, VideoIcon } from "@/components/Icons";
+import { PlayIcon, ClockIcon, ChevronDown, ChevronUp, ZapIcon, ShareIcon, MenuIcon, CheckCircleIcon, BookOpenIcon, VideoIcon } from "@/components/Icons";
+import ShareModal from "@/components/ShareModal";
 
 // Helper to normalize API response to existing component state structure
 const normalizePlaylistData = (apiData) => {
@@ -88,8 +89,7 @@ export default function PlaylistPage({ params }) {
     const [completionPercentage, setCompletionPercentage] = useState(0);
     const [isStarted, setIsStarted] = useState(false);
 
-    // Mock state for liking (could be real if API supported it)
-    const [isLiked, setIsLiked] = useState(false);
+    const [showShareModal, setShowShareModal] = useState(false);
     const [highlightResource, setHighlightResource] = useState(false);
 
     // Ref to track if we have already fetched
@@ -346,19 +346,18 @@ export default function PlaylistPage({ params }) {
                     {isStarted ? "Continue Learning" : "Start Learning"}
                 </button>
 
-                <button
-                    className={styles.iconButton}
-                    onClick={() => setIsLiked(!isLiked)}
-                    title={isLiked ? "Remove from Library" : "Save to Library"}
-                    style={{ color: isLiked ? "var(--primary)" : "inherit" }}
-                >
-                    <HeartIcon fill={isLiked ? "currentColor" : "none"} />
-                </button>
-
-                <button className={styles.iconButton} title="Share Playlist">
+                <button className={styles.iconButton} title="Share Playlist" onClick={() => setShowShareModal(true)}>
                     <ShareIcon />
                 </button>
             </div>
+            
+            {showShareModal && (
+                <ShareModal 
+                    onClose={() => setShowShareModal(false)}
+                    url={typeof window !== 'undefined' ? window.location.href : ''}
+                    title={curriculumData.curriculum_title || 'Check out this playlist!'}
+                />
+            )}
 
             {/* Progress Bar only shown if started */}
             {isStarted && (

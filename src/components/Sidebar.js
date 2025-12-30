@@ -17,10 +17,11 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
 
   // Trigger initial fetch when Sidebar mounts
   useEffect(() => {
-      if (fetchInitialData) {
+      // Don't fetch for authenticated users in sidebar
+      if (fetchInitialData && user) {
           fetchInitialData();
       }
-  }, [fetchInitialData]);
+  }, [fetchInitialData, user]);
   
   // Accordion States (Expanded by default)
   const [isLibraryOpen, setIsLibraryOpen] = useState(true);
@@ -31,6 +32,7 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
 
   useEffect(() => {
     const fetchPlaylists = async () => {
+
         if (!user) {
             setPlaylists([]);
             return;
@@ -86,8 +88,8 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
       ? (communities || []).filter(c => c.isJoined)
       : (communities || []);
 
-  const displayedCommunities = sidebarCommunities.slice(0, 2);
-  const displayedPlaylists = playlists.slice(0, 3); // Show top 3
+  const displayedCommunities = user ? sidebarCommunities.slice(0, 1) : [];
+  const displayedPlaylists = playlists.slice(0, 1); // Show top 3
 
   const handleToggleTheme = () => {
       if (theme === 'system') setTheme('light');
@@ -102,6 +104,22 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
   };
   
   const handleNavClick = () => {
+      if (isMobile && onClose) {
+          onClose();
+      }
+  };
+
+  const handleProtectedNav = (e) => {
+      // Allow navigation if user is authenticated
+      if (user) {
+          handleNavClick();
+          return;
+      }
+      
+      // If unauthenticated, prevent default navigation and redirect to login
+      e.preventDefault();
+      router.push('/login');
+      // Also close sidebar on mobile if needed
       if (isMobile && onClose) {
           onClose();
       }
@@ -151,19 +169,19 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
               <ZapIcon size={28} fill="var(--primary)" /> <span>StudyFlow</span>
             </Link>
              
-            <Link href="/dashboard" className={styles.navItem} onClick={handleNavClick}>
+            <Link href="/dashboard" className={styles.navItem} onClick={handleProtectedNav}>
               <HomeIcon />
               <span>Home</span>
             </Link>
 
-            <Link href="/profile" className={styles.navItem} onClick={handleNavClick}>
+            <Link href="/profile" className={styles.navItem} onClick={handleProtectedNav}>
                 <UserIcon />
                 <span>Profile</span>
              </Link>
 
             {/* Library Accordion */}
             {isCollapsed ? (
-                 <Link href="/library" className={styles.navItem} title="Library" onClick={handleNavClick}>
+                 <Link href="/library" className={styles.navItem} title="Library" onClick={handleProtectedNav}>
                      <LibraryIcon />
                  </Link>
             ) : (
@@ -172,7 +190,7 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
                         className={`${styles.navItem} ${isLibraryOpen ? styles.active : ''}`} 
                         style={{cursor: 'pointer', justifyContent: 'space-between', paddingRight:'8px', marginTop: '0'}}
                     >
-                        <Link href="/library" style={{display:'flex', gap:'16px', alignItems:'center', textDecoration:'none', color:'inherit', flex:1}} onClick={handleNavClick}>
+                        <Link href="/library" style={{display:'flex', gap:'16px', alignItems:'center', textDecoration:'none', color:'inherit', flex:1}} onClick={handleProtectedNav}>
                             <LibraryIcon />
                             <span>Library</span>
                         </Link>
@@ -185,12 +203,12 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
                             }}
                             style={{padding:'4px', display:'flex', alignItems:'center'}}
                         >
-                            {isLibraryOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                            {user && (isLibraryOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />)}
                         </div>
                     </div>
                     {isLibraryOpen && (
                         <div style={{
-                            paddingLeft:'0', 
+                            paddingLeft:'0', backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '8px', overflow: 'hidden', 
                             marginTop:'0', 
                             marginBottom:'16px', 
                             display:'flex', 
@@ -208,11 +226,7 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
                                 </Link>
                             ))}
                             
-                             {displayedPlaylists.length > 0 && (
-                                <Link href="/library" className={styles.seeAllBtn} style={{padding:'8px 12px', color:'var(--primary)', fontWeight:'600', fontSize:'0.85rem'}} onClick={handleNavClick}>
-                                    See All
-                                </Link>
-                             )}
+
                         </div>
                     )}
                 </>
@@ -220,7 +234,7 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
 
             {/* Community Accordion */}
              {isCollapsed ? (
-                 <Link href="/community" className={styles.navItem} title="Community" onClick={handleNavClick}>
+                 <Link href="/community" className={styles.navItem} title="Community" onClick={handleProtectedNav}>
                      <UsersIcon />
                  </Link>
             ) : (
@@ -229,7 +243,7 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
                         className={`${styles.navItem} ${isCommunityOpen ? styles.active : ''}`} 
                         style={{cursor: 'pointer', justifyContent: 'space-between', paddingRight:'8px'}}
                     >
-                        <Link href="/community" style={{display:'flex', gap:'16px', alignItems:'center', textDecoration:'none', color:'inherit', flex:1}} onClick={handleNavClick}>
+                        <Link href="/community" style={{display:'flex', gap:'16px', alignItems:'center', textDecoration:'none', color:'inherit', flex:1}} onClick={handleProtectedNav}>
                             <UsersIcon />
                             <span>Community</span>
                         </Link>
@@ -242,12 +256,12 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
                             }}
                              style={{padding:'4px', display:'flex', alignItems:'center'}}
                         >
-                            {isCommunityOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                            {user && (isCommunityOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />)}
                         </div>
                     </div>
                     {isCommunityOpen && (
                         <div style={{
-                            paddingLeft:'0', 
+                            paddingLeft:'0', backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '8px', overflow: 'hidden', 
                             marginTop:'0', 
                             marginBottom:'16px', 
                             display:'flex', 
@@ -278,12 +292,7 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
                                 );
                             })}
                             
-                            {/* Only show 'Manage/Explore' if there are communities to show, per user request to be 'empty' otherwise */}
-                            {displayedCommunities.length > 0 && (
-                                <Link href="/community" className={styles.seeAllBtn} style={{padding:'8px 12px', color:'var(--primary)', fontWeight:'600', fontSize:'0.85rem'}} onClick={handleNavClick}>
-                                    {user ? "Manage Communities" : "Explore All"}
-                                </Link>
-                            )}
+
                         </div>
                     )}
                 </>

@@ -5,6 +5,7 @@ import Sidebar from './Sidebar';
 import MobileHeader from './MobileHeader';
 import styles from './ClientLayout.module.css';
 import { CommunityProvider } from './CommunityContext';
+import AuthGuard from './AuthGuard';
 
 export default function ClientLayout({ children }) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -50,6 +51,7 @@ export default function ClientLayout({ children }) {
 
   return (
     <CommunityProvider>
+        <AuthGuard>
         <div className={containerClass}>
         {!isAuthPage && (
             <Sidebar 
@@ -68,6 +70,7 @@ export default function ClientLayout({ children }) {
             </main>
         </div>
         </div>
+    </AuthGuard>
     </CommunityProvider>
   );
 }

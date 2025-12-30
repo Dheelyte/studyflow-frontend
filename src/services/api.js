@@ -17,10 +17,31 @@ async function apiFetch(endpoint, options = {}) {
     if (!response.ok) {
         // Handle common errors like 401
         if (response.status === 401) {
-            console.warn("Unauthorized access");
-            // window.location.href = '/login'; // Optional: redirect
+            // Auto Refresh Logic
+            const { _retry } = options;
+            if (!_retry) {
+                try {
+                    console.log("Token expired, attempting refresh...");
+                    // Call refresh endpoint
+                    await apiFetch('/auth/refresh', { 
+                        method: 'POST', 
+                        _retry: true // Access internal directly to avoid recursing on this call if 401
+                    });
+                    
+                    // Retry original request
+                    return apiFetch(endpoint, { ...options, _retry: true });
+                } catch (refreshErr) {
+                    console.error("Session refresh failed", refreshErr);
+                    // Redirect to login if refresh fails
+                    window.location.href = '/login'; 
+                    throw new Error('Session expired');
+                }
+            } else {
+                 console.warn("Unauthorized access (retry failed)");
+                 window.location.href = '/login';
+            }
         }
-        throw new Error(`API Error: ${response.statusText}`);
+        throw new Error(`API Error: (${response.status}) ${response.statusText}`);
     }
 
     // safe parsing
