@@ -85,8 +85,8 @@ export default function CommunityPage() {
       rootMargin: '200px'
   });
 
-  const handleCreateCommunity = (data) => {
-      const newSlug = createCommunity(data);
+  const handleCreateCommunity = async (data) => {
+      const newSlug = await createCommunity(data);
       setShowCreateModal(false);
       router.push(`/community/${newSlug}`);
   };

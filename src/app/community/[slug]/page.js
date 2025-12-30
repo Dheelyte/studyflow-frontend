@@ -38,12 +38,20 @@ export default function CommunityDetail({ params }) {
 function CommunityDetailContent({ slug }) {
   const { user, getCommunity, posts, createPost, joinCommunity, leaveCommunity, fetchCommunityPosts, fetchCommunityDetails, loadingPosts, hasMorePosts, loadMorePosts } = useCommunity();
   const community = getCommunity(slug);
+  const [fetchError, setFetchError] = React.useState(false);
   
   // Fetch posts AND details (for member count) when entering the community
   useEffect(() => {
       if (slug) {
+         setFetchError(false);
          fetchCommunityPosts(slug);
-         fetchCommunityDetails(slug);
+         fetchCommunityDetails(slug).then(res => {
+             // If no result and not already in store (getCommunity uses store)
+             // We need to pass the updated function or rely on refetch result
+             if (!res && !getCommunity(slug)) {
+                 setFetchError(true);
+             }
+         });
       }
   }, [slug, fetchCommunityPosts, fetchCommunityDetails]);
   
@@ -56,6 +64,22 @@ function CommunityDetailContent({ slug }) {
       enabled: !loadingPosts && hasMorePosts(),
       rootMargin: '200px'
   });
+
+  if (fetchError) {
+      return (
+         <div className={styles.page}>
+             <div className={styles.mainColumn}>
+                <Link href="/community" className={styles.backBtn} style={{display:'flex', gap:'8px', alignItems:'center', marginBottom:'24px', color:'var(--secondary)'}}>
+                    <ChevronLeft size={16} /> Back to Hub
+                </Link>
+                <div style={{textAlign: 'center', padding: '60px 20px', color: 'var(--secondary)'}}>
+                    <h2>Community not found</h2>
+                    <p style={{marginTop:'8px'}}>The community you are looking for does not exist or has been removed.</p>
+                </div>
+             </div>
+         </div>
+      );
+  }
 
   if (!community) {
       return (

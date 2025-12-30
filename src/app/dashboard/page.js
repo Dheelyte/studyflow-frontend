@@ -8,13 +8,15 @@ import GenerationOverlay from "@/components/GenerationOverlay";
 import IntegratedSearchBar from "@/components/IntegratedSearchBar";
 import { ZapIcon, StarIcon, TrophyIconSimple } from '@/components/Icons';
 import { useAuth } from '@/context/AuthContext';
-import { curriculum } from '@/services/api';
+import { curriculum, communities } from '@/services/api';
 
 export default function Dashboard() {
     const [greeting, setGreeting] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
     const [genParams, setGenParams] = useState(null);
     const [playlists, setPlaylists] = useState([]);
+    const [exploreCommunities, setExploreCommunities] = useState([]);
+    const [loadingCommunities, setLoadingCommunities] = useState(true);
     const router = useRouter();
     const { user, checkUser } = useAuth();
 
@@ -29,13 +31,18 @@ export default function Dashboard() {
         checkUser();
     }, []); // Run ONCE on mount
 
-    // Fetch Playlists when User is available
+    // Fetch Playlists and Communities when User is available
     useEffect(() => {
-        const fetchPlaylists = async () => {
+        const fetchDashboardData = async () => {
             try {
-                const response = await curriculum.getMyPlaylists();
-                if (Array.isArray(response)) {
-                    // Map to Card props
+                // Parallel fetch
+                const [playlistsRes, communitiesRes] = await Promise.all([
+                    curriculum.getMyPlaylists().catch(e => []),
+                    communities.getExplore().catch(e => [])
+                ]);
+
+                // Process Playlists
+                if (Array.isArray(playlistsRes)) {
                     const colors = [
                         'linear-gradient(135deg, #6366f1, #8b5cf6)',
                         'linear-gradient(135deg, #ec4899, #f43f5e)',
@@ -43,27 +50,32 @@ export default function Dashboard() {
                         'linear-gradient(135deg, #f59e0b, #fbbf24)',
                         'linear-gradient(135deg, #3b82f6, #0ea5e9)'
                     ];
-
-                    const mapped = response.map((item, index) => ({
+                    const mapped = playlistsRes.map((item, index) => ({
                         id: item.id,
                         title: item.playlist?.title || "Untitled",
                         description: "0% Complete • Just Started", // Mock
                         color: colors[index % colors.length],
                         link: `/playlist/${item.playlist?.id || 1}`
                     }));
-
                     setPlaylists(mapped);
                 }
+
+                // Process Communities
+                if (Array.isArray(communitiesRes)) {
+                    setExploreCommunities(communitiesRes.slice(0, 3));
+                }
+
             } catch (error) {
-                console.error("Failed to fetch dashboard playlists", error);
+                console.error("Failed to fetch dashboard data", error);
+            } finally {
+                setLoadingCommunities(false);
             }
         };
 
         if (user) {
-            fetchPlaylists();
+            fetchDashboardData();
         }
-
-    }, [user?.id]); // Only refetch if User ID changes
+    }, [user?.id]);
 
     const handleSearch = (params) => {
         setGenParams(params);
@@ -153,6 +165,35 @@ export default function Dashboard() {
                     ) : (
                         <div style={{ color: 'var(--secondary)', padding: '20px', gridColumn: '1/-1' }}>
                             No recent activity. Start a new topic above!
+                        </div>
+                    )}
+                </div>
+            </section>
+
+            {/* Explore Communities Section */}
+            <section className={styles.section}>
+                <div className={styles.sectionHeader}>
+                    <h2 className={styles.sectionTitle}>Explore Communities</h2>
+                    <Link href="/community" className={styles.showAll}>View All</Link>
+                </div>
+                <div className={styles.grid}>
+                    {loadingCommunities ? (
+                         <div style={{ color: 'var(--secondary)', padding: '20px', gridColumn: '1/-1' }}>
+                            Loading communities...
+                        </div>
+                    ) : exploreCommunities.length > 0 ? (
+                        exploreCommunities.map((comm) => (
+                            <Link key={comm.id} href={`/community/${comm.id}`} style={{ display: 'contents' }}>
+                                <Card 
+                                    title={comm.name} 
+                                    description={`${comm.member_count} Members • ${comm.description || 'Join the discussion'}`}
+                                    color="linear-gradient(135deg, #0f172a, #334155)" 
+                                />
+                            </Link>
+                        ))
+                    ) : (
+                         <div style={{ color: 'var(--secondary)', padding: '20px', gridColumn: '1/-1' }}>
+                            No communities found.
                         </div>
                     )}
                 </div>

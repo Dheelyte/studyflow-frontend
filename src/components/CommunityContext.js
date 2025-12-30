@@ -170,22 +170,32 @@ export function CommunityProvider({ children }) {
         console.log("fetchData new communities:", newCommunities);
 
         setCommunities(prev => {
-            const existingMap = new Map(prev.map(c => [c.id, c]));
+            const newMap = new Map(newCommunities.map(c => [c.id, c]));
             
-            const merged = newCommunities.map(nc => {
-                const existing = existingMap.get(nc.id);
-                if (existing) {
-                    const useExistingCount = (nc.memberCount === 0 && existing.memberCount > 0);
+            // 1. Update existing items in 'prev'
+            const updatedPrev = prev.map(existing => {
+                const match = newMap.get(existing.id);
+                if (match) {
+                    // Update existing with new data
+                    const useExistingCount = (match.memberCount === 0 && existing.memberCount > 0);
                     return {
-                        ...existing, 
-                        ...nc, 
-                        memberCount: useExistingCount ? existing.memberCount : nc.memberCount
+                        ...existing,
+                        ...match,
+                        memberCount: useExistingCount ? existing.memberCount : match.memberCount,
+                        // If newCommunities is MyCommunities, and match found, isJoined must be true (usually)
+                        // But let's trust match.isJoined
                     };
                 }
-                return nc;
+                // If not in new list, KEEP it
+                // (e.g. an Explore community we are viewing details for)
+                return existing;
             });
             
-            return merged;
+            // 2. Find fully new items in 'newCommunities' that weren't in 'prev'
+            const prevIds = new Set(prev.map(c => c.id));
+            const brandNew = newCommunities.filter(nc => !prevIds.has(nc.id));
+            
+            return [...updatedPrev, ...brandNew];
         });
 
     } catch (err) {

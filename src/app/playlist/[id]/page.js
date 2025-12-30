@@ -165,6 +165,23 @@ export default function PlaylistPage({ params }) {
                     }
 
                     setExpandedModules({ [moduleToExpand]: true });
+
+                    // Scroll to Next Up resource after a brief delay to allow rendering
+                    setTimeout(() => {
+                        const nextUp = document.getElementById("next-up-resource");
+                        const target = nextUp; 
+                        
+                        if (target) {
+                            target.scrollIntoView({ behavior: "smooth", block: "center" });
+                            
+                            // Only highlight if the user has already started (resuming)
+                            // This prevents the "glow" effect on a brand new playlist where the first item is naturally next
+                            if (data.isStarted) {
+                                setHighlightResource(true);
+                                setTimeout(() => setHighlightResource(false), 2000);
+                            }
+                        }
+                    }, 600);
                 }
 
             } catch (err) {
