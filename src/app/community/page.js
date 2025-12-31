@@ -8,29 +8,8 @@ import CommunityStories from '@/components/CommunityStories';
 import { useCommunity } from '@/components/CommunityContext';
 import { PlusIcon } from '@/components/Icons';
 import useIntersectionObserver from '@/hooks/useIntersectionObserver';
-import Spinner from '@/components/Spinner';
+import PostSkeleton from '@/components/PostSkeleton';
 
-const PostSkeleton = () => (
-    <div style={{
-        background: 'var(--card)',
-        border: '1px solid var(--border)',
-        borderRadius: '16px',
-        padding: '24px',
-        marginBottom: '16px'
-    }}>
-       <div style={{display:'flex', gap:'12px', marginBottom:'16px'}}>
-           <div style={{width:'40px', height:'40px', borderRadius:'50%', background:'var(--border)', animation: 'pulse 1.5s infinite'}}></div>
-           <div style={{flex: 1}}>
-               <div style={{width: '30%', height:'14px', background:'var(--border)', borderRadius:'4px', marginBottom:'6px', animation: 'pulse 1.5s infinite'}}></div>
-               <div style={{width: '15%', height:'12px', background:'var(--border)', borderRadius:'4px', animation: 'pulse 1.5s infinite'}}></div>
-           </div>
-       </div>
-       <div style={{marginBottom:'24px'}}>
-            <div style={{width: '100%', height:'16px', background:'var(--border)', borderRadius:'4px', marginBottom:'8px', animation: 'pulse 1.5s infinite'}}></div>
-            <div style={{width: '90%', height:'16px', background:'var(--border)', borderRadius:'4px', marginBottom:'8px', animation: 'pulse 1.5s infinite'}}></div>
-       </div>
-    </div>
-);
 
 export default function CommunityPage() {
   const { 
@@ -197,7 +176,7 @@ export default function CommunityPage() {
              <div ref={loadMoreRef} style={{height:'20px', margin:'20px 0'}}>
                 {loadingPosts && posts.length > 0 && (
                     <div style={{textAlign:'center', padding:'20px', color:'var(--secondary)', display:'flex', justifyContent:'center'}}>
-                        <Spinner />
+                        <PostSkeleton />
                     </div>
                 )}
             </div>

@@ -5,7 +5,7 @@ import { SearchIcon, ZapIcon } from "@/components/Icons";
 import CustomDropdown from "@/components/CustomDropdown";
 import styles from './IntegratedSearchBar.module.css';
 
-export default function IntegratedSearchBar({ redirect = false, onSearch }) {
+export default function IntegratedSearchBar({ redirect = false, onSearch, shadow = true }) {
     const router = useRouter();
     const [themeQuery, setQuery] = useState('');
     const [experience, setExperience] = useState('');
@@ -42,14 +42,14 @@ export default function IntegratedSearchBar({ redirect = false, onSearch }) {
             // or directly to playlist generation if that was the flow.
             // Let's redirect to dashboard with search params so dashboard can pick it up if we wanted.
             // For MVP simplicity, let's redirect to playlist generation directly!
-             router.push(`/playlist/1?${queryString}`);
+             router.push(`/curriculum?${queryString}`);
         } else if (onSearch) {
             onSearch({ topic: themeQuery, experience: finalExperience, duration: finalDuration });
         }
     };
 
     return (
-        <div className={styles.integratedSearchBar}>
+        <div className={`${styles.integratedSearchBar} ${!shadow ? styles.noShadow : ""}`}>
             {/* Group Input and Icon together for mobile alignment */}
             <div className={styles.inputGroup}>
                 <div className={styles.searchIconWrapper}>

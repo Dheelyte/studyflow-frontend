@@ -83,7 +83,7 @@
     transform: scale(1.05);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 768px) {
     .integratedSearchBar {
       flex-direction: column;
       border-radius: 24px;
@@ -111,4 +111,8 @@
   .searchInput {
       padding: 12px 16px; /* Adjust padding */
   }
+}
+
+.noShadow {
+    box-shadow: none !important;
 }

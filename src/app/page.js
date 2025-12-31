@@ -1,5 +1,5 @@
 "use client";
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from './page.module.css';
@@ -13,6 +13,30 @@ export default function LandingPage() {
     const [isGenerating, setIsGenerating] = useState(false);
     const [genParams, setGenParams] = useState(null);
     const router = useRouter();
+    const videoRef = useRef(null);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        videoRef.current?.play().catch(e => console.log('Autoplay prevented', e));
+                    } else {
+                        videoRef.current?.pause();
+                    }
+                });
+            },
+            { threshold: 0.9 }
+        );
+
+        if (videoRef.current) {
+            observer.observe(videoRef.current);
+        }
+
+        return () => {
+            observer.disconnect();
+        };
+    }, []);
 
     const handleSearch = (params) => {
         setGenParams(params);
@@ -67,7 +91,7 @@ export default function LandingPage() {
                 </FadeIn>
 
                 <FadeIn direction="up" delay={0.2} style={{ width: '100%', maxWidth: '900px', marginTop: '32px' }}>
-                    <IntegratedSearchBar onSearch={handleSearch} />
+                    <IntegratedSearchBar redirect={true} />
                 </FadeIn>
 
                 <FadeIn direction="up" delay={0.3} className={styles.heroFooter}>
@@ -83,7 +107,7 @@ export default function LandingPage() {
                         width: '100%'
                     }}>
                         <video
-                            autoPlay
+                            ref={videoRef}
                             loop
                             muted
                             playsInline

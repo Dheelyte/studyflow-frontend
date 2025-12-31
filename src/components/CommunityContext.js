@@ -208,6 +208,10 @@ export function CommunityProvider({ children }) {
         }
     }
   }, [user]); // user is dependency now
+  // Trigger initial fetch
+  useEffect(() => {
+      fetchData();
+  }, [fetchData]);
 
 
 

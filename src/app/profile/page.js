@@ -1,9 +1,9 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import styles from './page.module.css';
-import { ZapIcon, StarIcon, TrophyIconSimple, TrendingUpIcon } from '@/components/Icons';
+import { ZapIcon, StarIcon, TrophyIconSimple } from '@/components/Icons';
 import { useAuth } from '@/context/AuthContext';
-import { users, curriculum } from '@/services/api'; 
+import { users } from '@/services/api'; 
 import EditProfileModal from '@/components/EditProfileModal';
 
 export default function ProfilePage() {
@@ -19,8 +19,6 @@ export default function ProfilePage() {
       title: user?.level_name || "Novice" 
   };
 
-  const [activeFlows, setActiveFlows] = useState([]);
-
   const getLast12Months = () => {
     const months = [];
     const date = new Date();
@@ -34,7 +32,7 @@ export default function ProfilePage() {
   
   const monthLabels = getLast12Months();
 
-  const [heatmapData, setHeatmapData] = useState(Array(365).fill(0));
+  const [heatmapData, setHeatmapData] = useState([]);
 
   const getIntensityClass = (count) => {
       if (count === 0) return '';
@@ -57,14 +55,21 @@ export default function ProfilePage() {
                 const data = [];
                 const today = new Date();
                 
-                for (let i = 364; i >= 0; i--) {
-                     const d = new Date(today);
-                     d.setDate(d.getDate() - i);
-                     // Local YYYY-MM-DD
-                     const dateStr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+                // Start from ~1 year ago, aligned to Sunday
+                const startDate = new Date(today);
+                startDate.setDate(today.getDate() - 365);
+                const dayOfWeek = startDate.getDay();
+                if (dayOfWeek !== 0) {
+                    startDate.setDate(startDate.getDate() - dayOfWeek);
+                }
+                
+                const itr = new Date(startDate);
+                while (itr <= today) {
+                     const dateStr = itr.getFullYear() + '-' + String(itr.getMonth() + 1).padStart(2, '0') + '-' + String(itr.getDate()).padStart(2, '0');
                      
                      const count = activityMap.get(dateStr) || 0;
-                     data.push(count);
+                     data.push({ count, date: dateStr });
+                     itr.setDate(itr.getDate() + 1);
                 }
                 setHeatmapData(data);
             }
@@ -73,39 +78,8 @@ export default function ProfilePage() {
         }
     };
 
-    const fetchPlaylists = async () => {
-        try {
-            // Using curriculum service to fetch my playlists
-            const response = await curriculum.getMyPlaylists();
-            if (Array.isArray(response)) {
-                // Map API response to UI model
-                // API: [{ id, user_id, created_at, playlist: { id, title } }]
-                const colors = [
-                    'linear-gradient(135deg, #6366f1, #a855f7)', // Indigo-Purple
-                    'linear-gradient(135deg, #3b82f6, #06b6d4)', // Blue-Cyan
-                    'linear-gradient(135deg, #10b981, #34d399)', // Green-Emerald
-                    'linear-gradient(135deg, #f59e0b, #fbbf24)', // Amber-Yellow
-                    'linear-gradient(135deg, #ec4899, #f472b6)'  // Pink-Rose
-                ];
-
-                const mapped = response.map((item, index) => ({
-                    id: item.id, // UserPlaylist ID
-                    title: item.playlist?.title || "Untitled Playlist",
-                    // Mocking progress as API doesn't provide it yet
-                    progress: 0, 
-                    color: colors[index % colors.length],
-                    modules: 'Start Learning' // Default text
-                }));
-                setActiveFlows(mapped);
-            }
-        } catch (error) {
-             console.error("Failed to fetch playlists:", error);
-        }
-    };
-
     if (user) {
         fetchActivity();
-        fetchPlaylists();
     }
   }, [user?.id]);
 
@@ -205,60 +179,43 @@ export default function ProfilePage() {
       <div className={styles.heatmapSection}>
           <div className={styles.sectionTitle}>
               <span>Activity Log</span>
-              <span style={{fontSize:'0.9rem', color:'var(--secondary)', fontWeight:'400'}}>Last 365 Days</span>
+              <span style={{fontSize:'0.9rem', color:'var(--secondary)', fontWeight:'400'}}>Last Year</span>
           </div>
           
-          <div className={styles.heatmapContainer}>
-              {/* Month Labels */}
-              <div className={styles.monthLabels}>
-                  {monthLabels.map((month, i) => (
-                      <span key={i}>{month}</span>
-                  ))}
-              </div>
+          <div className={styles.heatmapFlexContainer}>
+            {/* Day Labels - Fixed to left */}
+            <div className={styles.dayLabels}>
+                <span></span>
+                <span>Mon</span>
+                <span></span>
+                <span>Wed</span>
+                <span></span>
+                <span>Fri</span>
+                <span></span>
+            </div>
 
-              {/* Grid */}
-              <div ref={scrollRef} className={styles.heatmapGrid}>
-                {heatmapData.map((count, i) => (
-                    <div 
-                        key={i} 
-                        className={`${styles.heatBox} ${getIntensityClass(count)}`} 
-                        title={`Activity: ${count} contributions`}
-                    ></div>
-                ))}
+            <div className={styles.heatmapScrollWrapper} ref={scrollRef}>
+                <div className={styles.heatmapInnerContent}>
+                    {/* Month Labels */}
+                    <div className={styles.monthLabels}>
+                        {monthLabels.map((month, i) => (
+                            <span key={i}>{month}</span>
+                        ))}
+                    </div>
+
+                    {/* Grid */}
+                    <div className={styles.heatmapGrid}>
+                        {heatmapData.map((dayData, i) => (
+                            <div 
+                                key={i} 
+                                className={`${styles.heatBox} ${getIntensityClass(dayData.count)}`} 
+                                title={`${dayData.date}: ${dayData.count} activities`}
+                            ></div>
+                        ))}
+                    </div>
+                </div>
             </div>
           </div>
-      </div>
-
-      {/* Active Flows */}
-       <div className={styles.activeSection}>
-          <h2 className={styles.sectionTitle}>Active Flows</h2>
-          {activeFlows.length > 0 ? (
-            <div className={styles.flowsGrid}>
-                {activeFlows.map(flow => (
-                    <div key={flow.id} className={styles.flowCard}>
-                        <div className={styles.flowHeader} style={{background: flow.color}}>
-                            <span style={{width: 'fit-content', background:'rgba(0,0,0,0.2)', padding:'4px 8px', borderRadius:'6px', fontSize:'0.75rem', backdropFilter:'blur(4px)'}}>
-                                In Progress
-                            </span>
-                        </div>
-                        <div className={styles.flowBody}>
-                            <div className={styles.flowTitle}>{flow.title}</div>
-                            <div className={styles.flowMeta}>
-                                <span>{flow.modules}</span>
-                                <span>{flow.progress}%</span>
-                            </div>
-                            <div className={styles.progressBar}>
-                                <div className={styles.progress} style={{width: `${flow.progress}%`}}></div>
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-          ) : (
-            <div style={{color: 'var(--secondary)', padding: '24px', textAlign: 'center', border: '1px dashed var(--border)', borderRadius: '16px'}}>
-                No active flows found. Start a new curriculum to see it here!
-            </div>
-          )}
       </div>
 
     </div>

@@ -1,9 +1,10 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
+import PlaylistSkeleton from '@/components/PlaylistSkeleton';
 import { curriculum } from "@/services/api";
 import styles from "./page.module.css";
-import { PlayIcon, ClockIcon, ChevronDown, ChevronUp, ZapIcon, ShareIcon, MenuIcon, CheckCircleIcon, BookOpenIcon, VideoIcon } from "@/components/Icons";
+import { PlayIcon, ClockIcon, ChevronDown, ChevronUp, ZapIcon, ShareIcon, MenuIcon, CheckCircleIcon, BookOpenIcon, VideoIcon, TrophyIconSimple } from "@/components/Icons";
 import ShareModal from "@/components/ShareModal";
 
 // Helper to normalize API response to existing component state structure
@@ -31,9 +32,15 @@ const normalizePlaylistData = (apiData) => {
                 }
 
                 let isNextUp = false;
-                if (!r.is_completed && !foundNextUp) {
-                    isNextUp = true;
-                    foundNextUp = true;
+                let isLocked = false;
+
+                if (!r.is_completed) {
+                    if (!foundNextUp) {
+                        isNextUp = true;
+                        foundNextUp = true;
+                    } else {
+                        isLocked = true;
+                    }
                 }
 
                 return {
@@ -43,18 +50,22 @@ const normalizePlaylistData = (apiData) => {
                     description: r.description,
                     resource_url: r.url,
                     is_completed: r.is_completed,
-                    isNextUp: isNextUp
+                    isNextUp: isNextUp,
+                    isLocked: isLocked
                 };
             })
         }));
 
         const isComplete = moduleResourcesTotal > 0 && moduleResourcesTotal === moduleResourcesCompleted;
+        // Lock quiz if we have encountered an incomplete resource (meaning we plan to do it next, or later)
+        const isQuizLocked = foundNextUp;
 
         return {
             module_id: m.id,
             module_title: m.title,
             lessons: lessons,
-            is_module_completed: isComplete
+            is_module_completed: isComplete,
+            isQuizLocked: isQuizLocked
         };
     });
 
@@ -70,7 +81,8 @@ const normalizePlaylistData = (apiData) => {
         learning_objectives: apiData.objectives || [], // Handle null objectives
         completionPercentage, // Add calculated progress
         isStarted: completedResources > 0, // Auto-start if there is progress
-        nextUpId: foundNextUp ? "next-up-resource" : null // Helper for scrolling
+        nextUpId: foundNextUp ? "next-up-resource" : null, // Helper for scrolling
+        level: apiData.level || "Beginner"
     };
 };
 
@@ -220,8 +232,13 @@ export default function PlaylistPage({ params }) {
     };
 
     // Updated handler with redundancy check
-    const handleResourceClick = async (resourceId, url, isCompleted, e) => {
+    const handleResourceClick = async (resourceId, url, isCompleted, isLocked, e) => {
         // e.preventDefault(); // Optional: decide if we want to block navigation until complete. Usually unsafe for UX.
+
+        if (isLocked) {
+             // Allow navigation but do not track progress
+             return;
+        }
 
         // Check if already completed to avoid redundant calls
         if (isCompleted) {
@@ -279,15 +296,7 @@ export default function PlaylistPage({ params }) {
 
 
     if (loading) {
-        return (
-            <div className={styles.container} style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ color: 'var(--text-primary)', textAlign: 'center' }}>
-                    <div className={styles.loadingSpinner}></div>
-                    <h2>{playlistId ? "Loading your playlist..." : "Generating your personalized curriculum..."}</h2>
-                    <p>This may take a few seconds.</p>
-                </div>
-            </div>
-        );
+        return <PlaylistSkeleton />;
     }
 
     if (error) {
@@ -321,7 +330,7 @@ export default function PlaylistPage({ params }) {
                     <ZapIcon size={64} fill="white" />
                 </div>
                 <div className={styles.playlistInfo}>
-                    <span className={styles.type}>Curriculum</span>
+                    <span className={styles.type}>{(curriculumData.level || "Beginner").toUpperCase()}</span>
                     <h1 className={styles.title}>{curriculumData.curriculum_title}</h1>
                     <p className={styles.description}>{curriculumData.overview}</p>
                     <div className={styles.meta}>
@@ -446,9 +455,9 @@ export default function PlaylistPage({ params }) {
                                                                     ${resource.isNextUp && highlightResource ? styles.highlight : ""}
                                                                 `}
                                                                 // UPDATED: Pass is_completed to handler
-                                                                onClick={(e) => handleResourceClick(resource.resource_id, resource.resource_url, resource.is_completed, e)}
+                                                                onClick={(e) => handleResourceClick(resource.resource_id, resource.resource_url, resource.is_completed, resource.isLocked, e)}
                                                                 style={{
-                                                                    // Override inline opacity and border if needed, or rely on classes
+                                                                    opacity: resource.isLocked ? 0.6 : 1,
                                                                 }}
                                                             >
                                                                 {resource.isNextUp && <div className={styles.nextUpBadge}>Next Up</div>}
@@ -472,6 +481,32 @@ export default function PlaylistPage({ params }) {
                                                 </div>
                                             </div>
                                         ))}
+                                        
+                                        <div style={{ marginTop: '1.5rem', padding: '0 1rem 1.5rem 1rem' }}>
+                                            <button 
+                                                className={styles.resourceCard} 
+                                                disabled={module.isQuizLocked}
+                                                style={{ 
+                                                width: '100%', 
+                                                background: 'linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,165,0,0.05))',
+                                                border: '1px solid rgba(255,215,0,0.3)',
+                                                justifyContent: 'flex-start',
+                                                gap: '12px',
+                                                cursor: module.isQuizLocked ? 'not-allowed' : 'pointer',
+                                                textAlign: 'left',
+                                                padding: '16px',
+                                                opacity: module.isQuizLocked ? 0.5 : 1
+                                            }} onClick={() => !module.isQuizLocked && alert("Quiz feature coming soon!")}>
+                                                <div className={styles.resourceIcon} style={{ background: 'rgba(255,215,0,0.2)', color: '#ffd700' }}>
+                                                    <TrophyIconSimple size={20} />
+                                                </div>
+                                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                                                    <span style={{ fontWeight: '700', color: 'var(--foreground)' }}>{module.isQuizLocked ? "Quiz Locked" : "Ready to test your knowledge?"}</span>
+                                                    <span style={{ fontSize: '0.85rem', color: 'var(--secondary)' }}>{module.isQuizLocked ? "Complete all previous items to unlock." : `Take the ${module.module_title} Quiz`}</span>
+                                                </div>
+                                            </button>
+                                        </div>
+
                                     </div>
                                 )}
                             </div>

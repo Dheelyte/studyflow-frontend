@@ -15,45 +15,26 @@ export function AuthProvider({ children }) {
     const router = useRouter();
 
     useEffect(() => {
-        // Load cached user data if available
-        const cachedUser = localStorage.getItem(USER_DATA_KEY);
-        if (cachedUser) {
-            try {
-                setUser(JSON.parse(cachedUser));
-            } catch (e) {
-                console.error('Failed to parse cached user data', e);
-            }
-        }
-        setLoading(false);
+        checkUser();
     }, []);
 
     const checkUser = useCallback(async () => {
-        // Optimization: Don't check server if we know we aren't logged in
-        const isLoggedIn = localStorage.getItem(IS_LOGGED_IN_KEY);
-
-        // Explicitly check for the string 'true'
-        if (isLoggedIn !== 'true') {
-            setUser(null);
-            setLoading(false);
-            return;
-        }
-
         try {
-            // FIX: Changed authentic.getMe() to auth.me()
+            // Always try to fetch the user. The backend (via cookies) is the source of truth.
+            // If valid cookies exist, this will succeed (possibly triggering a refresh).
             const response = await auth.me(); 
             // Handle response structure depending on if apiFetch returns { data: user } or just user
             const userData = response.data || response;
             
             setUser(userData);
             localStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
-            // Ensure key is set if successful
             localStorage.setItem(IS_LOGGED_IN_KEY, 'true');
         } catch (error) {
             // Not logged in or session expired
-            console.warn("Session expired or invalid:", error);
+            console.warn("Session check failed:", error);
             setUser(null);
             localStorage.removeItem(IS_LOGGED_IN_KEY);
-        localStorage.removeItem(USER_DATA_KEY);
+            localStorage.removeItem(USER_DATA_KEY);
         } finally {
             setLoading(false);
         }

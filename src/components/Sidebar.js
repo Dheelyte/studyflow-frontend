@@ -1,95 +1,16 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import styles from './Sidebar.module.css';
-import { HomeIcon, LibraryIcon, PlusIcon, ZapIcon, ChevronLeft, ChevronRight, XIcon, LaptopIcon, UsersIcon, UserIcon, ChevronDown, ChevronUp, SunIcon, MoonIcon } from './Icons';
+import { HomeIcon, LibraryIcon, ZapIcon, ChevronLeft, ChevronRight, XIcon, LaptopIcon, UserIcon, SunIcon, MoonIcon, UsersIcon } from './Icons';
 import { useTheme } from './ThemeProvider';
 import { useAuth } from '@/context/AuthContext';
-import { useCommunity } from './CommunityContext';
-import { curriculum } from '@/services/api';
 
 export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse, isMobile }) {
   const router = useRouter();
   const { user, logout } = useAuth();
   const { theme, setTheme } = useTheme();
-  const { communities = [], fetchInitialData } = useCommunity() || {};
-
-  // Trigger initial fetch when Sidebar mounts
-  useEffect(() => {
-      // Don't fetch for authenticated users in sidebar
-      if (fetchInitialData && user) {
-          fetchInitialData();
-      }
-  }, [fetchInitialData, user]);
-  
-  // Accordion States (Expanded by default)
-  const [isLibraryOpen, setIsLibraryOpen] = useState(true);
-  const [isCommunityOpen, setIsCommunityOpen] = useState(true);
-
-  // Playlist State
-  const [playlists, setPlaylists] = useState([]);
-
-  useEffect(() => {
-    const fetchPlaylists = async () => {
-
-        if (!user) {
-            setPlaylists([]);
-            return;
-        }
-        try {
-            const response = await curriculum.getMyPlaylists();
-            if (Array.isArray(response)) {
-                const colors = [
-                    'linear-gradient(135deg, #6366f1, #a855f7)', 
-                    'linear-gradient(135deg, #3b82f6, #06b6d4)', 
-                    'linear-gradient(135deg, #10b981, #34d399)', 
-                    'linear-gradient(135deg, #f59e0b, #fbbf24)', 
-                    'linear-gradient(135deg, #ec4899, #f472b6)' 
-                ];
-
-                const mapped = response.map((item, index) => ({
-                    id: item.id,
-                    title: item.playlist?.title || "Untitled",
-                    progress: "In Progress", // Mock
-                    color: colors[index % colors.length],
-                    link: `/playlist/${item.playlist?.id || 1}`
-                }));
-                // We only show top 3 in sidebar usually? Or slice.
-                setPlaylists(mapped);
-            }
-        } catch (error) {
-           console.error("Sidebar playlist fetch error", error);
-        }
-    };
-
-    fetchPlaylists();
-  }, [user?.id]);
-
-
-  // Helper to generate consistent colors based on ID/Name
-  const getCommunityColor = (id) => {
-      const str = String(id);
-      let hash = 0;
-      for (let i = 0; i < str.length; i++) {
-          hash = str.charCodeAt(i) + ((hash << 5) - hash);
-      }
-      const colors = ['#6366f1', '#eab308', '#ec4899', '#8b5cf6', '#10b981', '#f59e0b', '#3b82f6', '#ef4444'];
-      return colors[Math.abs(hash) % colors.length];
-  };
-
-  const formatMembers = (count) => {
-      if (!count) return '0 members';
-      if (count >= 1000) return `${(count / 1000).toFixed(1)}k members`;
-      return `${count} members`;
-  };
-
-  const sidebarCommunities = user 
-      ? (communities || []).filter(c => c.isJoined)
-      : (communities || []);
-
-  const displayedCommunities = user ? sidebarCommunities.slice(0, 1) : [];
-  const displayedPlaylists = playlists.slice(0, 1); // Show top 3
 
   const handleToggleTheme = () => {
       if (theme === 'system') setTheme('light');
@@ -179,124 +100,17 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
                 <span>Profile</span>
              </Link>
 
-            {/* Library Accordion */}
-            {isCollapsed ? (
-                 <Link href="/library" className={styles.navItem} title="Library" onClick={handleProtectedNav}>
-                     <LibraryIcon />
-                 </Link>
-            ) : (
-                <>
-                    <div 
-                        className={`${styles.navItem} ${isLibraryOpen ? styles.active : ''}`} 
-                        style={{cursor: 'pointer', justifyContent: 'space-between', paddingRight:'8px', marginTop: '0'}}
-                    >
-                        <Link href="/library" style={{display:'flex', gap:'16px', alignItems:'center', textDecoration:'none', color:'inherit', flex:1}} onClick={handleProtectedNav}>
-                            <LibraryIcon />
-                            <span>Library</span>
-                        </Link>
-                        
-                        <div 
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                e.preventDefault();
-                                setIsLibraryOpen(!isLibraryOpen);
-                            }}
-                            style={{padding:'4px', display:'flex', alignItems:'center'}}
-                        >
-                            {user && (isLibraryOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />)}
-                        </div>
-                    </div>
-                    {isLibraryOpen && (
-                        <div style={{
-                            paddingLeft:'0', backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '8px', overflow: 'hidden', 
-                            marginTop:'0', 
-                            marginBottom:'16px', 
-                            display:'flex', 
-                            flexDirection:'column', 
-                            gap:'8px',
-                            marginLeft: '0'
-                        }}>
-                             {displayedPlaylists.length > 0 && displayedPlaylists.map(flow => (
-                                <Link href={flow.link} key={flow.id} className={styles.playlistItem} style={{padding: '8px 12px'}} onClick={handleNavClick}>
-                                    <div className={styles.playlistImage} style={{ background: flow.color, width:'28px', height:'28px', borderRadius:'6px' }}></div>
-                                    <div className={styles.playlistInfo}>
-                                        <div className={styles.playlistName} style={{fontSize:'0.85rem'}}>{flow.title}</div>
-                                        <div className={styles.playlistMeta} style={{fontSize:'0.75rem'}}>{flow.progress}</div>
-                                    </div>
-                                </Link>
-                            ))}
-                            
+            {/* Library Link (Simplified) */}
+            <Link href="/library" className={styles.navItem} onClick={handleProtectedNav} title="Library">
+                <LibraryIcon />
+                <span>Library</span>
+            </Link>
 
-                        </div>
-                    )}
-                </>
-            )}
-
-            {/* Community Accordion */}
-             {isCollapsed ? (
-                 <Link href="/community" className={styles.navItem} title="Community" onClick={handleProtectedNav}>
-                     <UsersIcon />
-                 </Link>
-            ) : (
-                <>
-                    <div 
-                        className={`${styles.navItem} ${isCommunityOpen ? styles.active : ''}`} 
-                        style={{cursor: 'pointer', justifyContent: 'space-between', paddingRight:'8px'}}
-                    >
-                        <Link href="/community" style={{display:'flex', gap:'16px', alignItems:'center', textDecoration:'none', color:'inherit', flex:1}} onClick={handleProtectedNav}>
-                            <UsersIcon />
-                            <span>Community</span>
-                        </Link>
-
-                        <div 
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                e.preventDefault();
-                                setIsCommunityOpen(!isCommunityOpen);
-                            }}
-                             style={{padding:'4px', display:'flex', alignItems:'center'}}
-                        >
-                            {user && (isCommunityOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />)}
-                        </div>
-                    </div>
-                    {isCommunityOpen && (
-                        <div style={{
-                            paddingLeft:'0', backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '8px', overflow: 'hidden', 
-                            marginTop:'0', 
-                            marginBottom:'16px', 
-                            display:'flex', 
-                            flexDirection:'column', 
-                            gap:'8px',
-                            marginLeft: '0'
-                        }}>
-                            {/* Dynamically rendered communities - Only render if not empty */}
-                            {displayedCommunities.length > 0 && displayedCommunities.map((comm) => {
-                                const commColor = getCommunityColor(comm.id);
-                                return (
-                                <Link href={`/community/${comm.id}`} key={comm.id} className={styles.playlistItem} style={{padding: '8px 12px'}} onClick={handleNavClick}>
-                                    <div className={styles.playlistImage} style={{ 
-                                        background: 'transparent', 
-                                        border: `1px solid ${commColor}`,
-                                        width:'28px', height:'28px',
-                                        borderRadius: '50%',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        color: commColor, fontWeight: '700', fontSize: '0.8rem'
-                                    }}>
-                                        {comm.name ? comm.name.substring(0,1) : '#'}
-                                    </div>
-                                    <div className={styles.playlistInfo}>
-                                        <div className={styles.playlistName} style={{fontSize:'0.85rem'}}>{comm.name || 'Community'}</div>
-                                        <div className={styles.playlistMeta} style={{fontSize:'0.75rem'}}>{formatMembers(comm.memberCount)}</div>
-                                    </div>
-                                </Link>
-                                );
-                            })}
-                            
-
-                        </div>
-                    )}
-                </>
-            )}
+            {/* Community Link (Simplified) */}
+            <Link href="/community" className={styles.navItem} onClick={handleProtectedNav} title="Community">
+                <UsersIcon />
+                <span>Community</span>
+            </Link>
 
           </nav>
 

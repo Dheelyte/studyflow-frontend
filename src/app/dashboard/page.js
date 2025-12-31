@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from "./page.module.css";
 import Card from "@/components/Card";
+import SkeletonCard from "@/components/SkeletonCard";
 import GenerationOverlay from "@/components/GenerationOverlay";
 import IntegratedSearchBar from "@/components/IntegratedSearchBar";
 import { ZapIcon, StarIcon, TrophyIconSimple } from '@/components/Icons';
@@ -15,6 +16,7 @@ export default function Dashboard() {
     const [isGenerating, setIsGenerating] = useState(false);
     const [genParams, setGenParams] = useState(null);
     const [playlists, setPlaylists] = useState([]);
+    const [loadingPlaylists, setLoadingPlaylists] = useState(true);
     const [exploreCommunities, setExploreCommunities] = useState([]);
     const [loadingCommunities, setLoadingCommunities] = useState(true);
     const router = useRouter();
@@ -69,6 +71,7 @@ export default function Dashboard() {
                 console.error("Failed to fetch dashboard data", error);
             } finally {
                 setLoadingCommunities(false);
+                setLoadingPlaylists(false);
             }
         };
 
@@ -91,7 +94,7 @@ export default function Dashboard() {
             duration: genParams.duration
         };
         const queryString = new URLSearchParams(query).toString();
-        router.push(`/playlist/1?${queryString}`);
+        router.push(`/curriculum?${queryString}`);
     };
 
     // Derived stats from user context
@@ -115,7 +118,7 @@ export default function Dashboard() {
 
             <div className={styles.heroSection}>
                 <h1 className={styles.greeting}>{greeting || 'Hello'}, {user?.first_name || 'Alex'}. Ready to flow?</h1>
-                <IntegratedSearchBar onSearch={handleSearch} />
+                <IntegratedSearchBar redirect={true} shadow={false} />
             </div>
 
             {/* Stats Grid */}
@@ -155,15 +158,21 @@ export default function Dashboard() {
                     <h2 className={styles.sectionTitle}>Jump Back In</h2>
                     <Link href="/library" className={styles.showAll}>View Library</Link>
                 </div>
-                <div className={styles.grid}>
-                    {playlists.length > 0 ? (
-                        playlists.slice(0, 3).map(playlist => (
-                            <Link key={playlist.id} href={playlist.link} style={{ display: 'contents' }}>
+                <div className={styles.scrollContainer}>
+                    {loadingPlaylists ? (
+                        <>
+                            <div style={{ minWidth: '280px', height: '100%' }}><SkeletonCard /></div>
+                            <div style={{ minWidth: '280px', height: '100%' }}><SkeletonCard /></div>
+                            <div style={{ minWidth: '280px', height: '100%' }}><SkeletonCard /></div>
+                        </>
+                    ) : playlists.length > 0 ? (
+                        playlists.slice(0, 5).map(playlist => (
+                            <Link key={playlist.id} href={playlist.link} style={{ minWidth: '280px', display: 'block', textDecoration: 'none' }}>
                                 <Card title={playlist.title} description={playlist.description} color={playlist.color} />
                             </Link>
                         ))
                     ) : (
-                        <div style={{ color: 'var(--secondary)', padding: '20px', gridColumn: '1/-1' }}>
+                        <div style={{ color: 'var(--secondary)', padding: '20px', minWidth: '300px' }}>
                             No recent activity. Start a new topic above!
                         </div>
                     )}
@@ -176,23 +185,25 @@ export default function Dashboard() {
                     <h2 className={styles.sectionTitle}>Explore Communities</h2>
                     <Link href="/community" className={styles.showAll}>View All</Link>
                 </div>
-                <div className={styles.grid}>
+                <div className={styles.scrollContainer}>
                     {loadingCommunities ? (
-                         <div style={{ color: 'var(--secondary)', padding: '20px', gridColumn: '1/-1' }}>
-                            Loading communities...
-                        </div>
+                        <>
+                            <div style={{ minWidth: '280px', height: '100%' }}><SkeletonCard /></div>
+                            <div style={{ minWidth: '280px', height: '100%' }}><SkeletonCard /></div>
+                            <div style={{ minWidth: '280px', height: '100%' }}><SkeletonCard /></div>
+                        </>
                     ) : exploreCommunities.length > 0 ? (
                         exploreCommunities.map((comm) => (
-                            <Link key={comm.id} href={`/community/${comm.id}`} style={{ display: 'contents' }}>
+                            <Link key={comm.id} href={'/community/' + comm.id} style={{ minWidth: '280px', display: 'block', textDecoration: 'none' }}>
                                 <Card 
                                     title={comm.name} 
-                                    description={`${comm.member_count} Members • ${comm.description || 'Join the discussion'}`}
+                                    description={comm.member_count + ' Members • ' + (comm.description || 'Join the discussion')}
                                     color="linear-gradient(135deg, #0f172a, #334155)" 
                                 />
                             </Link>
                         ))
                     ) : (
-                         <div style={{ color: 'var(--secondary)', padding: '20px', gridColumn: '1/-1' }}>
+                        <div style={{ color: 'var(--secondary)', padding: '20px', minWidth: '300px' }}>
                             No communities found.
                         </div>
                     )}
@@ -205,15 +216,18 @@ export default function Dashboard() {
                     <h2 className={styles.sectionTitle}>Recommended based on your goals</h2>
                     <span className={styles.showAll}>Explore More</span>
                 </div>
-                <div className={styles.grid}>
-                    <Link href="/playlist/1" style={{ display: 'contents' }}>
+                <div className={styles.scrollContainer}>
+                    <Link href="/playlist/1" style={{ minWidth: '280px', display: 'block', textDecoration: 'none' }}>
                         <Card title="Advanced Next.js" description="Master Server Components" color="linear-gradient(135deg, #020617, #334155)" />
                     </Link>
-                    <Link href="/playlist/1" style={{ display: 'contents' }}>
+                    <Link href="/playlist/1" style={{ minWidth: '280px', display: 'block', textDecoration: 'none' }}>
                         <Card title="GenAI Engineering" description="LLMs, RAG, and Agents" color="linear-gradient(135deg, #3b82f6, #2563eb)" />
                     </Link>
-                    <Link href="/playlist/1" style={{ display: 'contents' }}>
+                    <Link href="/playlist/1" style={{ minWidth: '280px', display: 'block', textDecoration: 'none' }}>
                         <Card title="Docker Mastery" description="Containerization from scratch" color="linear-gradient(135deg, #0ea5e9, #0284c7)" />
+                    </Link>
+                     <Link href="/playlist/1" style={{ minWidth: '280px', display: 'block', textDecoration: 'none' }}>
+                        <Card title="Rust Foundations" description="Memory safety & concurrency" color="linear-gradient(135deg, #f59e0b, #b45309)" />
                     </Link>
                 </div>
             </section>

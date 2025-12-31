@@ -1,11 +1,12 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import CurriculumSkeleton from '@/components/CurriculumSkeleton';
 import { curriculum } from "@/services/api";
 import styles from "./page.module.css";
 import { useAuth } from "@/context/AuthContext";
 import { useRedirectState } from "@/hooks/useRedirectState";
-import { PlayIcon, ClockIcon, ChevronDown, ChevronUp, ZapIcon, HeartIcon, ShareIcon, MenuIcon, CheckCircleIcon, BookOpenIcon, VideoIcon } from "@/components/Icons";
+import { PlayIcon, ClockIcon, ChevronDown, ChevronUp, ZapIcon, HeartIcon, ShareIcon, MenuIcon, CheckCircleIcon, BookOpenIcon, VideoIcon, TrophyIconSimple } from "@/components/Icons";
 
 export default function CurriculumPage() {
     const searchParams = useSearchParams();
@@ -25,6 +26,22 @@ export default function CurriculumPage() {
     // Mock state for liking
     const [isLiked, setIsLiked] = useState(false);
     const [highlightResource, setHighlightResource] = useState(false);
+    
+    // New Interaction State
+    const [isGlowing, setIsGlowing] = useState(false);
+    const startBtnRef = useRef(null);
+
+    const handleResourceClick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (startBtnRef.current) {
+            startBtnRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            setIsGlowing(true);
+            setTimeout(() => setIsGlowing(false), 2000); // Remove glow after 2s
+        }
+    };
 
     // Ref to track if we have already fetched for the current topic to prevent double-fetch in StrictMode
     const fetchedTopicRef = useRef(null);
@@ -163,24 +180,15 @@ export default function CurriculumPage() {
     const completionPercentage = 0; // Example value
 
     if (loading) {
-        return (
-            <div className={styles.container} style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ color: 'var(--text-primary)', textAlign: 'center' }}>
-                    <div className={styles.loadingSpinner}></div> {/* Assuming global spinner or just text */}
-                    <h2>Generating your personalized curriculum...</h2>
-                    <p>This may take a few seconds.</p>
-                </div>
-            </div>
-        );
+        return <CurriculumSkeleton />;
     }
 
     if (error) {
         return (
-            <div className={styles.container} style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className={styles.container} style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
                 <div style={{ color: 'var(--text-error)', textAlign: 'center' }}>
                     <h2>Error</h2>
                     <p>{error}</p>
-                    <button onClick={() => window.location.reload()} style={{ marginTop: '1rem', padding: '0.5rem 1rem', cursor: 'pointer' }}>Try Again</button>
                 </div>
             </div>
         );
@@ -188,8 +196,8 @@ export default function CurriculumPage() {
 
     if (!curriculumData) {
         return (
-            <div className={styles.container} style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ color: 'var(--text-primary)', textAlign: 'center' }}>
+            <div className={styles.container} style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <div style={{ color: "var(--text-primary)", textAlign: "center" }}>
                     <h2>No curriculum found</h2>
                     <p>Try searching for a topic on the home page.</p>
                 </div>
@@ -205,7 +213,7 @@ export default function CurriculumPage() {
                     <ZapIcon size={64} fill="white" />
                 </div>
                 <div className={styles.playlistInfo}>
-                    <span className={styles.type}>Curriculum</span>
+                    <span className={styles.type}>{(searchParams.get("experience_level") || "Beginner").toUpperCase()}</span>
                     <h1 className={styles.title}>{curriculumData.curriculum_title}</h1>
                     <p className={styles.description}>{curriculumData.overview}</p>
                     <div className={styles.meta}>
@@ -225,18 +233,9 @@ export default function CurriculumPage() {
             </div>
 
             <div className={styles.controls}>
-                <button className={styles.playButton} onClick={handlePlay} disabled={isCreating}>
+                <button ref={startBtnRef} className={`${styles.playButton} ${isGlowing ? styles.glowing : ""}`} onClick={handlePlay} disabled={isCreating}>
                     <PlayIcon size={24} fill="white" />
                     {isCreating ? "Creating Playlist..." : (isStarted ? "Continue Learning" : "Start Learning")}
-                </button>
-
-                <button
-                    className={styles.iconButton}
-                    onClick={() => setIsLiked(!isLiked)}
-                    title={isLiked ? "Remove from Library" : "Save to Library"}
-                    style={{ color: isLiked ? "var(--primary)" : "inherit" }}
-                >
-                    <HeartIcon fill={isLiked ? "currentColor" : "none"} />
                 </button>
 
                 <button className={styles.iconButton} title="Share Playlist">
@@ -302,16 +301,13 @@ export default function CurriculumPage() {
                                                 <div className={styles.resourcesList}>
                                                     {lesson.resources && lesson.resources.map((resource, rIdx) => {
                                                         const firstId = curriculumData.modules[0]?.module_id !== undefined ? curriculumData.modules[0].module_id : 0;
-                                                        const isFirstResource = uniqueId === firstId && lessonIdx === 0 && rIdx === 0;
-
+                                                        
                                                         return (
-                                                            <a
-                                                                href={resource.resource_url}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
+                                                            <div
                                                                 key={rIdx}
-                                                                id={isFirstResource ? "first-resource" : null}
-                                                                className={`${styles.resourceCard} ${isFirstResource && highlightResource ? styles.highlight : ""}`}
+                                                                className={`${styles.resourceCard} ${styles.resourceDisabled}`}
+                                                                onClick={(e) => handleResourceClick(e)}
+                                                                title="Click 'Start Learning' to create your playlist first"
                                                             >
                                                                 <div className={styles.resourceIcon}>
                                                                     {resource.type === "Video" ? <VideoIcon size={20} /> : <BookOpenIcon size={20} />}
@@ -323,12 +319,30 @@ export default function CurriculumPage() {
                                                                     </div>
                                                                     <p className={styles.resourceDescription}>{resource.description}</p>
                                                                 </div>
-                                                            </a>
+                                                            </div>
                                                         );
                                                     })}
                                                 </div>
                                             </div>
                                         ))}
+                                        <div style={{ marginTop: '1.5rem', padding: '0 1rem 1.5rem 1rem' }}>
+                                            <button className={styles.resourceCard} style={{ 
+                                                width: '100%', 
+                                                background: 'linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,165,0,0.05))',
+                                                border: '1px solid rgba(255,215,0,0.3)',
+                                                justifyContent: 'flex-start',
+                                                gap: '12px',
+                                                cursor: 'pointer', textAlign: 'left', padding: '16px'
+                                            }} onClick={() => alert("Quiz feature coming soon!")}>
+                                                <div className={styles.resourceIcon} style={{ background: 'rgba(255,215,0,0.2)', color: '#ffd700' }}>
+                                                    <TrophyIconSimple size={20} />
+                                                </div>
+                                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                                                    <span style={{ fontWeight: '700', color: 'var(--foreground)' }}>Ready to test your knowledge?</span>
+                                                    <span style={{ fontSize: '0.85rem', color: 'var(--secondary)' }}>Take the {module.module_title} Quiz</span>
+                                                </div>
+                                            </button>
+                                        </div>
                                     </div>
                                 )}
                             </div>

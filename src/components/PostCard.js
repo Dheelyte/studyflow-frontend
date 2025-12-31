@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { HeartIcon, MessageSquareIcon, ShareIcon } from './Icons';
+import { HeartIcon, MessageSquareIcon } from './Icons';
 import SimpleRichTextEditor from './SimpleRichTextEditor';
 import { comments as commentApi, posts as postsApi } from '@/services/api';
 import { useCommunity } from '@/components/CommunityContext';
@@ -128,24 +128,6 @@ export default function PostCard({ id, author, time, content, likes: initialLike
         });
     };
 
-    const handleShare = async () => {
-        requireAuth(async () => {
-            if (navigator.share) {
-                try {
-                    await navigator.share({
-                        title: 'Check out this post on StudyFlow',
-                        text: content,
-                        url: window.location.href,
-                    });
-                } catch (err) {
-                    console.log('Share canceled');
-                }
-            } else {
-                 navigator.clipboard.writeText(window.location.href);
-                 alert('Link copied to clipboard!');
-            }
-        });
-    };
 
     const renderContent = (text) => {
         if (!text) return null;
@@ -199,9 +181,6 @@ export default function PostCard({ id, author, time, content, likes: initialLike
                <button onClick={toggleComments} style={{display:'flex', gap:'8px', alignItems:'center', background:'none', border:'none', cursor:'pointer', color:'var(--secondary)'}}>
                    <MessageSquareIcon size={20} />
                    <span>{totalComments}</span>
-               </button>
-               <button onClick={handleShare} style={{display:'flex', gap:'8px', alignItems:'center', background:'none', border:'none', cursor:'pointer', color:'var(--secondary)'}}>
-                   <ShareIcon size={20} />
                </button>
            </div>
 

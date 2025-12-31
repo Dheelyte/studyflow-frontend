@@ -458,3 +458,24 @@
         flex-wrap: wrap; 
     }
 }
+
+/* Button Glow Animation */
+@keyframes buttonGlow {
+  0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+}
+
+.glowing {
+  animation: buttonGlow 1.5s infinite;
+}
+
+/* Disabled Resource Styles */
+.resourceDisabled {
+  cursor: pointer; /* Still clickable to trigger scroll */
+}
+
+.resourceDisabled:hover {
+  transform: none;
+  border-color: rgba(99, 102, 241, 0.2);
+}

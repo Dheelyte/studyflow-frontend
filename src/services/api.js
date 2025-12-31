@@ -1,5 +1,21 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
 
+// Internal state for robust refresh logic
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+    failedQueue.forEach(prom => {
+        if (error) {
+            prom.reject(error);
+        } else {
+            prom.resolve(token);
+        }
+    });
+
+    failedQueue = [];
+};
+
 async function apiFetch(endpoint, options = {}) {
     const { headers, ...rest } = options;
     const config = {
@@ -17,28 +33,57 @@ async function apiFetch(endpoint, options = {}) {
     if (!response.ok) {
         // Handle common errors like 401
         if (response.status === 401) {
-            // Auto Refresh Logic
+            // Don't attempt to refresh if the error comes from login or register endpoints
+            if (endpoint.includes('/auth/login') || endpoint.includes('/auth/register')) {
+                throw new Error('Invalid credentials');
+            }
             const { _retry } = options;
-            if (!_retry) {
-                try {
-                    console.log("Token expired, attempting refresh...");
-                    // Call refresh endpoint
-                    await apiFetch('/auth/refresh', { 
-                        method: 'POST', 
-                        _retry: true // Access internal directly to avoid recursing on this call if 401
-                    });
-                    
-                    // Retry original request
-                    return apiFetch(endpoint, { ...options, _retry: true });
-                } catch (refreshErr) {
-                    console.error("Session refresh failed", refreshErr);
-                    // Redirect to login if refresh fails
-                    window.location.href = '/login'; 
-                    throw new Error('Session expired');
-                }
-            } else {
+            
+            // If this is already a retry, just fail to prevent infinite loops
+            if (_retry) {
                  console.warn("Unauthorized access (retry failed)");
-                 window.location.href = '/login';
+                 if (window.location.pathname !== '/login') { window.location.href = '/login'; }
+                 throw new Error('Session expired');
+            }
+
+            if (isRefreshing) {
+                // If refresh is in progress, queue this request
+                return new Promise(function(resolve, reject) {
+                    failedQueue.push({ resolve, reject });
+                }).then(() => {
+                    // When resolved, retry the original request
+                    return apiFetch(endpoint, { ...options, _retry: true });
+                }).catch(err => {
+                    return Promise.reject(err);
+                });
+            }
+
+            options._retry = true;
+            isRefreshing = true;
+
+            try {
+                console.log("Token expired, attempting refresh via /refresh...");
+                // Call refresh endpoint. We pass _retry=true so if THIS fails with 401, it goes to the immediate fail block above.
+                // User requested strictly /auth/refresh
+                await apiFetch('/auth/refresh', { 
+                    method: 'POST', 
+                    // Ensure we don't infinitely retry the refresh call itself
+                    _retry: true 
+                });
+                
+                // On success, process queue and retry current request
+                processQueue(null);
+                isRefreshing = false;
+                // Retry current request with updated credentials (cookies handled by browser)
+                return apiFetch(endpoint, { ...options, _retry: true });
+
+            } catch (refreshErr) {
+                console.error("Session refresh failed", refreshErr);
+                processQueue(refreshErr, null);
+                isRefreshing = false;
+                // Redirect because refresh failed, meaning user is not logged in / session invalid
+                if (window.location.pathname !== '/login') { window.location.href = '/login'; } 
+                throw new Error('Session expired');
             }
         }
         throw new Error(`API Error: (${response.status}) ${response.statusText}`);
