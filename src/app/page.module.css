@@ -109,17 +109,6 @@
     background: var(--primary-hover);
 }
 
-.iconBox {
-    background: rgba(255,255,255,0.05);
-    width: 60px;
-    height: 60px;
-    border-radius: 16px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 8px;
-}
-
 .howItWorks {
     padding: 100px 24px;
     background: var(--card);
@@ -133,53 +122,6 @@
     font-weight: 800;
     margin-bottom: 60px;
     color: var(--foreground);
-}
-
-.steps {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    gap: 24px;
-    max-width: 1000px;
-    margin: 0 auto;
-    flex-wrap: wrap;
-}
-
-.step {
-    flex: 1;
-    min-width: 200px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-}
-
-.stepNumber {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: var(--primary);
-    color: white;
-    font-weight: 800;
-    font-size: 1.2rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.stepConnector {
-    flex: 1;
-    height: 2px;
-    background: var(--border);
-    margin-top: 24px;
-    min-width: 50px;
-    display: none; /* Hidden on mobile */
-}
-
-@media (min-width: 768px) {
-    .stepConnector {
-        display: block;
-    }
 }
 
 .ctaSection {
@@ -367,7 +309,10 @@
     background: var(--background);
     max-width: 1200px;
     margin: 0 auto;
-    overflow: hidden; /* Prevent marquee overflow */
+    overflow: hidden;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box; /* Prevent marquee overflow */
 }
 
 .topicsGrid {
@@ -466,7 +411,7 @@
 /* Infinite Marquee */
 .marqueeContainer {
     width: 100%;
-    max-width: 100%;
+    max-width: 100vw;
     overflow: hidden;
     position: relative;
     mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
@@ -504,12 +449,6 @@
     margin-bottom: 60px;
 }
 
-@media (max-width: 768px) {
-    .footerGrid {
-        grid-template-columns: 1fr;
-        gap: 40px;
-    }
-}
 
 .footerBrand p {
     color: var(--secondary);
@@ -553,12 +492,6 @@
     align-items: center;
 }
 
-@media (max-width: 768px) {
-    .footerBottom {
-        flex-direction: column;
-        gap: 16px;
-    }
-}
 
 /* Reverse Marquee */
 .marqueeTrackReverse {
@@ -629,17 +562,7 @@
     align-items: center;
 }
 
-@media (max-width: 768px) {
-    .stackedCardContent {
-        flex-direction: column;
-        text-align: center;
-    }
 
-   .stackedCardVisual {
-       width: 100%;
-       margin-top: 24px;
-   }
-}
 
 .stackedCardInfo {
     flex: 1;
@@ -650,6 +573,7 @@
     height: 300px;
     border-radius: 24px;
     background: var(--background);
+    padding: 32px;
     display: flex; 
     align-items: center; 
     justify-content: center;
@@ -705,7 +629,7 @@
 .mockPostCard1 {
     position: absolute;
     top: 20px;
-    left: 20px;
+    left: 0;
     z-index: 1;
     transform: rotate(-2deg);
     max-width: 320px;
@@ -713,7 +637,8 @@
 
 .mockPostCard2 {
     position: absolute;
-    top: 140px;
+    top: 160px;
+        right: -10px;
     left: 140px;
     z-index: 2;
     transform: rotate(2deg);
@@ -721,38 +646,6 @@
     box-shadow: 0 10px 30px -5px rgba(0,0,0,0.2);
 }
 
-/* Post Cards Mobile Stacking Fixed for Aesthetics & Robustness */
-@media (max-width: 768px) {
-    .communityVisual {
-        height: auto;
-        min-height: 0;
-        padding: 40px 0;
-        flex-direction: column;
-        gap: 32px;
-        display: flex;
-        align-items: center;
-    }
-    
-    .mockPostCard1, .mockPostCard2 {
-        position: relative;
-        top: auto;
-        left: auto;
-        transform: none;
-        margin: 0 auto;
-        width: 85%;
-        max-width: 350px;
-    }
-
-    .mockPostCard1 {
-        transform: rotate(-3deg);
-        z-index: 1;
-    }
-
-    .mockPostCard2 {
-        transform: rotate(2deg);
-        z-index: 2;
-    }
-}
 
 /* Header Refactor & Mobile Fix */
 .headerBrand {
@@ -769,12 +662,196 @@
   align-items: center;
 }
 
+
+/* Post Cards Mobile Stacking: RESTORED ABSOLUTE POSITIONING */
+@media (max-width: 768px) {
+    .communityVisual {
+        width: 100%;
+        min-height: 0;
+        padding: 0;
+        display: block;
+        position: relative;
+        margin-top: 40px;
+        margin-bottom: 40px;
+        flex: none;
+        height: 420px;
+    }
+    
+    .mockPostCard1, .mockPostCard2 {
+        position: absolute;
+        width: 85%;
+        max-width: 320px;
+    }
+
+    .mockPostCard1 {
+        top: 0;
+        left: 0;
+        transform: none;
+        z-index: 1;
+    }
+
+    .mockPostCard2 {
+        top: 160px;
+        right: 20px;
+        left: auto;
+        transform: none;
+        z-index: 2;
+    }
+}
+
+
+/* Restoring Mobile Styles */
+@media (max-width: 768px) {
+    .footerGrid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+}
+
+@media (max-width: 768px) {
+    .footerBottom {
+        flex-direction: column;
+        gap: 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    .stackedCardContent {
+        flex-direction: column;
+        text-align: center;
+    }
+
+   .stackedCardVisual {
+       width: 100%;
+       margin-top: 24px;
+   }
+}
+
 @media (max-width: 768px) {
   .header {
-    padding: 16px 20px; /* Reduced from 24px 40px */
+    padding: 16px 20px;
   }
   
   .headerActions {
-    gap: 8px; /* Reduced from 16px */
+    gap: 8px;
   }
+}
+
+/* Visual Components for Stacked Cards */
+.visualMockup {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* Path Visual */
+.pathContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: relative;
+}
+
+.pathLine {
+    position: absolute;
+    left: 24px;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 4px;
+}
+
+.pathNode {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    padding: 16px 24px;
+    border-radius: 12px;
+    width: 220px;
+    z-index: 2;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.pathIcon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: white;
+    color: var(--primary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+/* Gamification Visual */
+.streakCard {
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.streakFlame {
+    font-size: 3rem;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 0 10px rgba(255,165,0,0.5));
+}
+
+.streakText {
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Community Visual */
+.chatContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 240px;
+}
+
+.chatBubble {
+    padding: 16px 20px;
+    border-radius: 16px;
+    font-size: 0.9rem;
+    position: relative;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.chatLeft {
+    background: rgba(255,255,255,0.9);
+    color: #333;
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+}
+
+.chatRight {
+    background: rgba(255,255,255,0.25);
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+@media (max-width: 768px) {
+    .communitySection {
+        padding: 60px 20px;
+        gap: 24px;
+    }
 }

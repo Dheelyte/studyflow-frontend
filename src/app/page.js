@@ -6,6 +6,7 @@ import styles from './page.module.css';
 import { ZapIcon, TrophyIconSimple, CheckIcon, UsersIcon, SearchIcon, PlayIcon, StarIcon, PlusIcon, ChevronRight } from '@/components/Icons';
 import IntegratedSearchBar from '@/components/IntegratedSearchBar';
 import ThemeToggle from '@/components/ThemeToggle';
+import TypingText from '@/components/TypingText';
 import FadeIn from '@/components/FadeIn';
 
 export default function LandingPage() {
@@ -58,9 +59,9 @@ export default function LandingPage() {
                     <ZapIcon size={24} fill="var(--primary)" /> StudyFlow
                 </div>
                 <div className={styles.headerActions}>
-                    <ThemeToggle />
                     <Link href="/login" style={{ color: 'var(--foreground)', fontWeight: '600', textDecoration: 'none' }}>Log In</Link>
                     <Link href="/signup" className={styles.ctaSmall}>Sign Up</Link>
+                    <ThemeToggle />
                 </div>
             </header>
 
@@ -115,7 +116,9 @@ export default function LandingPage() {
                             <SearchIcon size={32} />
                         </div>
                         <h3>Set your Goal</h3>
-                        <p className={styles.featureText}>Type any skill or topic, from &quot;React Hooks&quot; to &quot;Astrophysics&quot;.</p>
+                        <p className={styles.featureText}>
+                            I want to learn <TypingText words={["React Hooks", "Astrophysics", "Python", "Data Science", "Piano", "Spanish"]} />
+                        </p>
                     </FadeIn>
                     <FadeIn direction="up" delay={0.2} className={styles.stepCard}>
                         <div className={styles.stepIconBg}>
@@ -149,8 +152,24 @@ export default function LandingPage() {
                                     We don&apos;t just serve you random videos. Our Gemini-powered engine analyzes thousands of resources to create a cohesive, step-by-step curriculum tailored to your experience level and time constraints.
                                 </p>
                             </div>
-                            <div className={styles.stackedCardVisual} style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: 'white' }}>
-                                <ZapIcon size={60} />
+                            <div className={styles.stackedCardVisual} style={{ background: "linear-gradient(135deg, #6366f1, #8b5cf6)" }}>
+                                <div className={styles.visualMockup}>
+                                    <div className={styles.pathContainer}>
+                                        <div className={styles.pathLine}></div>
+                                        <div className={styles.pathNode}>
+                                            <div className={styles.pathIcon}><PlayIcon size={12} fill="var(--primary)" /></div>
+                                            <span style={{fontSize: "0.9rem", fontWeight: "600"}}>React Basics</span>
+                                        </div>
+                                        <div className={styles.pathNode}>
+                                            <div className={styles.pathIcon}><ZapIcon size={12} fill="var(--primary)" /></div>
+                                            <span style={{fontSize: "0.9rem", fontWeight: "600"}}>Advanced Hooks</span>
+                                        </div>
+                                        <div className={styles.pathNode}>
+                                            <div className={styles.pathIcon}><StarIcon size={12} fill="var(--primary)" /></div>
+                                            <span style={{fontSize: "0.9rem", fontWeight: "600"}}>Capstone Project</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -163,8 +182,14 @@ export default function LandingPage() {
                                     Stay consistent with streaks, XP, and daily goals. We turn learning into a game you actually want to play. Compete with friends or beat your own best.
                                 </p>
                             </div>
-                            <div className={styles.stackedCardVisual} style={{ background: 'linear-gradient(135deg, #eab308, #f59e0b)', color: 'white' }}>
-                                <TrophyIconSimple size={60} />
+                            <div className={styles.stackedCardVisual} style={{ background: "linear-gradient(135deg, #eab308, #f59e0b)" }}>
+                                <div className={styles.visualMockup}>
+                                    <div className={styles.streakCard}>
+                                        <div className={styles.streakFlame}>🔥</div>
+                                        <div className={styles.streakText}>12 Day Streak</div>
+                                        <div style={{fontSize: "0.9rem", marginTop: "4px", opacity: 0.9}}>Keep it burning!</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -177,8 +202,20 @@ export default function LandingPage() {
                                     Never learn alone. Join niche communities for every topic. Share your notes, ask questions, and get feedback from learners who are on the same path.
                                 </p>
                             </div>
-                            <div className={styles.stackedCardVisual} style={{ background: 'linear-gradient(135deg, #ec4899, #f43f5e)', color: 'white' }}>
-                                <UsersIcon size={60} />
+                            <div className={styles.stackedCardVisual} style={{ background: "linear-gradient(135deg, #ec4899, #f43f5e)" }}>
+                                <div className={styles.visualMockup}>
+                                    <div className={styles.chatContainer}>
+                                        <div className={`${styles.chatBubble} ${styles.chatLeft}`}>
+                                            Has anyone finished module 4? 🙋‍♀️
+                                        </div>
+                                        <div className={`${styles.chatBubble} ${styles.chatRight}`}>
+                                            Yes! The visualizer helps a lot.
+                                        </div>
+                                        <div className={`${styles.chatBubble} ${styles.chatLeft}`}>
+                                            Thanks! I will check it out.
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -318,7 +355,7 @@ export default function LandingPage() {
             <section className={styles.ctaSection}>
                 <FadeIn direction="up" className={styles.flexColumnCentered}>
                     <h2>Ready to start your flow?</h2>
-                    <p>Join 10,000+ learners mastering new skills every day.</p>
+                    <p>Join learners mastering new skills every day.</p>
                     <Link href="/signup" className={styles.ctaButtonLarge}>Get Started for Free</Link>
                 </FadeIn>
             </section>

@@ -6,6 +6,7 @@ import { curriculum } from "@/services/api";
 import styles from "./page.module.css";
 import { useAuth } from "@/context/AuthContext";
 import { useRedirectState } from "@/hooks/useRedirectState";
+import ShareModal from "@/components/ShareModal";
 import { PlayIcon, ClockIcon, ChevronDown, ChevronUp, ZapIcon, HeartIcon, ShareIcon, MenuIcon, CheckCircleIcon, BookOpenIcon, VideoIcon, TrophyIconSimple } from "@/components/Icons";
 
 export default function CurriculumPage() {
@@ -23,6 +24,7 @@ export default function CurriculumPage() {
     // isStarted state: initially false (hides progress bar, shows "Start Learning")
     const [isStarted, setIsStarted] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
+    const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
     // Mock state for liking
     const [isLiked, setIsLiked] = useState(false);
@@ -218,25 +220,14 @@ export default function CurriculumPage() {
             <div className={styles.headerBg}></div>
             <div className={styles.header}>
                 <div className={styles.playlistImage}>
-                    <ZapIcon size={64} fill="white" />
+                    <span style={{ fontSize: "1.5rem", fontWeight: "800", textAlign: "center", lineHeight: "1.2", padding: "16px" }}>
+                        {curriculumData.curriculum_title}
+                    </span>
                 </div>
                 <div className={styles.playlistInfo}>
                     <span className={styles.type}>{(searchParams.get("experience_level") || "Beginner").toUpperCase()}</span>
                     <h1 className={styles.title}>{curriculumData.curriculum_title}</h1>
                     <p className={styles.description}>{curriculumData.overview}</p>
-                    <div className={styles.meta}>
-                        <div className={styles.metaItem}>
-                            <span>By <strong>StudyFlow AI</strong></span>
-                        </div>
-                        <div className={styles.metaItem}>
-                            <span>•</span>
-                            <span>Last updated today</span>
-                        </div>
-                        <div className={styles.metaItem}>
-                            <span>•</span>
-                            <span>{curriculumData.modules ? curriculumData.modules.length : 0} modules</span>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -246,7 +237,7 @@ export default function CurriculumPage() {
                     {isCreating ? "Creating Playlist..." : (isStarted ? "Continue Learning" : "Start Learning")}
                 </button>
 
-                <button className={styles.iconButton} title="Share Playlist">
+                <button className={styles.iconButton} title="Share Playlist" onClick={() => setIsShareModalOpen(true)}>
                     <ShareIcon />
                 </button>
             </div>
@@ -359,6 +350,14 @@ export default function CurriculumPage() {
                 </div>
             </div>
 
+            {isShareModalOpen && (
+                <ShareModal 
+                    onClose={() => setIsShareModalOpen(false)} 
+                    url={typeof window !== "undefined" ? `${window.location.origin}${pathname}?${searchParams.toString()}` : ""} 
+                    title={curriculumData.curriculum_title} 
+                    heading="Share this curriculum"
+                />
+            )}
         </div>
     );
 }

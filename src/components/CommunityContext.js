@@ -1,7 +1,7 @@
 "use client";
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { communities as communityApi, posts as postApi, auth as authApi } from '@/services/api';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { formatTimeAgo } from '@/utils/dateUtils';
 
@@ -13,6 +13,7 @@ export function CommunityProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth(); // Use centralized Auth state
   const router = useRouter();
+  const pathname = usePathname();
 
   // Track the latest fetch ID to prevent race conditions
   const fetchIdRef = useRef(0);
@@ -117,6 +118,10 @@ export function CommunityProvider({ children }) {
   };
 
   const fetchData = useCallback(async () => {
+    if (typeof window !== 'undefined' && window.location.pathname === '/') {
+        setLoading(false);
+        return;
+    }
     // Increment ID to mark start of new fetch
     const currentFetchId = ++fetchIdRef.current;
     
@@ -208,7 +213,7 @@ export function CommunityProvider({ children }) {
             setLoading(false);
         }
     }
-  }, [user]); // user is dependency now
+  }, [user, pathname]);
   // Trigger initial fetch
   useEffect(() => {
       fetchData();

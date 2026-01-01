@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import styles from './ShareModal.module.css';
 import { XIcon, CheckIcon, ShareIcon } from '@/components/Icons';
 
-export default function ShareModal({ onClose, url, title }) {
+export default function ShareModal({ onClose, url, title, heading = "Share this Playlist" }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -29,7 +29,7 @@ export default function ShareModal({ onClose, url, title }) {
             <div className={styles.iconWrapper}>
                 <ShareIcon size={20} />
             </div>
-            <h2 className={styles.title}>Share this Playlist</h2>
+            <h2 className={styles.title}>{heading}</h2>
             <button className={styles.closeBtn} onClick={onClose}>
                 <XIcon size={20} />
             </button>

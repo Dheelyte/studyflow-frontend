@@ -33,6 +33,18 @@ export default function ProfilePage() {
   const monthLabels = getLast12Months();
 
   const [heatmapData, setHeatmapData] = useState([]);
+  const [tooltipData, setTooltipData] = useState({ visible: false, x: 0, y: 0, count: 0, date: "" });
+
+  const handleInteraction = (e, dayData) => {
+      const rect = e.target.getBoundingClientRect();
+      setTooltipData({
+          x: rect.left + rect.width / 2,
+          y: rect.top,
+          count: dayData.count,
+          date: dayData.date,
+          visible: true
+      });
+  };
 
   const getIntensityClass = (count) => {
       if (count === 0) return '';
@@ -209,7 +221,9 @@ export default function ProfilePage() {
                             <div 
                                 key={i} 
                                 className={`${styles.heatBox} ${getIntensityClass(dayData.count)}`} 
-                                title={`${dayData.date}: ${dayData.count} activities`}
+                                onMouseEnter={(e) => handleInteraction(e, dayData)}
+                                onClick={(e) => handleInteraction(e, dayData)}
+                                onMouseLeave={() => setTooltipData(prev => ({ ...prev, visible: false }))}
                             ></div>
                         ))}
                     </div>
@@ -218,6 +232,14 @@ export default function ProfilePage() {
           </div>
       </div>
 
+      {tooltipData.visible && (
+          <div 
+              className={styles.tooltip}
+              style={{ top: tooltipData.y, left: tooltipData.x }}
+          >
+              {tooltipData.count === 0 ? `No activity on ${tooltipData.date}` : `${tooltipData.count} activities on ${tooltipData.date}`}
+          </div>
+      )}
     </div>
   );
 }

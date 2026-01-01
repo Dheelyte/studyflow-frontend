@@ -19,6 +19,10 @@ export function AuthProvider({ children }) {
     }, []);
 
     const checkUser = useCallback(async () => {
+        if (typeof window !== 'undefined' && window.location.pathname === '/') {
+            setLoading(false);
+            return;
+        }
         try {
             // Always try to fetch the user. The backend (via cookies) is the source of truth.
             // If valid cookies exist, this will succeed (possibly triggering a refresh).

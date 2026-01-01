@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter, usePathname } from 'next/navigation';
 
-const PUBLIC_PATHS = ['/login', '/signup'];
+const PUBLIC_PATHS = ['/login', '/signup', '/curriculum', '/community'];
 
 export default function AuthGuard({ children }) {
     const { user, loading } = useAuth();
@@ -14,7 +14,7 @@ export default function AuthGuard({ children }) {
     
     useEffect(() => {
         if (!loading) {
-             const isPublicPath = PUBLIC_PATHS.some(path => pathname.startsWith(path));
+             const isPublicPath = pathname === '/' || PUBLIC_PATHS.some(path => pathname.startsWith(path));
              if (!user && !isPublicPath) {
                  router.push('/login');
              }
@@ -25,7 +25,7 @@ export default function AuthGuard({ children }) {
         return <div style={{height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--foreground)'}}>Loading...</div>;
     }
 
-    const isPublicPath = PUBLIC_PATHS.some(path => pathname.startsWith(path));
+    const isPublicPath = pathname === '/' || PUBLIC_PATHS.some(path => pathname.startsWith(path));
     if (!user && !isPublicPath) {
         return null; // Redirecting
     }
