@@ -1,45 +1,244 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styles from './GenerationOverlay.module.css';
 
-const steps = [
-    "Analyzing learning topic...",
-    "Calibrating to experience level...",
-    "Scanning documentation and resources...",
-    "Structuring modules and milestones...",
-    "Gamifying your curriculum...",
-    "Finalizing your playlist..."
+const FACTS = [
+    "Did you know? Spaced repetition can improve retention by up to 200%.",
+    "Active recall is more effective than re-reading notes.",
+    "The Feynman Technique: Teach a concept to understand it better.",
+    "Sleep is crucial for memory consolidation after learning.",
+    "Pomodoro technique helps maintain focus for longer periods.",
+    "Interleaved practice boosts problem-solving skills.",
+    "Dual coding (images + text) enhances learning.",
+    "Teaching others is the highest form of mastery."
 ];
 
-export default function GenerationOverlay({ topic, experience, onComplete }) {
-    const [stepIndex, setStepIndex] = useState(0);
+const RELATED_TERMS = [
+    "Concepts", "History", "Syntax", "Patterns", "Tools", 
+    "Best Practices", "Case Studies", "Frameworks", "Security",
+    "Optimization", "Architecture", "Debugging", "Community",
+    "Resources", "Algorithms", "Data Structures"
+];
 
+// Reduced logs to ensure they have enough time to finish typing
+const LOG_MESSAGES = [
+    "Initializing knowledge engine...",
+    "Connecting to global learning graph...",
+    "Parsing educational documentation...",
+    "Optimizing for experience level...",
+    "Generating localized examples...",
+    "Finalizing curriculum path..."
+];
+
+export default function GenerationOverlay({ topic, experience, onComplete, isFinished = false }) {
+    const [nodes, setNodes] = useState([]);
+    const [lines, setLines] = useState([]);
+    const [factIndex, setFactIndex] = useState(0);
+    const [progress, setProgress] = useState(0);
+    const [logs, setLogs] = useState([]);
+    const [typedText, setTypedText] = useState('');
+    
+    const containerRef = useRef(null);
+    const boxRef = useRef(null); 
+
+    // Initial fact rotation
     useEffect(() => {
-        if (stepIndex < steps.length) {
-            const timeout = setTimeout(() => {
-                setStepIndex(prev => prev + 1);
-            }, 800); 
-            return () => clearTimeout(timeout);
-        } else {
-            // Finished, trigger callback
-            const timeout = setTimeout(() => {
-                onComplete();
+        const interval = setInterval(() => {
+            setFactIndex(prev => (prev + 1) % FACTS.length);
+        }, 3500);
+        return () => clearInterval(interval);
+    }, []);
+
+    // Progress and Logs timer with stall logic
+    useEffect(() => {
+        // Base duration to reach 90%
+        const simulatedDuration = 8000; 
+        const startTime = Date.now();
+        
+        const interval = setInterval(() => {
+            const elapsed = Date.now() - startTime;
+            
+            // Calculate simulated progress up to 90%
+            let p = Math.min((elapsed / simulatedDuration) * 90, 90);
+
+            // If API is finished, we can go past 90% to 100%
+            if (isFinished) {
+               // Fast forward to complete
+               setProgress(prev => {
+                   if (prev >= 100) {
+                       clearInterval(interval);
+                       return 100;
+                   }
+                   return Math.min(prev + 5, 100); // Fast increment
+               });
+            } else {
+                // If not finished, cap at 90%
+                if (p >= 90) p = 90;
+                setProgress(p);
+            }
+
+            // Logic to drive logs based on progress (still works roughly the same)
+            // Map 0-90% to the first 5 logs, last log reserved for finish
+            const logProgress = isFinished ? 100 : p;
+            const logIndex = Math.floor((logProgress / 100) * LOG_MESSAGES.length);
+            
+            if (logIndex < LOG_MESSAGES.length && LOG_MESSAGES[logIndex]) {
+                 setLogs(prev => {
+                     const msg = LOG_MESSAGES[logIndex];
+                     if (prev[0] !== msg) {
+                         return [msg];
+                     }
+                     return prev;
+                 });
+            }
+
+        }, 100);
+
+        return () => clearInterval(interval);
+    }, [isFinished]);
+
+    // Completion Effect
+    useEffect(() => {
+        if (progress >= 100 && onComplete) {
+            const timer = setTimeout(() => {
+                 onComplete();
             }, 500);
-            return () => clearTimeout(timeout);
+            return () => clearTimeout(timer);
         }
-    }, [stepIndex, onComplete]);
+    }, [progress, onComplete]);
+
+    // Robust Typing Effect using Date.now()
+    useEffect(() => {
+        if (logs.length === 0) return;
+        const targetText = logs[0];
+        setTypedText('');
+        
+        const startTime = Date.now();
+        const charDuration = 25; // ms per char
+
+        const interval = setInterval(() => {
+            const now = Date.now();
+            const elapsed = now - startTime;
+            const charCount = Math.floor(elapsed / charDuration);
+            
+            if (charCount >= targetText.length) {
+                setTypedText(targetText);
+                clearInterval(interval);
+            } else {
+                setTypedText(targetText.substring(0, charCount));
+            }
+        }, 16); // Check every frame (~60fps)
+
+        return () => clearInterval(interval);
+    }, [logs]);
+
+    // Spawn nodes logic
+    useEffect(() => {
+        let count = 0;
+        const maxNodes = 8;
+        
+        const spawnInterval = setInterval(() => {
+            if (count >= maxNodes) {
+                clearInterval(spawnInterval);
+                return;
+            }
+
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 160 + Math.random() * 100; 
+            const x = Math.cos(angle) * distance;
+            const y = Math.sin(angle) * distance;
+
+            const newNode = {
+                id: count,
+                x,
+                y,
+                label: RELATED_TERMS[Math.floor(Math.random() * RELATED_TERMS.length)]
+            };
+
+            setNodes(prev => [...prev, newNode]);
+            setLines(prev => [...prev, { id: count, x2: x, y2: y }]);
+            count++;
+        }, 1200);
+
+        return () => clearInterval(spawnInterval);
+    }, []);
+
+    // SVG Progress Calculation
+    const radius = 90; // Inside 200px box (200/2 - stroke)
+    const circumference = 2 * Math.PI * radius;
+    const strokeDashoffset = circumference - (progress / 100) * circumference;
 
     return (
         <div className={styles.overlay}>
-             <div className={styles.content}>
-                <div className={styles.spinner}></div>
-                <h1 className={styles.statusText}>
-                    {stepIndex < steps.length ? steps[stepIndex] : "Ready!"}
-                </h1>
-                <p className={styles.subText}>
-                    Generating <strong>{experience}</strong> curriculum for: <strong style={{color: 'var(--primary)'}}>{topic}</strong>
-                </p>
-            </div>
+             <div className={styles.graphContainer} ref={containerRef}>
+                {/* Lines Layer */}
+                <svg className={styles.connections}>
+                    <g transform="translate(50%, 50%)" style={{ overflow: 'visible' }}>
+                        {lines.map(line => (
+                            <line 
+                                key={line.id}
+                                x1={0} y1={0}
+                                x2={line.x2} y2={line.y2}
+                                className={styles.line}
+                            />
+                        ))}
+                    </g>
+                </svg>
+
+                {/* Center Node + Progress Ring */}
+                <div className={styles.centerWrapper}>
+                    <svg className={styles.progressSvg}>
+                         {/* Background Circle */}
+                        <circle 
+                            cx="100" cy="100" r={radius} 
+                            className={styles.progressBg}
+                        />
+                        {/* Progress Circle */}
+                        <circle 
+                            cx="100" cy="100" r={radius} 
+                            className={styles.progressCircle}
+                            strokeDasharray={circumference}
+                            strokeDashoffset={strokeDashoffset}
+                        />
+                    </svg>
+
+                    <div className={styles.centerNode} ref={boxRef}>
+                        <div>{topic}</div>
+                        <div className={styles.percentage}>{Math.round(progress)}%</div>
+                    </div>
+                </div>
+
+                {/* Floating Nodes */}
+                {nodes.map(node => (
+                    <div 
+                        key={node.id} 
+                        className={styles.node}
+                        style={{
+                            transform: `translate(${node.x}px, ${node.y}px)`   
+                        }}
+                    >
+                        {node.label}
+                    </div>
+                ))}
+             </div>
+
+             <div className={styles.statusBar}>
+                <div className={styles.logContainer}>
+                    {/* Render only the typed text */}
+                    {logs.length > 0 && (
+                        <div className={styles.logItem}>
+                           &gt;_ {typedText}<span className={styles.cursor}>|</span>
+                        </div>
+                    )}
+                </div>
+
+                <div className={styles.factBox}>
+                    <div className={styles.factLabel}>Did You Know?</div>
+                    <div className={styles.factText} key={factIndex} style={{animation: 'fadeIn 0.5s'}}>
+                        {FACTS[factIndex]}
+                    </div>
+                </div>
+             </div>
         </div>
     );
 }

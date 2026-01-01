@@ -168,15 +168,15 @@
 .heatmapFlexContainer {
     display: flex;
     gap: 8px;
-    align-items: flex-end; /* Align to bottom so labels align with grid */
+    align-items: flex-start; /* Align to bottom so labels align with grid */
 }
 
 .dayLabels {
     display: grid;
-    grid-template-rows: repeat(7, 1fr);
+    grid-template-rows: repeat(7, 14px);
     gap: 4px;
     padding-bottom: 8px; /* Match scrollbar spacing */
-    padding-top: 20px; /* Offset for month labels space */
+    padding-top: 24px; /* Offset for month labels space */
     font-size: 0.75rem;
     color: var(--secondary);
     text-align: right;
@@ -207,6 +207,8 @@
 }
 
 .monthLabels {
+    height: 16px;
+    line-height: 16px;
     display: flex;
     justify-content: space-between;
     font-size: 0.75rem;
@@ -220,14 +222,14 @@
     /* Use auto-fill or just large number of columns */
     grid-template-columns: repeat(auto-fill, minmax(14px, 1fr));
     /* Force specific flow */
-    grid-template-rows: repeat(7, 1fr);
+    grid-template-rows: repeat(7, 14px);
     grid-auto-flow: column; 
     gap: 4px;
 }
 
 /* Override grid columns to be dynamic based on content length or large enough fixed */
 .heatmapGrid {
-    grid-template-columns: repeat(54, minmax(14px, 1fr)); /* 54 weeks cover a year + padding */
+    grid-template-columns: repeat(54, 14px); /* 54 weeks cover a year + padding */
 }
 
 
@@ -244,8 +246,8 @@
     }
 }
 
-.heatBox.l1 { background: rgba(99, 102, 241, 0.2); }
-.heatBox.l2 { background: rgba(99, 102, 241, 0.5); }
+.heatBox.l1 { background: rgba(99, 102, 241, 0.4); }
+.heatBox.l2 { background: rgba(99, 102, 241, 0.6); }
 .heatBox.l3 { background: rgba(99, 102, 241, 0.8); }
 .heatBox.l4 { background: #6366f1; }
 

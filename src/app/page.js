@@ -7,11 +7,8 @@ import { ZapIcon, TrophyIconSimple, CheckIcon, UsersIcon, SearchIcon, PlayIcon, 
 import IntegratedSearchBar from '@/components/IntegratedSearchBar';
 import ThemeToggle from '@/components/ThemeToggle';
 import FadeIn from '@/components/FadeIn';
-import GenerationOverlay from '@/components/GenerationOverlay';
 
 export default function LandingPage() {
-    const [isGenerating, setIsGenerating] = useState(false);
-    const [genParams, setGenParams] = useState(null);
     const router = useRouter();
     const videoRef = useRef(null);
 
@@ -39,20 +36,15 @@ export default function LandingPage() {
     }, []);
 
     const handleSearch = (params) => {
-        setGenParams(params);
-        setIsGenerating(true);
-    };
-
-    const onGenerationComplete = () => {
-        if (!genParams) return;
         const query = {
-            topic: genParams.topic,
-            experience: genParams.experience,
-            duration: genParams.duration
+            topic: params.topic,
+            experience: params.experience,
+            duration: params.duration
         };
         const queryString = new URLSearchParams(query).toString();
         router.push(`/curriculum?${queryString}`);
     };
+
 
     const topics = ['Next.js 14', 'Python for AI', 'UI/UX Principles', 'Rust Foundations', 'Cybersecurity', 'Digital Marketing', 'Piano Basics', 'Calculus I', 'Three.js', 'System Design', 'Japanese N5', 'Guitar Solos', 'Docker Mastery', 'Figma Secrets', 'Blockchain Dev'];
     const marqueeTopics = [...topics, ...topics];
@@ -60,13 +52,6 @@ export default function LandingPage() {
 
     return (
         <div className={styles.container}>
-            {isGenerating && genParams && (
-                <GenerationOverlay
-                    topic={genParams.topic}
-                    experience={genParams.experience}
-                    onComplete={onGenerationComplete}
-                />
-            )}
 
             <header className={styles.header}>
                 <div className={styles.headerBrand}>
@@ -91,7 +76,7 @@ export default function LandingPage() {
                 </FadeIn>
 
                 <FadeIn direction="up" delay={0.2} style={{ width: '100%', maxWidth: '900px', marginTop: '32px' }}>
-                    <IntegratedSearchBar redirect={true} />
+                    <IntegratedSearchBar onSearch={handleSearch} />
                 </FadeIn>
 
                 <FadeIn direction="up" delay={0.3} className={styles.heroFooter}>

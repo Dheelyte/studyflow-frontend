@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import CurriculumSkeleton from '@/components/CurriculumSkeleton';
+import GenerationOverlay from '@/components/GenerationOverlay';
 import { curriculum } from "@/services/api";
 import styles from "./page.module.css";
 import { useAuth } from "@/context/AuthContext";
@@ -18,6 +18,7 @@ export default function CurriculumPage() {
     const [curriculumData, setCurriculumData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [showOverlay, setShowOverlay] = useState(true);
     const [expandedModules, setExpandedModules] = useState({});
     // isStarted state: initially false (hides progress bar, shows "Start Learning")
     const [isStarted, setIsStarted] = useState(false);
@@ -179,8 +180,15 @@ export default function CurriculumPage() {
     // Calculate Completion (Mock logic)
     const completionPercentage = 0; // Example value
 
-    if (loading) {
-        return <CurriculumSkeleton />;
+    if (showOverlay) {
+        return (
+            <GenerationOverlay
+                topic={searchParams.get("topic")}
+                experience={searchParams.get("experience_level")}
+                isFinished={!loading}
+                onComplete={() => setShowOverlay(false)}
+            />
+        );
     }
 
     if (error) {

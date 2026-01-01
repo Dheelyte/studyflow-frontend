@@ -5,7 +5,6 @@ import Link from 'next/link';
 import styles from "./page.module.css";
 import Card from "@/components/Card";
 import SkeletonCard from "@/components/SkeletonCard";
-import GenerationOverlay from "@/components/GenerationOverlay";
 import IntegratedSearchBar from "@/components/IntegratedSearchBar";
 import { ZapIcon, StarIcon, TrophyIconSimple } from '@/components/Icons';
 import { useAuth } from '@/context/AuthContext';
@@ -13,8 +12,6 @@ import { curriculum, communities } from '@/services/api';
 
 export default function Dashboard() {
     const [greeting, setGreeting] = useState('');
-    const [isGenerating, setIsGenerating] = useState(false);
-    const [genParams, setGenParams] = useState(null);
     const [playlists, setPlaylists] = useState([]);
     const [loadingPlaylists, setLoadingPlaylists] = useState(true);
     const [exploreCommunities, setExploreCommunities] = useState([]);
@@ -81,21 +78,15 @@ export default function Dashboard() {
     }, [user?.id]);
 
     const handleSearch = (params) => {
-        setGenParams(params);
-        setIsGenerating(true);
-    };
-
-    const onGenerationComplete = () => {
-        if (!genParams) return;
-
         const query = {
-            topic: genParams.topic,
-            experience: genParams.experience,
-            duration: genParams.duration
+            topic: params.topic,
+            experience: params.experience,
+            duration: params.duration
         };
         const queryString = new URLSearchParams(query).toString();
         router.push(`/curriculum?${queryString}`);
     };
+
 
     // Derived stats from user context
     const stats = {
@@ -108,13 +99,6 @@ export default function Dashboard() {
     return (
         <div className={styles.page}>
 
-            {isGenerating && genParams && (
-                <GenerationOverlay
-                    topic={genParams.topic}
-                    experience={genParams.experience}
-                    onComplete={onGenerationComplete}
-                />
-            )}
 
             <div className={styles.heroSection}>
                 <h1 className={styles.greeting}>{greeting || 'Hello'}, {user?.first_name || 'Alex'}. Ready to flow?</h1>
