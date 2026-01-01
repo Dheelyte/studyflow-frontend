@@ -4,10 +4,13 @@ import Link from 'next/link';
 import styles from './page.module.css';
 import { useAuth } from '@/context/AuthContext';
 import { curriculum } from '@/services/api';
+import Card from '@/components/Card';
+import SkeletonCard from '@/components/SkeletonCard';
 
 export default function LibraryPage() {
   const { user } = useAuth();
   const [playlists, setPlaylists] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPlaylists = async () => {
@@ -26,26 +29,31 @@ export default function LibraryPage() {
                 const mapped = response.map((item, index) => ({
                     id: item.id,
                     title: item.playlist?.title || "Untitled Playlist",
-                    progress: 0, // Mock
+                    description: "Your personalized curriculum", 
+                    progress: 35, // Mock progress consistent with Dashboard
                     color: colors[index % colors.length],
-                    modules: 'Modules: TBD', // Mock
                     link: `/playlist/${item.playlist?.id || 1}`
                 }));
-                // Mock data if empty for visual confirmation
-                if (mapped.length === 0) {
-                     // Keep empty
-                }
                 setPlaylists(mapped);
             }
         } catch (error) {
              console.error("Failed to fetch playlists:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
     if (user) {
         fetchPlaylists();
+    } else {
+        // If not authenticated, we could redirect or just show empty state.
+        // AuthGuard should handle this, but setting loading false safe-guards against infinite loading.
+        const timeout = setTimeout(() => {
+             if (!user) setLoading(false); 
+        }, 1000);
+        return () => clearTimeout(timeout);
     }
-  }, [user?.id]); // FIX: Depends on ID, not object ref
+  }, [user]);
 
   return (
     <div className={styles.page}>
@@ -55,26 +63,24 @@ export default function LibraryPage() {
       </div>
 
       <div className={styles.grid}>
-         {playlists.length > 0 ? (
+         {loading ? (
+             <>
+                <div style={{minWidth: 0}}><SkeletonCard /></div>
+                <div style={{minWidth: 0}}><SkeletonCard /></div>
+                <div style={{minWidth: 0}}><SkeletonCard /></div>
+                <div style={{minWidth: 0}}><SkeletonCard /></div>
+                <div style={{minWidth: 0}}><SkeletonCard /></div>
+                <div style={{minWidth: 0}}><SkeletonCard /></div>
+             </>
+         ) : playlists.length > 0 ? (
             playlists.map(playlist => (
-                 <Link key={playlist.id} href={playlist.link} style={{display: 'contents'}}>
-                     <div className={styles.libraryCard}>
-                         {/* Square Image Placeholder with Gradient */}
-                         <div className={styles.imagePlaceholder} style={{background: playlist.color}}></div>
-                         
-                         <div className={styles.cardBody}>
-                             <div>
-                                 <div className={styles.cardTitle}>{playlist.title}</div>
-                                 <div className={styles.cardMeta}>
-                                     <span>{playlist.modules}</span>
-                                     <span>{playlist.progress}%</span>
-                                 </div>
-                             </div>
-                             <div className={styles.progressBar}>
-                                 <div className={styles.progress} style={{width: `${playlist.progress}%`}}></div>
-                             </div>
-                         </div>
-                     </div>
+                 <Link key={playlist.id} href={playlist.link} style={{display: 'block', textDecoration: 'none'}}>
+                     <Card 
+                        title={playlist.title} 
+                        description={playlist.description}
+                        color={playlist.color}
+                        progress={playlist.progress}
+                     />
                  </Link>
             ))
          ) : (

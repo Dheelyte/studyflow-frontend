@@ -3,6 +3,7 @@ import { createContext, useContext, useState, useEffect, useCallback, useRef } f
 import { communities as communityApi, posts as postApi, auth as authApi } from '@/services/api';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { formatTimeAgo } from '@/utils/dateUtils';
 
 const CommunityContext = createContext();
 
@@ -70,7 +71,7 @@ export function CommunityProvider({ children }) {
                 ...p,
                 author: "User", 
                 initials: "U",
-                time: new Date(p.created_at).toLocaleDateString(),
+                time: formatTimeAgo(p.created_at),
                 tag: "General",
                 likes: 0,
                 comments: [], 

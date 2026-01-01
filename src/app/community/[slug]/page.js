@@ -164,31 +164,14 @@ function CommunityDetailContent({ slug }) {
                      </div>
 
                      <div style={{flex:1}}>
-                         <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start'}}>
-                            <div>
-                                <h1 className={styles.title}>{community.name}</h1>
-                                <p className={styles.subtitle}>{community.description}</p>
-                            </div>
-                            {community.isJoined ? (
-                                <button 
-                                    className={styles.createBtn} 
-                                    style={{width:'auto', padding:'8px 24px'}}
-                                    onClick={() => leaveCommunity(community.id)}
-                                >
-                                    Joined
-                                </button>
-                            ) : (
-                                <button 
-                                    className={styles.createBtn} 
-                                    style={{width:'auto', background:'var(--primary)', color:'white', border:'none', padding:'8px 24px'}} 
-                                    onClick={() => joinCommunity(community.id)}
-                                >
-                                    Join
-                                </button>
-                            )}
+                         {/* Title Section */}
+                         <div style={{marginBottom: '16px'}}>
+                            <h1 className={styles.title}>{community.name}</h1>
+                            <p className={styles.subtitle}>{community.description}</p>
                          </div>
-                         <div style={{marginTop: '16px', display:'flex', gap:'8px'}}>
-                             {/* Display Member Count Here */}
+                         
+                         {/* Metadata and Button Row */}
+                         <div style={{display:'flex', gap:'8px', alignItems:'center', flexWrap:'wrap'}}>
                              <span style={{fontSize:'0.9rem', fontWeight:'600', color:'var(--foreground)'}}>
                                 {community.memberCount !== undefined ? community.memberCount : '...'} <span style={{fontWeight:'400', color:'var(--secondary)'}}>Members</span>
                              </span>
@@ -198,6 +181,27 @@ function CommunityDetailContent({ slug }) {
                              {community.tags && community.tags.map(t => (
                                  <span key={t} style={{fontSize:'0.8rem', background:'rgba(255,255,255,0.05)', padding:'4px 8px', borderRadius:'6px'}}>#{t}</span>
                              ))}
+
+                             {/* Button moved here, pushed to right - Mobile Only */}
+                             <div className={styles.mobileOnly} style={{marginLeft: 'auto'}}>
+                                {community.isJoined ? (
+                                    <button 
+                                        className={styles.createBtn} 
+                                        style={{width:'auto', padding:'8px 24px'}}
+                                        onClick={() => leaveCommunity(community.id)}
+                                    >
+                                        Joined
+                                    </button>
+                                ) : (
+                                    <button 
+                                        className={styles.createBtn} 
+                                        style={{width:'auto', background:'var(--primary)', color:'white', border:'none', padding:'8px 24px'}} 
+                                        onClick={() => joinCommunity(community.id)}
+                                    >
+                                        Join
+                                    </button>
+                                )}
+                             </div>
                          </div>
                      </div>
                  </div>
@@ -235,6 +239,26 @@ function CommunityDetailContent({ slug }) {
                 <div style={{marginTop:'16px', display:'flex', gap:'8px', alignItems:'center', color:'var(--secondary)'}}>
                      {/* Redundant Member count but sidebar usually has it too */}
                     <span style={{fontWeight:'700', color:'var(--foreground)'}}>{community.memberCount || 0}</span> Members
+                </div>
+                
+                <div style={{marginTop: '20px'}}>
+                    {community.isJoined ? (
+                        <button 
+                            className={styles.createBtn} 
+                            style={{width:'100%', padding:'12px'}}
+                            onClick={() => leaveCommunity(community.id)}
+                        >
+                            Joined
+                        </button>
+                    ) : (
+                        <button 
+                            className={styles.createBtn} 
+                            style={{width:'100%', background:'var(--primary)', color:'white', border:'none', padding:'12px'}} 
+                            onClick={() => joinCommunity(community.id)}
+                        >
+                            Join Community
+                        </button>
+                    )}
                 </div>
              </div>
          </div>

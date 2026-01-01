@@ -31,6 +31,7 @@ export default function CommunityPage() {
   const [feedTab, setFeedTab] = useState('feed'); 
   const [initialized, setInitialized] = useState(false);
   const router = useRouter();
+  const [hasCheckedEmptyFeed, setHasCheckedEmptyFeed] = useState(false);
 
   useEffect(() => {
       if (!loading && !initialized) {
@@ -53,6 +54,19 @@ export default function CommunityPage() {
          fetchUserFeed(true);
      }
   }, [user]);
+
+  
+  // Auto-switch to explore if feed is empty (UX improvement)
+  // Auto-switch to explore if feed is empty (UX improvement)
+  useEffect(() => {
+     if (user && initialized && !loadingPosts && feedTab === 'feed' && !hasCheckedEmptyFeed) {
+         if (posts.length === 0) {
+             setFeedTab('explore');
+             fetchExploreFeed(true);
+         }
+         setHasCheckedEmptyFeed(true);
+     }
+  }, [user, initialized, loadingPosts, posts.length, feedTab, hasCheckedEmptyFeed, fetchExploreFeed]);
 
   const loadMoreRef = useIntersectionObserver({
       onIntersect: () => {
@@ -115,6 +129,78 @@ export default function CommunityPage() {
        </div>
   );
 
+  const PostFeed = () => (
+      <>
+        {(loadingPosts || !initialized) && posts.length === 0 ? (
+            Array.from({ length: 3 }).map((_, i) => <PostSkeleton key={i} />)
+        ) : (
+            <>
+                {posts.length === 0 ? (
+                    <div style={{textAlign:'center', padding:'40px', color:'var(--secondary)'}}>
+                        {feedTab === 'feed' 
+                            ? 'No posts from your communities yet. Join more groups!' 
+                            : 'No posts found.'}
+                    </div>
+                ) : (
+                    posts.map(post => (
+                        <PostCard key={post.id} {...post} />
+                    ))
+                )}
+            </>
+        )}
+         <div ref={loadMoreRef} style={{height:'20px', margin:'20px 0'}}>
+            {loadingPosts && posts.length > 0 && (
+                <div style={{textAlign:'center', padding:'20px', color:'var(--secondary)', display:'flex', justifyContent:'center'}}>
+                    <PostSkeleton />
+                </div>
+            )}
+        </div>
+      </>
+  );
+
+  const MobileExploreList = () => (
+      <div className={styles.trendingList}>
+          {exploreCommunities.map(c => (
+                 <div 
+                    key={c.id} 
+                    className={styles.trendingItem} 
+                    onClick={() => router.push(`/community/${c.id}`)}
+                    style={{padding:'16px', background:'var(--card)', borderRadius:'12px', border:'1px solid var(--border)'}}
+                 >
+                    <div style={{display:'flex', alignItems:'center', flex:1}}>
+                         <div 
+                            className={styles.exploreAvatar}
+                            style={{
+                                width: '48px', height: '48px', marginRight:'16px', fontSize:'1.1rem',
+                                background: `linear-gradient(135deg, ${c.color || '#6366f1'}, ${c.color ? c.color+'dd' : '#a855f7'})`
+                            }}
+                        >
+                            {c.name.substring(0, 2).toUpperCase()}
+                        </div>
+                        <div>
+                            <span className={styles.hashtag} style={{fontSize:'1rem'}}>{c.name}</span>
+                        </div>
+                    </div>
+                    <button 
+                        className={styles.joinBtn}
+                        style={{padding:'8px 20px'}}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            requireAuth(() => joinCommunity(c.id));
+                        }}
+                    >
+                        Join
+                    </button>
+                 </div>
+            ))}
+            {exploreCommunities.length === 0 && (
+                <div style={{textAlign:'center', padding:'40px', color:'var(--secondary)'}}>
+                    No new communities to explore right now.
+                </div>
+            )}
+      </div>
+  );
+
   return (
     <div className={styles.page}>
       {showCreateModal && (
@@ -151,35 +237,24 @@ export default function CommunityPage() {
                 className={`${styles.tab} ${feedTab === 'explore' ? styles.active : ''}`}
                 onClick={() => handleTabChange('explore')}
             >
-                Explore
+                <span className={styles.desktopOnly}>Explore</span>
+                <span className={styles.mobileOnly}>Explore Communities</span>
             </button>
         </div>
 
         <div className={styles.feed}>
-             {(loadingPosts || !initialized) && posts.length === 0 ? (
-                Array.from({ length: 3 }).map((_, i) => <PostSkeleton key={i} />)
-            ) : (
-                <>
-                    {posts.length === 0 ? (
-                        <div style={{textAlign:'center', padding:'40px', color:'var(--secondary)'}}>
-                            {feedTab === 'feed' 
-                                ? 'No posts from your communities yet. Join more groups!' 
-                                : 'No posts found.'}
-                        </div>
-                    ) : (
-                        posts.map(post => (
-                            <PostCard key={post.id} {...post} />
-                        ))
-                    )}
-                </>
-            )}
-             <div ref={loadMoreRef} style={{height:'20px', margin:'20px 0'}}>
-                {loadingPosts && posts.length > 0 && (
-                    <div style={{textAlign:'center', padding:'20px', color:'var(--secondary)', display:'flex', justifyContent:'center'}}>
-                        <PostSkeleton />
+             {feedTab === 'explore' ? (
+                 <>
+                    <div className={styles.desktopOnly}>
+                        <PostFeed />
                     </div>
-                )}
-            </div>
+                    <div className={styles.mobileOnly}>
+                        <MobileExploreList />
+                    </div>
+                 </>
+             ) : (
+                 <PostFeed />
+             )}
         </div>
       </div>
 

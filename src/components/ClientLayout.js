@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Sidebar from './Sidebar';
+import BottomNav from './BottomNav';
 import MobileHeader from './MobileHeader';
 import styles from './ClientLayout.module.css';
 import { CommunityProvider } from './CommunityContext';
@@ -63,6 +64,7 @@ export default function ClientLayout({ children }) {
             />
         )}
         
+        {isMobile && !isAuthPage && <BottomNav />}
         <div className={styles.mainWrapper}>
             {!isAuthPage && <MobileHeader onMenuClick={toggleSidebar} />}
             <main className={styles.contentScroll}>

@@ -6,16 +6,26 @@ const PlayIcon = () => (
     </svg>
 )
 
-export default function Card({ title, description, color }) {
+export default function Card({ title, description, color, progress }) {
   return (
     <div className={styles.card}>
       <div className={styles.image} style={{ background: color || 'linear-gradient(45deg, #333, #555)' }}>
         <div className={styles.playButton}>
             <PlayIcon />
         </div>
+        <div className={styles.titleOverlay}>
+            <div className={styles.title}>{title}</div>
+            <div className={styles.description}>{description}</div>
+        </div>
+        {typeof progress === 'number' && (
+            <>
+                <div className={styles.percentage}>{Math.min(100, Math.max(0, Math.round(progress)))}%</div>
+                <div className={styles.progressBar}>
+                    <div className={styles.progressFill} style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}></div>
+                </div>
+            </>
+        )}
       </div>
-      <div className={styles.title}>{title}</div>
-      <div className={styles.description}>{description}</div>
     </div>
   );
 }

@@ -9,6 +9,7 @@ export default function CommunityStories() {
   const { communities, user, loading } = useCommunity();
   const scrollRef = useRef(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(true);
   
   // If user is logged in, show joined communities.
   // If user is guest, show explore/trending communities.
@@ -33,13 +34,19 @@ export default function CommunityStories() {
   useEffect(() => {
     const handleScroll = () => {
       if (scrollRef.current) {
-        setShowLeftArrow(scrollRef.current.scrollLeft > 0);
+        const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+        setShowLeftArrow(scrollLeft > 0);
+        // Check if scrolled to end (allow 1px for float precision). 
+        // If content fits (scrollWidth <= clientWidth), this will also be false.
+        setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 1);
       }
     };
 
     const container = scrollRef.current;
     if (container) {
       container.addEventListener('scroll', handleScroll);
+      window.addEventListener('resize', handleScroll);
+      // Run initially to set correct state
       handleScroll();
     }
 
@@ -47,8 +54,9 @@ export default function CommunityStories() {
       if (container) {
         container.removeEventListener('scroll', handleScroll);
       }
+      window.removeEventListener('resize', handleScroll);
     };
-  }, []);
+  }, [displayCommunities.length]); // Re-run if list length changes
 
   return (
     <div style={{display:'flex', flexDirection:'column', gap:'12px', marginBottom: '16px', marginTop: '8px'}}>
@@ -106,7 +114,7 @@ export default function CommunityStories() {
             )}
             </div>
 
-            {!loading && (
+            {!loading && showRightArrow && (
                 <button 
                     className={`${styles.navBtn} ${styles.navBtnRight}`} 
                     onClick={() => scroll('right')}

@@ -4,8 +4,29 @@ import { HeartIcon, MessageSquareIcon } from './Icons';
 import SimpleRichTextEditor from './SimpleRichTextEditor';
 import { comments as commentApi, posts as postsApi } from '@/services/api';
 import { useCommunity } from '@/components/CommunityContext';
+import { formatTimeAgo } from '@/utils/dateUtils';
 
 const COMMENT_LIMIT = 5;
+
+const PASTEL_COLORS = [
+    'linear-gradient(135deg, #FF9A9E 0%, #FECFEF 100%)', // Pink
+    'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)', // Purple
+    'linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)', // Blue/Green
+    'linear-gradient(135deg, #fccb90 0%, #d57eeb 100%)', // Orange/Purple
+    'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)', // Light Purple/Blue
+    'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', // Red/Pink
+    'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', // Blue
+    'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', // Green
+];
+
+function getColorForAuthor(author) {
+    let hash = 0;
+    for (let i = 0; i < author.length; i++) {
+        hash = author.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const index = Math.abs(hash) % PASTEL_COLORS.length;
+    return PASTEL_COLORS[index];
+}
 
 export default function PostCard({ id, author, time, content, likes: initialLikesProp, likes_count, comments: initialComments, liked: initialLikedProp, liked_by_user, commentsCount: initialCount }) {
     const { requireAuth } = useCommunity(); // Use auth helper
@@ -33,6 +54,14 @@ export default function PostCard({ id, author, time, content, likes: initialLike
     }, [initialCount]);
 
     const [newComment, setNewComment] = useState('');
+    const [isExpanded, setIsExpanded] = useState(false);
+    const MAX_LENGTH = 280;
+
+    const shouldTruncate = content && content.length > MAX_LENGTH;
+    const displayContent = shouldTruncate && !isExpanded 
+        ? content.slice(0, MAX_LENGTH) + '...' 
+        : content;
+
 
     const toggleLike = () => {
         requireAuth(async () => {
@@ -59,7 +88,7 @@ export default function PostCard({ id, author, time, content, likes: initialLike
                     id: c.id,
                     author: c.user?.email ? c.user.email.split('@')[0] : 'User',
                     content: c.content,
-                    time: new Date(c.created_at).toLocaleDateString()
+                    time: formatTimeAgo(c.created_at)
                 }));
                 
                 if (skip === 0) {
@@ -162,7 +191,20 @@ export default function PostCard({ id, author, time, content, likes: initialLike
             marginBottom: '0px'
         }}>
            <div style={{display:'flex', gap:'12px', marginBottom:'16px'}}>
-               <div style={{width:'40px', height:'40px', borderRadius:'50%', background:'linear-gradient(135deg, #ccc, #999)'}}></div>
+               <div style={{
+                   width:'40px', 
+                   height:'40px', 
+                   borderRadius:'50%', 
+                   background: getColorForAuthor(author),
+                   display: 'flex',
+                   alignItems: 'center',
+                   justifyContent: 'center',
+                   color: 'white',
+                   fontWeight: 'bold',
+                   fontSize: '0.9rem'
+               }}>
+                   {author ? author.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : '?'}
+               </div>
                <div>
                    <div style={{fontWeight:'700'}}>{author}</div>
                    <div style={{fontSize:'0.8rem', color:'var(--secondary)'}}>{time}</div>
@@ -170,7 +212,24 @@ export default function PostCard({ id, author, time, content, likes: initialLike
            </div>
 
            <div style={{fontSize:'1rem', lineHeight:'1.6', marginBottom:'24px', color:'var(--foreground)'}}>
-                {renderContent(content)}
+                {renderContent(displayContent)}
+                {shouldTruncate && (
+                    <button 
+                        onClick={() => setIsExpanded(!isExpanded)}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            color: 'var(--secondary)',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            padding: '0',
+                            marginTop: '8px',
+                            fontSize: '0.9rem'
+                        }}
+                    >
+                        {isExpanded ? 'Show less' : 'Read more'}
+                    </button>
+                )}
            </div>
 
            <div style={{display:'flex', gap:'24px', borderTop:'1px solid var(--border)', paddingTop:'16px'}}>

@@ -168,7 +168,7 @@ export default function Dashboard() {
                     ) : playlists.length > 0 ? (
                         playlists.slice(0, 5).map(playlist => (
                             <Link key={playlist.id} href={playlist.link} style={{ minWidth: '280px', display: 'block', textDecoration: 'none' }}>
-                                <Card title={playlist.title} description={playlist.description} color={playlist.color} />
+                                <Card title={playlist.title} description={playlist.description} color={playlist.color} progress={playlist.progress || 35} />
                             </Link>
                         ))
                     ) : (
