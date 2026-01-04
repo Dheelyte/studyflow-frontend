@@ -56,7 +56,7 @@ export default function LandingPage() {
 
             <header className={styles.header}>
                 <div className={styles.headerBrand}>
-                    <ZapIcon size={24} fill="var(--primary)" /> StudyFlow
+                    <ZapIcon size={24} fill="var(--primary)" /> Studywise
                 </div>
                 <div className={styles.headerActions}>
                     <Link href="/login" style={{ color: 'var(--foreground)', fontWeight: '600', textDecoration: 'none' }}>Log In</Link>

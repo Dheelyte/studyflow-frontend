@@ -223,6 +223,55 @@ export const curriculum = {
         method: 'POST',
         body: JSON.stringify(data)
     }),
+    getQuiz: (moduleId) => {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve({
+                    id: `quiz_${moduleId}`,
+                    questions: [
+                        {
+                            id: 1,
+                            text: "What is the primary purpose of this module?",
+                            options: [
+                                { id: "a", text: "To waste time" },
+                                { id: "b", text: "To learn fundamental concepts" },
+                                { id: "c", text: "To buy coffee" }
+                            ],
+                            correctOptionId: "b"
+                        },
+                        {
+                            id: 2,
+                            text: "Which concept was NOT covered?",
+                            options: [
+                                { id: "a", text: "Advanced Quantum Mechanics" },
+                                { id: "b", text: "Basic Syntax" },
+                                { id: "c", text: "Core Principles" }
+                            ],
+                            correctOptionId: "a"
+                        },
+                        {
+                            id: 3,
+                            text: "How do you apply this knowledge?",
+                            options: [
+                                { id: "a", text: "By practice and building" },
+                                { id: "b", text: "By sleeping" },
+                                { id: "c", text: "By staring at the screen" }
+                            ],
+                            correctOptionId: "a"
+                        }
+                    ]
+                });
+            }, 800);
+        });
+    },
+    submitQuiz: (moduleId, score) => {
+        return new Promise((resolve) => {
+            console.log(`[MOCK] Submitted quiz for module ${moduleId} with score ${score}`);
+            setTimeout(() => {
+                resolve({ success: true });
+            }, 500);
+        });
+    }
 };
 
 export default { auth, users, communities, posts, comments, curriculum };

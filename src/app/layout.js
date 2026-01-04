@@ -4,7 +4,7 @@ import ClientLayout from "@/components/ClientLayout";
 import { AuthProvider } from "@/context/AuthContext";
 
 export const metadata = {
-  title: "StudyFlow",
+  title: "Studywise",
   description: "Your personalized learning curriculum, visualized.",
 };
 

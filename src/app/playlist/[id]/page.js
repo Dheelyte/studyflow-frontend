@@ -6,6 +6,7 @@ import { curriculum } from "@/services/api";
 import styles from "./page.module.css";
 import { PlayIcon, ClockIcon, ChevronDown, ChevronUp, ZapIcon, ShareIcon, MenuIcon, CheckCircleIcon, BookOpenIcon, VideoIcon, TrophyIconSimple } from "@/components/Icons";
 import ShareModal from "@/components/ShareModal";
+import QuizModal from "@/components/QuizModal";
 
 // Helper to normalize API response to existing component state structure
 const normalizePlaylistData = (apiData) => {
@@ -102,7 +103,9 @@ export default function PlaylistPage({ params }) {
     const [isStarted, setIsStarted] = useState(false);
 
     const [showShareModal, setShowShareModal] = useState(false);
-    const [highlightResource, setHighlightResource] = useState(false);
+        const [highlightResource, setHighlightResource] = useState(false);
+    const [showQuizModal, setShowQuizModal] = useState(false);
+    const [activeQuizModule, setActiveQuizModule] = useState(null);
 
     // Ref to track if we have already fetched
     const fetchedRef = useRef(null);
@@ -295,6 +298,17 @@ export default function PlaylistPage({ params }) {
     }, [curriculumData]);
 
 
+        const handleOpenQuiz = (moduleId, moduleTitle) => {
+        setActiveQuizModule({ id: moduleId, title: moduleTitle });
+        setShowQuizModal(true);
+    };
+
+    const handleQuizComplete = (score) => {
+        // You could add logic here to unlock next module or show celebration
+        setShowQuizModal(false);
+        setActiveQuizModule(null);
+    };
+
     if (loading) {
         return <PlaylistSkeleton />;
     }
@@ -365,6 +379,16 @@ export default function PlaylistPage({ params }) {
                     onClose={() => setShowShareModal(false)}
                     url={typeof window !== 'undefined' ? window.location.href : ''}
                     title={curriculumData.curriculum_title || 'Check out this playlist!'}
+                />
+            )}
+
+            {showQuizModal && activeQuizModule && (
+                <QuizModal 
+                    isOpen={showQuizModal}
+                    onClose={() => setShowQuizModal(false)}
+                    moduleTitle={activeQuizModule.title}
+                    moduleId={activeQuizModule.id}
+                    onComplete={handleQuizComplete}
                 />
             )}
 
@@ -496,7 +520,7 @@ export default function PlaylistPage({ params }) {
                                                 textAlign: 'left',
                                                 padding: '16px',
                                                 opacity: module.isQuizLocked ? 0.5 : 1
-                                            }} onClick={() => !module.isQuizLocked && alert("Quiz feature coming soon!")}>
+                                            }} onClick={() => !module.isQuizLocked && handleOpenQuiz(module.module_id, module.module_title)}>
                                                 <div className={styles.resourceIcon} style={{ background: 'rgba(255,215,0,0.2)', color: '#ffd700' }}>
                                                     <TrophyIconSimple size={20} />
                                                 </div>

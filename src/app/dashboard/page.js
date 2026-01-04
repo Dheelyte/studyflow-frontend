@@ -52,9 +52,12 @@ export default function Dashboard() {
                     const mapped = playlistsRes.map((item, index) => ({
                         id: item.id,
                         title: item.playlist?.title || "Untitled",
-                        description: "0% Complete • Just Started", // Mock
+                        description: "Your personalized curriculum",
                         color: colors[index % colors.length],
-                        link: `/playlist/${item.playlist?.id || 1}`
+                        link: `/playlist/${item.playlist?.id || 1}`,
+                        progress: item.progress?.percentage || 0,
+                        completedModules: item.progress?.completed_modules || 0,
+                        totalModules: item.progress?.total_modules || 0
                     }));
                     setPlaylists(mapped);
                 }
@@ -152,7 +155,7 @@ export default function Dashboard() {
                     ) : playlists.length > 0 ? (
                         playlists.slice(0, 5).map(playlist => (
                             <Link key={playlist.id} href={playlist.link} style={{ minWidth: '280px', display: 'block', textDecoration: 'none' }}>
-                                <Card title={playlist.title} description={playlist.description} color={playlist.color} progress={playlist.progress || 35} />
+                                <Card title={playlist.title} description={playlist.description} color={playlist.color} progress={playlist.progress} completedModules={playlist.completedModules} totalModules={playlist.totalModules} />
                             </Link>
                         ))
                     ) : (

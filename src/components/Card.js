@@ -6,7 +6,9 @@ const PlayIcon = () => (
     </svg>
 )
 
-export default function Card({ title, description, color, progress }) {
+export default function Card({ title, description, color, progress, completedModules, totalModules }) {
+  const hasModuleInfo = typeof completedModules === 'number' && typeof totalModules === 'number';
+
   return (
     <div className={styles.card}>
       <div className={styles.image} style={{ background: color || 'linear-gradient(45deg, #333, #555)' }}>
@@ -19,7 +21,9 @@ export default function Card({ title, description, color, progress }) {
         </div>
         {typeof progress === 'number' && (
             <>
-                <div className={styles.percentage}>{Math.min(100, Math.max(0, Math.round(progress)))}%</div>
+                <div className={styles.percentage}>
+                    {Math.min(100, Math.max(0, Math.round(progress)))}% {hasModuleInfo && `• ${completedModules}/${totalModules} Modules`}
+                </div>
                 <div className={styles.progressBar}>
                     <div className={styles.progressFill} style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}></div>
                 </div>

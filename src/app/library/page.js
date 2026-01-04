@@ -30,7 +30,9 @@ export default function LibraryPage() {
                     id: item.id,
                     title: item.playlist?.title || "Untitled Playlist",
                     description: "Your personalized curriculum", 
-                    progress: 35, // Mock progress consistent with Dashboard
+                    progress: item.progress?.percentage || 0,
+                    completedModules: item.progress?.completed_modules || 0,
+                    totalModules: item.progress?.total_modules || 0,
                     color: colors[index % colors.length],
                     link: `/playlist/${item.playlist?.id || 1}`
                 }));
@@ -80,6 +82,8 @@ export default function LibraryPage() {
                         description={playlist.description}
                         color={playlist.color}
                         progress={playlist.progress}
+                        completedModules={playlist.completedModules}
+                        totalModules={playlist.totalModules}
                      />
                  </Link>
             ))
