@@ -57,7 +57,8 @@ export default function Dashboard() {
                         link: `/playlist/${item.playlist?.id || 1}`,
                         progress: item.progress?.percentage || 0,
                         completedModules: item.progress?.completed_modules || 0,
-                        totalModules: item.progress?.total_modules || 0
+                        totalModules: item.progress?.total_modules || 0,
+                        level: item.playlist?.level
                     }));
                     setPlaylists(mapped);
                 }
@@ -155,7 +156,7 @@ export default function Dashboard() {
                     ) : playlists.length > 0 ? (
                         playlists.slice(0, 5).map(playlist => (
                             <Link key={playlist.id} href={playlist.link} style={{ minWidth: '280px', display: 'block', textDecoration: 'none' }}>
-                                <Card title={playlist.title} description={playlist.description} color={playlist.color} progress={playlist.progress} completedModules={playlist.completedModules} totalModules={playlist.totalModules} />
+                                <Card title={playlist.title} description={playlist.description} color={playlist.color} progress={playlist.progress} completedModules={playlist.completedModules} totalModules={playlist.totalModules} level={playlist.level} />
                             </Link>
                         ))
                     ) : (

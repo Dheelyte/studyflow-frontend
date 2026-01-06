@@ -6,23 +6,32 @@ const PlayIcon = () => (
     </svg>
 )
 
-export default function Card({ title, description, color, progress, completedModules, totalModules }) {
+export default function Card({ title, description, color, progress, completedModules, totalModules, level }) {
   const hasModuleInfo = typeof completedModules === 'number' && typeof totalModules === 'number';
 
   return (
     <div className={styles.card}>
       <div className={styles.image} style={{ background: color || 'linear-gradient(45deg, #333, #555)' }}>
+        {level && <div className={styles.levelBadge}>{level}</div>}
         <div className={styles.playButton}>
             <PlayIcon />
         </div>
         <div className={styles.titleOverlay}>
             <div className={styles.title}>{title}</div>
             <div className={styles.description}>{description}</div>
+            
         </div>
         {typeof progress === 'number' && (
             <>
                 <div className={styles.percentage}>
-                    {Math.min(100, Math.max(0, Math.round(progress)))}% {hasModuleInfo && `• ${completedModules}/${totalModules} Modules`}
+
+                    <span>{Math.min(100, Math.max(0, Math.round(progress)))}%</span>
+                    {hasModuleInfo && (
+                        <>
+                            <span className={styles.statsSeparator}>•</span>
+                            <span className={styles.statsModules}>{completedModules}/{totalModules} Modules</span>
+                        </>
+                    )}
                 </div>
                 <div className={styles.progressBar}>
                     <div className={styles.progressFill} style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}></div>

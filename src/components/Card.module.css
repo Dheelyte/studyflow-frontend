@@ -96,8 +96,28 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
     color: white;
+
     z-index: 3;
 }
+
+.levelBadge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    z-index: 3;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
 
 .card:hover .playButton {
     opacity: 1;
@@ -111,7 +131,7 @@
     left: 0;
     width: 100%;
     height: 4px;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.3);
     z-index: 2;
 }
 
@@ -125,11 +145,44 @@
 
 .percentage {
     position: absolute;
-    bottom: 8px; /* Just above simple progress bar height might vary, relying on z-index */
+    bottom: 8px;
     right: 8px;
     font-size: 0.75rem;
     font-weight: 700;
     color: white;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
     z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
 }
+
+.statsSeparator {
+    opacity: 0.6;
+    font-size: 0.7rem;
+}
+
+.statsModules {
+    opacity: 0.9;
+    font-weight: 500;
+}
+
+
+.levelBadge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    z-index: 3;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+

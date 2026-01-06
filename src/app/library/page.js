@@ -33,6 +33,7 @@ export default function LibraryPage() {
                     progress: item.progress?.percentage || 0,
                     completedModules: item.progress?.completed_modules || 0,
                     totalModules: item.progress?.total_modules || 0,
+                    level: item.playlist?.level,
                     color: colors[index % colors.length],
                     link: `/playlist/${item.playlist?.id || 1}`
                 }));
@@ -84,6 +85,7 @@ export default function LibraryPage() {
                         progress={playlist.progress}
                         completedModules={playlist.completedModules}
                         totalModules={playlist.totalModules}
+                        level={playlist.level}
                      />
                  </Link>
             ))
