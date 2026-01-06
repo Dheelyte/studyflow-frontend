@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from 'react';
+import { useScroll, useTransform, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from './page.module.css';
@@ -12,6 +13,8 @@ import FadeIn from '@/components/FadeIn';
 export default function LandingPage() {
     const router = useRouter();
     const videoRef = useRef(null);
+    const container = useRef(null);
+    const { scrollYProgress } = useScroll({ target: container, offset: ['start start', 'end end'] });
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -51,6 +54,14 @@ export default function LandingPage() {
     const marqueeTopics = [...topics, ...topics];
     const marqueeTopicsReverse = [...topics.reverse(), ...topics];
 
+    const examples = [
+        "Python for Beginners", "History of Jazz", "Calculus II", "Digital Photography",
+        "React Hooks", "Machine Learning Basics", "Creative Writing", "SEO Strategies",
+        "Public Speaking", "Watercolor Painting", "Financial Literacy", "Yoga for Beginners",
+        "Cybersecurity Fundamentals", "Interior Design", "Music Theory"
+    ];
+    const marqueeExamples = [...examples, ...examples];
+
     return (
         <div className={styles.container}>
 
@@ -76,11 +87,20 @@ export default function LandingPage() {
                     </p>
                 </FadeIn>
 
-                <FadeIn direction="up" delay={0.2} style={{ width: '100%', maxWidth: '900px', marginTop: '32px' }}>
-                    <IntegratedSearchBar onSearch={handleSearch} />
+                <FadeIn direction="up" delay={0.2} className={styles.heroFooter} style={{ width: '100%', flexDirection: 'column' }}>
+                   <div className={styles.marqueeContainer} style={{ maxWidth: '900px', margin: '0 auto', maskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)' }}>
+                        <div className={styles.marqueeTrack} style={{ animationDuration: '60s' }}>
+                            {marqueeExamples.map((ex, i) => (
+                                <span key={`${ex}-${i}`} className={styles.examplePill} style={{ whiteSpace: 'nowrap' }}>
+                                    {ex}
+                                </span>
+                            ))}
+                        </div>
+                   </div>
                 </FadeIn>
 
-                <FadeIn direction="up" delay={0.3} className={styles.heroFooter}>
+                <FadeIn direction="up" delay={0.3} style={{ width: '100%', maxWidth: '900px', marginTop: '12px' }}>
+                    <IntegratedSearchBar onSearch={handleSearch} />
                 </FadeIn>
 
                 <FadeIn direction="up" delay={0.4} style={{ marginTop: '48px', width: '100%', display: 'flex', justifyContent: 'center' }}>
@@ -137,92 +157,41 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* 3. WHY STUDYFLOW (STACKED CARDS) SECTION */}
-            <section className={styles.stackedSection}>
+                                    {/* 3. WHY STUDYWISE (DYNAMIC STACK) SECTION */}
+            <section className={styles.stackedSection} ref={container}>
                 <FadeIn>
-                    <h2 className={styles.sectionHeading} style={{ textAlign: 'center' }}>Why Studywise?</h2>
+                     <h2 className={styles.sectionHeading} style={{ textAlign: 'center', marginBottom: '40px' }}>Why Studywise?</h2>
                 </FadeIn>
                 <div className={styles.stackedContainer}>
-                    {/* Card 1 */}
-                    <div className={styles.stackedCard} style={{ top: '120px', zIndex: 1, background: 'var(--card)' }}>
-                        <div className={styles.stackedCardContent}>
-                            <div className={styles.stackedCardInfo}>
-                                <h3 style={{ fontSize: '2rem', marginBottom: '16px' }}>AI-Curated Paths</h3>
-                                <p style={{ fontSize: '1.1rem', color: 'var(--secondary)', lineHeight: '1.6' }}>
-                                    We don&apos;t just serve you random videos. Our Gemini-powered engine analyzes thousands of resources to create a cohesive, step-by-step curriculum tailored to your experience level and time constraints.
-                                </p>
-                            </div>
-                            <div className={styles.stackedCardVisual} style={{ background: "linear-gradient(135deg, #6366f1, #8b5cf6)" }}>
-                                <div className={styles.visualMockup}>
-                                    <div className={styles.pathContainer}>
-                                        <div className={styles.pathLine}></div>
-                                        <div className={styles.pathNode}>
-                                            <div className={styles.pathIcon}><PlayIcon size={12} fill="var(--primary)" /></div>
-                                            <span style={{fontSize: "0.9rem", fontWeight: "600"}}>React Basics</span>
-                                        </div>
-                                        <div className={styles.pathNode}>
-                                            <div className={styles.pathIcon}><ZapIcon size={12} fill="var(--primary)" /></div>
-                                            <span style={{fontSize: "0.9rem", fontWeight: "600"}}>Advanced Hooks</span>
-                                        </div>
-                                        <div className={styles.pathNode}>
-                                            <div className={styles.pathIcon}><StarIcon size={12} fill="var(--primary)" /></div>
-                                            <span style={{fontSize: "0.9rem", fontWeight: "600"}}>Capstone Project</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {/* Card 2 */}
-                    <div className={styles.stackedCard} style={{ top: '150px', zIndex: 2, background: 'var(--card)' }}>
-                        <div className={styles.stackedCardContent}>
-                            <div className={styles.stackedCardInfo}>
-                                <h3 style={{ fontSize: '2rem', marginBottom: '16px' }}>Gamified Motivation</h3>
-                                <p style={{ fontSize: '1.1rem', color: 'var(--secondary)', lineHeight: '1.6' }}>
-                                    Stay consistent with streaks, XP, and daily goals. We turn learning into a game you actually want to play. Compete with friends or beat your own best.
-                                </p>
-                            </div>
-                            <div className={styles.stackedCardVisual} style={{ background: "linear-gradient(135deg, #eab308, #f59e0b)" }}>
-                                <div className={styles.visualMockup}>
-                                    <div className={styles.streakCard}>
-                                        <div className={styles.streakFlame}>🔥</div>
-                                        <div className={styles.streakText}>12 Day Streak</div>
-                                        <div style={{fontSize: "0.9rem", marginTop: "4px", opacity: 0.9}}>Keep it burning!</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {/* Card 3 */}
-                    <div className={styles.stackedCard} style={{ top: '180px', zIndex: 3, background: 'var(--card)' }}>
-                        <div className={styles.stackedCardContent}>
-                            <div className={styles.stackedCardInfo}>
-                                <h3 style={{ fontSize: '2rem', marginBottom: '16px' }}>Community Powered</h3>
-                                <p style={{ fontSize: '1.1rem', color: 'var(--secondary)', lineHeight: '1.6' }}>
-                                    Never learn alone. Join niche communities for every topic. Share your notes, ask questions, and get feedback from learners who are on the same path.
-                                </p>
-                            </div>
-                            <div className={styles.stackedCardVisual} style={{ background: "linear-gradient(135deg, #ec4899, #f43f5e)" }}>
-                                <div className={styles.visualMockup}>
-                                    <div className={styles.chatContainer}>
-                                        <div className={`${styles.chatBubble} ${styles.chatLeft}`}>
-                                            Has anyone finished module 4? 🙋‍♀️
-                                        </div>
-                                        <div className={`${styles.chatBubble} ${styles.chatRight}`}>
-                                            Yes! The visualizer helps a lot.
-                                        </div>
-                                        <div className={`${styles.chatBubble} ${styles.chatLeft}`}>
-                                            Thanks! I will check it out.
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                {
+                    [
+                        {
+                            title: "AI-Curated Paths", subtitle: "Personalized curriculum tailored to you",
+                            desc: "We don't just serve you random videos. Our Gemini-powered engine analyzes thousands of resources to create a cohesive, step-by-step curriculum.",
+                            color: "linear-gradient(135deg, #6366f1, #8b5cf6)", 
+                            visual: (<div className={styles.visualMockup}><div className={styles.pathContainer}><div className={styles.pathLine}></div><div className={styles.pathNode}><div className={styles.pathIcon}><PlayIcon size={12} fill="var(--primary)" /></div><span style={{fontSize: "0.9rem", fontWeight: "600"}}>React Basics</span></div><div className={styles.pathNode}><div className={styles.pathIcon}><ZapIcon size={12} fill="var(--primary)" /></div><span style={{fontSize: "0.9rem", fontWeight: "600"}}>Advanced Hooks</span></div><div className={styles.pathNode}><div className={styles.pathIcon}><StarIcon size={12} fill="var(--primary)" /></div><span style={{fontSize: "0.9rem", fontWeight: "600"}}>Capstone Project</span></div></div></div>)
+                        },
+                        {
+                            title: "Gamified Motivation", subtitle: "Track progress with streaks and XP",
+                            desc: "Stay consistent with streaks, XP, and daily goals. We turn learning into a game you actually want to play.",
+                            color: "linear-gradient(135deg, #eab308, #f59e0b)",
+                            visual: (<div className={styles.streakCard}><div className={styles.streakFlame}>🔥</div><div className={styles.streakText}>12 Day Streak</div></div>)
+                        },
+                        {
+                            title: "Community Powered", subtitle: "Join communities for every topic",
+                            desc: "Never learn alone. Join niche communities for every topic. Share your notes and ask questions.",
+                            color: "linear-gradient(135deg, #ec4899, #f43f5e)",
+                            visual: (<div className={styles.chatContainer}><div className={`${styles.chatBubble} ${styles.chatLeft}`}>Has anyone finished module 4? 🙋‍♀️</div><div className={`${styles.chatBubble} ${styles.chatRight}`}>Yes! The visualizer helps properly.</div></div>)
+                        }
+                    ].map((card, i) => {
+                        const targetScale = 1 - ( (3 - i) * 0.05);
+                        return <Card key={i} i={i} {...card} progress={scrollYProgress} range={[i * 0.25, 1]} targetScale={targetScale}>{card.visual}</Card>
+                    })
+                }
                 </div>
             </section>
 
-            {/* 4. LEARN BETTER TOGETHER (COMMUNITY) SECTION */}
+{/* 4. LEARN BETTER TOGETHER (COMMUNITY) SECTION */}
             <section className={styles.communitySection}>
                 <div className={styles.communityContent}>
                     <FadeIn direction="right">
@@ -448,4 +417,35 @@ function FAQSection() {
             </div>
         </section>
     );
+}
+
+
+function Card({ i, title, subtitle, description, color, children, progress, range, targetScale }) {
+  const container = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: container,
+    offset: ['start end', 'start start']
+  });
+
+  const imageScale = useTransform(scrollYProgress, [0, 1], [1.1, 1]);
+  const scale = useTransform(progress, range, [1, targetScale]);
+
+  return (
+    <div ref={container} className={styles.cardContainer} style={{top: `${i * 25}px`}}>
+      <motion.div 
+        className={styles.dynamicCard}
+        style={{ scale, top: `calc(-5% + ${i * 25}px)` }}
+      >
+        <div className={styles.dynamicCardContent}>
+             <h3 style={{ fontSize: '2.5rem', marginBottom: '8px', fontWeight: '800' }}>{title}</h3><div style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--primary)', marginBottom: '24px', letterSpacing: '0px', textTransform: 'none' }}>{subtitle}</div>
+             <p style={{ fontSize: '1.2rem', color: 'var(--secondary)', lineHeight: '1.6' }}>{description}</p>
+        </div>
+        <div className={styles.dynamicCardVisual} style={{ background: color }}>
+             <motion.div style={{scale: imageScale, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                {children}
+             </motion.div>
+        </div>
+      </motion.div>
+    </div>
+  )
 }

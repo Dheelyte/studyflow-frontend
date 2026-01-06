@@ -18,10 +18,10 @@ export default function IntegratedSearchBar({ redirect = false, onSearch, shadow
     ];
 
     const durationOptions = [
+      { value: 'No Fixed Duration', label: 'No Fixed Learning Duration', description: 'Complete zero-to-hero journey.' },
       { value: '1 Day', label: '1 Day', description: 'Intensive crash course.' },
       { value: '7 Days', label: '7 Days', description: 'Standard weekly sprint.' },
-      { value: '1 Month', label: '1 Month', description: 'In-depth mastery path.' },
-      { value: '3 Months', label: '3 Months', description: 'Complete zero-to-hero journey.' }
+      { value: '1 Month', label: '1 Month', description: 'In-depth mastery path.' }
     ];
 
     const handleStart = () => {
@@ -72,7 +72,7 @@ export default function IntegratedSearchBar({ redirect = false, onSearch, shadow
                 options={experienceOptions}
                 value={experience}
                 onChange={setExperience}
-                placeholder="Experience Level"
+                placeholder="Your Experience Level"
             />
 
             <div className={styles.divider}></div>
@@ -81,7 +81,7 @@ export default function IntegratedSearchBar({ redirect = false, onSearch, shadow
                 options={durationOptions}
                 value={duration}
                 onChange={setDuration}
-                placeholder="Duration"
+                placeholder="Learning Duration"
             />
 
             <button className={styles.searchButton} onClick={handleStart}>
