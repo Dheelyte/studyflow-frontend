@@ -19,7 +19,7 @@ export function AuthProvider({ children }) {
     }, []);
 
     const checkUser = useCallback(async () => {
-        if (typeof window !== 'undefined' && window.location.pathname === '/') {
+        if (typeof window !== 'undefined' && window.location.pathname === '/' || window.location.pathname.startsWith('/playlist/')) {
             setLoading(false);
             return;
         }

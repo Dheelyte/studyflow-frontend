@@ -140,7 +140,7 @@ export default function LandingPage() {
             {/* 3. WHY STUDYFLOW (STACKED CARDS) SECTION */}
             <section className={styles.stackedSection}>
                 <FadeIn>
-                    <h2 className={styles.sectionHeading} style={{ textAlign: 'center' }}>Why StudyFlow?</h2>
+                    <h2 className={styles.sectionHeading} style={{ textAlign: 'center' }}>Why Studywise?</h2>
                 </FadeIn>
                 <div className={styles.stackedContainer}>
                     {/* Card 1 */}
@@ -313,7 +313,7 @@ export default function LandingPage() {
                         <div style={{ marginBottom: '24px', display: 'flex', gap: '4px', color: '#eab308' }}>
                             {[1, 2, 3, 4, 5].map(i => <StarIcon key={i} size={16} fill="currentColor" stroke="none" />)}
                         </div>
-                        <p className={styles.quote}>&quot;I was overwhelmed by the amount of React tutorials online. StudyFlow curated exactly what I needed.&quot;</p>
+                        <p className={styles.quote}>&quot;I was overwhelmed by the amount of React tutorials online. Studywise curated exactly what I needed.&quot;</p>
                         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                             <div className={styles.avatarRing}><div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'var(--card)' }}></div></div>
                             <div>
@@ -368,7 +368,7 @@ export default function LandingPage() {
                 <div className={styles.footerGrid}>
                     <div className={styles.footerBrand}>
                         <div style={{ display: 'flex', gap: '8px', fontWeight: '800', fontSize: '1.2rem', alignItems: 'center' }}>
-                            <ZapIcon size={24} fill="var(--primary)" /> StudyFlow
+                            <ZapIcon size={24} fill="var(--primary)" /> Studywise
                         </div>
                         <p>The AI-powered curriculum designer that helps you master any topic. Flow state on demand.</p>
                     </div>
@@ -400,7 +400,7 @@ export default function LandingPage() {
                     </div>
                 </div>
                 <div className={styles.footerBottom}>
-                    <div>&copy; 2024 StudyFlow Inc.</div>
+                    <div>&copy; 2024 Studywise Inc.</div>
                     <div style={{ display: 'flex', gap: '16px' }}>
                         <a href="#" aria-label="Twitter">Twitter</a>
                         <a href="#" aria-label="GitHub">GitHub</a>
@@ -416,10 +416,10 @@ function FAQSection() {
     const [openIndex, setOpenIndex] = useState(0);
 
     const questions = [
-        { q: "Is StudyFlow really free?", a: "Yes! You can generate unlimited curriculums on the free plan. We may introduce premium features later." },
+        { q: "Is Studywise really free?", a: "Yes! You can generate unlimited curriculums on the free plan. We may introduce premium features later." },
         { q: "How accurate is the AI?", a: "We use Gemini Ultra 1.5 to curate high-quality resources. The content is constantly vetted by our algorithm." },
         { q: "Can I customize the curriculum?", a: "Absolutely. You can edit, remove, or reorder modules as you see fit." },
-        { q: "Is there a mobile app?", a: "StudyFlow is fully responsive and works great on any device. A native app is coming soon!" }
+        { q: "Is there a mobile app?", a: "Studywise is fully responsive and works great on any device. A native app is coming soon!" }
     ];
 
     return (

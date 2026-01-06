@@ -16,7 +16,7 @@ export default function AuthGuard({ children }) {
         if (!loading) {
              const isPublicPath = pathname === '/' || PUBLIC_PATHS.some(path => pathname.startsWith(path));
              if (!user && !isPublicPath) {
-                 router.push('/login');
+                 // router.push('/login');
              }
         }
     }, [user, loading, pathname, router]);
@@ -27,7 +27,7 @@ export default function AuthGuard({ children }) {
 
     const isPublicPath = pathname === '/' || PUBLIC_PATHS.some(path => pathname.startsWith(path));
     if (!user && !isPublicPath) {
-        return null; // Redirecting
+        // return null; // Redirecting
     }
 
     return children;

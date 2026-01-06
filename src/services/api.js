@@ -42,7 +42,7 @@ async function apiFetch(endpoint, options = {}) {
             // If this is already a retry, just fail to prevent infinite loops
             if (_retry) {
                  console.warn("Unauthorized access (retry failed)");
-                 if (window.location.pathname !== '/login') { window.location.href = '/login'; }
+                 if (window.location.pathname !== '/login') { /* window.location.href = '/login'; */ }
                  throw new Error('Session expired');
             }
 
@@ -82,7 +82,7 @@ async function apiFetch(endpoint, options = {}) {
                 processQueue(refreshErr, null);
                 isRefreshing = false;
                 // Redirect because refresh failed, meaning user is not logged in / session invalid
-                if (window.location.pathname !== '/login') { window.location.href = '/login'; } 
+                if (window.location.pathname !== '/login') { /* window.location.href = '/login'; */ } 
                 throw new Error('Session expired');
             }
         }
@@ -223,53 +223,15 @@ export const curriculum = {
         method: 'POST',
         body: JSON.stringify(data)
     }),
-    getQuiz: (moduleId) => {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve({
-                    id: `quiz_${moduleId}`,
-                    questions: [
-                        {
-                            id: 1,
-                            text: "What is the primary purpose of this module?",
-                            options: [
-                                { id: "a", text: "To waste time" },
-                                { id: "b", text: "To learn fundamental concepts" },
-                                { id: "c", text: "To buy coffee" }
-                            ],
-                            correctOptionId: "b"
-                        },
-                        {
-                            id: 2,
-                            text: "Which concept was NOT covered?",
-                            options: [
-                                { id: "a", text: "Advanced Quantum Mechanics" },
-                                { id: "b", text: "Basic Syntax" },
-                                { id: "c", text: "Core Principles" }
-                            ],
-                            correctOptionId: "a"
-                        },
-                        {
-                            id: 3,
-                            text: "How do you apply this knowledge?",
-                            options: [
-                                { id: "a", text: "By practice and building" },
-                                { id: "b", text: "By sleeping" },
-                                { id: "c", text: "By staring at the screen" }
-                            ],
-                            correctOptionId: "a"
-                        }
-                    ]
-                });
-            }, 800);
-        });
+    getQuiz: (moduleId, params) => {
+        const searchParams = new URLSearchParams(params);
+        return apiFetch(`/modules/${moduleId}/quiz?${searchParams.toString()}`);
     },
-    submitQuiz: (moduleId, score) => {
-        return new Promise((resolve) => {
-            console.log(`[MOCK] Submitted quiz for module ${moduleId} with score ${score}`);
-            setTimeout(() => {
-                resolve({ success: true });
-            }, 500);
+    submitQuiz: (moduleId, payload) => {
+        console.log('Submitting Quiz Payload:', JSON.stringify(payload));
+        return apiFetch(`/modules/${moduleId}/quiz/submit`, {
+            method: 'POST',
+            body: JSON.stringify(payload)
         });
     }
 };

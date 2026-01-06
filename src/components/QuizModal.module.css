@@ -25,6 +25,7 @@
   flex-direction: column;
   overflow: hidden;
   position: relative;
+  max-height: 90vh;
 }
 
 /* Header */
@@ -72,6 +73,8 @@
   align-items: center;
   text-align: center;
   min-height: 300px;
+  flex: 1;
+  overflow-y: auto;
   justify-content: center;
 }
 
@@ -238,4 +241,14 @@
   0% { transform: translateY(0px); }
   50% { transform: translateY(-10px); }
   100% { transform: translateY(0px); }
+}
+
+/* Inline Code Styling */
+.inlineCode {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9em;
+  color: #fbbf24; /* Amber-400 for visibility */
 }

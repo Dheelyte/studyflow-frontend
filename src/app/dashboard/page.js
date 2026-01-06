@@ -197,27 +197,6 @@ export default function Dashboard() {
                 </div>
             </section>
 
-            {/* Recommended Section - Static for now, logic not requested */}
-            <section className={styles.section}>
-                <div className={styles.sectionHeader}>
-                    <h2 className={styles.sectionTitle}>Recommended based on your goals</h2>
-                    <span className={styles.showAll}>Explore More</span>
-                </div>
-                <div className={styles.scrollContainer}>
-                    <Link href="/playlist/1" style={{ minWidth: '280px', display: 'block', textDecoration: 'none' }}>
-                        <Card title="Advanced Next.js" description="Master Server Components" color="linear-gradient(135deg, #020617, #334155)" />
-                    </Link>
-                    <Link href="/playlist/1" style={{ minWidth: '280px', display: 'block', textDecoration: 'none' }}>
-                        <Card title="GenAI Engineering" description="LLMs, RAG, and Agents" color="linear-gradient(135deg, #3b82f6, #2563eb)" />
-                    </Link>
-                    <Link href="/playlist/1" style={{ minWidth: '280px', display: 'block', textDecoration: 'none' }}>
-                        <Card title="Docker Mastery" description="Containerization from scratch" color="linear-gradient(135deg, #0ea5e9, #0284c7)" />
-                    </Link>
-                     <Link href="/playlist/1" style={{ minWidth: '280px', display: 'block', textDecoration: 'none' }}>
-                        <Card title="Rust Foundations" description="Memory safety & concurrency" color="linear-gradient(135deg, #f59e0b, #b45309)" />
-                    </Link>
-                </div>
-            </section>
 
         </div>
     );

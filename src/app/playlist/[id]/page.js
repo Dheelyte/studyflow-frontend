@@ -14,7 +14,12 @@ const normalizePlaylistData = (apiData) => {
 
     let totalResources = 0;
     let completedResources = 0;
+
+    // Global flag to track if we have found the first incomplete item (Next Up)
     let foundNextUp = false;
+
+    // Track if global sequence is broken (used to lock future items)
+    // Actually `foundNextUp` serves this purpose: if foundNextUp is true, everything subsequent is locked.
 
     const modules = (apiData.modules || []).map(m => {
         let moduleResourcesTotal = 0;
@@ -22,7 +27,7 @@ const normalizePlaylistData = (apiData) => {
 
         const lessons = (m.lessons || []).map(l => ({
             lesson_title: l.title,
-            estimated_time: l.estimated_time || "1 hour", // Fallback if missing
+            estimated_time: l.estimated_time || "1 hour",
             resources: (l.resources || []).map(r => {
                 totalResources++;
                 moduleResourcesTotal++;
@@ -45,7 +50,7 @@ const normalizePlaylistData = (apiData) => {
                 }
 
                 return {
-                    resource_id: r.id, // Ensure we have an ID for scrolling
+                    resource_id: r.id,
                     label: r.title,
                     type: r.type,
                     description: r.description,
@@ -57,16 +62,48 @@ const normalizePlaylistData = (apiData) => {
             })
         }));
 
-        const isComplete = moduleResourcesTotal > 0 && moduleResourcesTotal === moduleResourcesCompleted;
-        // Lock quiz if we have encountered an incomplete resource (meaning we plan to do it next, or later)
-        const isQuizLocked = foundNextUp;
+        const isResourcesComplete = moduleResourcesTotal > 0 && moduleResourcesTotal === moduleResourcesCompleted;
+        const isQuizCompleted = m.quiz_completed === true;
+
+        let isQuizNextUp = false;
+        let isQuizLocked = false;
+
+        // Quiz Logic
+        // 1. If resources NOT complete, Quiz is locked.
+        // 2. If resources complete, check if Quiz is complete.
+        // 3. If Quiz NOT complete:
+        //    - If !foundNextUp (meaning this is the first incomplete thing after resources), THIS IS NEXT UP.
+        //    - Else (foundNextUp implies a resource earlier in this module was incomplete), Quiz is locked.
+
+        if (!isResourcesComplete) {
+            isQuizLocked = true;
+            // The foundNextUp would have been triggered by a resource inside this module already.
+        } else {
+            // Resources are done. Check Quiz status.
+            if (!isQuizCompleted) {
+                if (!foundNextUp) {
+                    isQuizNextUp = true;
+                    foundNextUp = true;
+                } else {
+                    // This creates a lock if some previous module had an incomplete item
+                    isQuizLocked = true;
+                }
+            }
+        }
+
+        // Note: completionPercentage calculation counts resources only. 
+        // We might want to include quizzes in "Module Completion" logic but maybe not the global % yet unless requested.
+        // For 'is_module_completed' flag, usually it means everything in it is done.
+        const isModuleComplete = isResourcesComplete && isQuizCompleted;
 
         return {
             module_id: m.id,
             module_title: m.title,
             lessons: lessons,
-            is_module_completed: isComplete,
-            isQuizLocked: isQuizLocked
+            is_module_completed: isModuleComplete,
+            isQuizLocked,
+            isQuizNextUp,
+            quiz_completed: isQuizCompleted
         };
     });
 
@@ -75,14 +112,14 @@ const normalizePlaylistData = (apiData) => {
         : 0;
 
     return {
-        _raw: apiData, // Keep raw data for safe updates if needed
+        _raw: apiData,
         curriculum_title: apiData.title,
         overview: apiData.description || "No description available.",
         modules: modules,
-        learning_objectives: apiData.objectives || [], // Handle null objectives
-        completionPercentage, // Add calculated progress
-        isStarted: completedResources > 0, // Auto-start if there is progress
-        nextUpId: foundNextUp ? "next-up-resource" : null, // Helper for scrolling
+        learning_objectives: apiData.objectives || [],
+        completionPercentage,
+        isStarted: completedResources > 0,
+        nextUpId: foundNextUp ? "next-up-resource" : null, // This ID might conflict if multiple "next ups", but logic ensures only 1 true
         level: apiData.level || "Beginner"
     };
 };
@@ -103,7 +140,7 @@ export default function PlaylistPage({ params }) {
     const [isStarted, setIsStarted] = useState(false);
 
     const [showShareModal, setShowShareModal] = useState(false);
-        const [highlightResource, setHighlightResource] = useState(false);
+    const [highlightResource, setHighlightResource] = useState(false);
     const [showQuizModal, setShowQuizModal] = useState(false);
     const [activeQuizModule, setActiveQuizModule] = useState(null);
 
@@ -167,15 +204,21 @@ export default function PlaylistPage({ params }) {
                 if (data.modules && data.modules.length > 0) {
                     let moduleToExpand = data.modules[0].module_id !== undefined ? data.modules[0].module_id : 0;
 
-                    // Find module with Next Up resource
+                    // Find module with Next Up resource or Quiz
                     for (const m of data.modules) {
+                        let innerFound = false;
                         if (m.lessons) {
                             for (const l of m.lessons) {
                                 if (l.resources && l.resources.some(r => r.isNextUp)) {
                                     moduleToExpand = m.module_id;
+                                    innerFound = true;
                                     break;
                                 }
                             }
+                        }
+                        if (innerFound || m.isQuizNextUp) {
+                            moduleToExpand = m.module_id;
+                            break;
                         }
                     }
 
@@ -184,11 +227,11 @@ export default function PlaylistPage({ params }) {
                     // Scroll to Next Up resource after a brief delay to allow rendering
                     setTimeout(() => {
                         const nextUp = document.getElementById("next-up-resource");
-                        const target = nextUp; 
-                        
+                        const target = nextUp;
+
                         if (target) {
                             target.scrollIntoView({ behavior: "smooth", block: "center" });
-                            
+
                             // Only highlight if the user has already started (resuming)
                             // This prevents the "glow" effect on a brand new playlist where the first item is naturally next
                             if (data.isStarted) {
@@ -239,8 +282,8 @@ export default function PlaylistPage({ params }) {
         // e.preventDefault(); // Optional: decide if we want to block navigation until complete. Usually unsafe for UX.
 
         if (isLocked) {
-             // Allow navigation but do not track progress
-             return;
+            // Allow navigation but do not track progress
+            return;
         }
 
         // Check if already completed to avoid redundant calls
@@ -298,15 +341,30 @@ export default function PlaylistPage({ params }) {
     }, [curriculumData]);
 
 
-        const handleOpenQuiz = (moduleId, moduleTitle) => {
+    const handleOpenQuiz = (moduleId, moduleTitle) => {
         setActiveQuizModule({ id: moduleId, title: moduleTitle });
         setShowQuizModal(true);
     };
 
     const handleQuizComplete = (score) => {
-        // You could add logic here to unlock next module or show celebration
         setShowQuizModal(false);
         setActiveQuizModule(null);
+        // Force re-fetch logic or local update. 
+        // Since quiz_completed is server-side, it's safest to trigger a refresh 
+        // OR update local state optimistically.
+        // Let's update local state optimistically to unblock the next module immediately.
+        setCurriculumData(prev => {
+            if (!prev) return prev;
+
+            // We need to simulate the raw data update so 'normalizePlaylistData' can re-run properly
+            // Because locking logic is inside normalizePlaylistData.
+            const newRaw = JSON.parse(JSON.stringify(prev._raw));
+            const modIndex = newRaw.modules.findIndex(m => m.id === activeQuizModule.id);
+            if (modIndex !== -1) {
+                newRaw.modules[modIndex].quiz_completed = true;
+            }
+            return normalizePlaylistData(newRaw);
+        });
     };
 
     if (loading) {
@@ -347,19 +405,6 @@ export default function PlaylistPage({ params }) {
                     <span className={styles.type}>{(curriculumData.level || "Beginner").toUpperCase()}</span>
                     <h1 className={styles.title}>{curriculumData.curriculum_title}</h1>
                     <p className={styles.description}>{curriculumData.overview}</p>
-                    <div className={styles.meta}>
-                        <div className={styles.metaItem}>
-                            <span>By <strong>StudyFlow AI</strong></span>
-                        </div>
-                        <div className={styles.metaItem}>
-                            <span>•</span>
-                            <span>Last updated today</span>
-                        </div>
-                        <div className={styles.metaItem}>
-                            <span>•</span>
-                            <span>{curriculumData.modules ? curriculumData.modules.length : 0} modules</span>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -373,9 +418,9 @@ export default function PlaylistPage({ params }) {
                     <ShareIcon />
                 </button>
             </div>
-            
+
             {showShareModal && (
-                <ShareModal 
+                <ShareModal
                     onClose={() => setShowShareModal(false)}
                     url={typeof window !== 'undefined' ? window.location.href : ''}
                     title={curriculumData.curriculum_title || 'Check out this playlist!'}
@@ -383,12 +428,14 @@ export default function PlaylistPage({ params }) {
             )}
 
             {showQuizModal && activeQuizModule && (
-                <QuizModal 
+                <QuizModal
                     isOpen={showQuizModal}
                     onClose={() => setShowQuizModal(false)}
                     moduleTitle={activeQuizModule.title}
                     moduleId={activeQuizModule.id}
                     onComplete={handleQuizComplete}
+                    curriculumTitle={curriculumData.curriculum_title}
+                    experienceLevel={curriculumData.level}
                 />
             )}
 
@@ -505,28 +552,46 @@ export default function PlaylistPage({ params }) {
                                                 </div>
                                             </div>
                                         ))}
-                                        
+
                                         <div style={{ marginTop: '1.5rem', padding: '0 1rem 1.5rem 1rem' }}>
-                                            <button 
-                                                className={styles.resourceCard} 
+                                            <button
+                                                id={module.isQuizNextUp ? "next-up-resource" : null}
+                                                className={`${styles.resourceCard} ${module.isQuizNextUp ? styles.highlight : ''}`}
                                                 disabled={module.isQuizLocked}
-                                                style={{ 
-                                                width: '100%', 
-                                                background: 'linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,165,0,0.05))',
-                                                border: '1px solid rgba(255,215,0,0.3)',
-                                                justifyContent: 'flex-start',
-                                                gap: '12px',
-                                                cursor: module.isQuizLocked ? 'not-allowed' : 'pointer',
-                                                textAlign: 'left',
-                                                padding: '16px',
-                                                opacity: module.isQuizLocked ? 0.5 : 1
-                                            }} onClick={() => !module.isQuizLocked && handleOpenQuiz(module.module_id, module.module_title)}>
-                                                <div className={styles.resourceIcon} style={{ background: 'rgba(255,215,0,0.2)', color: '#ffd700' }}>
-                                                    <TrophyIconSimple size={20} />
+                                                style={{
+                                                    width: '100%',
+                                                    background: module.quiz_completed
+                                                        ? 'rgba(16, 185, 129, 0.1)' // Greenish tint if done
+                                                        : 'linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,165,0,0.05))',
+                                                    border: module.quiz_completed
+                                                        ? '1px solid rgba(16, 185, 129, 0.2)'
+                                                        : '1px solid rgba(255,215,0,0.3)',
+                                                    justifyContent: 'flex-start',
+                                                    gap: '12px',
+                                                    cursor: module.isQuizLocked ? 'not-allowed' : 'pointer',
+                                                    textAlign: 'left',
+                                                    padding: '16px',
+                                                    opacity: module.isQuizLocked ? 0.5 : 1,
+                                                    position: 'relative'
+                                                }} onClick={() => !module.isQuizLocked && !module.quiz_completed && handleOpenQuiz(module.module_id, module.module_title)}>
+
+                                                {module.isQuizNextUp && <div className={styles.nextUpBadge}>Next Up</div>}
+
+                                                <div className={styles.resourceIcon} style={{
+                                                    background: module.quiz_completed ? 'rgba(16, 185, 129, 0.2)' : 'rgba(255,215,0,0.2)',
+                                                    color: module.quiz_completed ? '#10b981' : '#ffd700'
+                                                }}>
+                                                    {module.quiz_completed ? <CheckCircleIcon size={20} /> : <TrophyIconSimple size={20} />}
                                                 </div>
                                                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                                                    <span style={{ fontWeight: '700', color: 'var(--foreground)' }}>{module.isQuizLocked ? "Quiz Locked" : "Ready to test your knowledge?"}</span>
-                                                    <span style={{ fontSize: '0.85rem', color: 'var(--secondary)' }}>{module.isQuizLocked ? "Complete all previous items to unlock." : `Take the ${module.module_title} Quiz`}</span>
+                                                    <span style={{ fontWeight: '700', color: 'var(--foreground)' }}>
+                                                        {module.quiz_completed ? "Quiz Completed" : (module.isQuizLocked ? "Quiz Locked" : "Ready to test your knowledge?")}
+                                                    </span>
+                                                    <span style={{ fontSize: '0.85rem', color: 'var(--secondary)' }}>
+                                                        {module.quiz_completed
+                                                            ? `You've passed the ${module.module_title} quiz!`
+                                                            : (module.isQuizLocked ? "Complete all previous items to unlock." : `Take the ${module.module_title} Quiz`)}
+                                                    </span>
                                                 </div>
                                             </button>
                                         </div>

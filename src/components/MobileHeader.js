@@ -7,7 +7,7 @@ export default function MobileHeader({ onMenuClick }) {
   return (
     <header className={styles.header}>
       <Link href="/" className={styles.logo} style={{textDecoration: 'none'}}>
-        <ZapIcon size={24} fill="var(--primary)" /> StudyFlow
+        <ZapIcon size={24} fill="var(--primary)" /> Studywise
       </Link>
     </header>
   );

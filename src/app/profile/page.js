@@ -109,7 +109,7 @@ export default function ProfilePage() {
 
   const defaultName = "Delight Gbolahan";
   const defaultHandle = "@delight_dev";
-  const defaultBio = "Full-stack developer in training. Obsessed with React and clean UI. Building StudyFlow to help others learn faster.";
+  const defaultBio = "Full-stack developer in training. Obsessed with React and clean UI. Building Studywise to help others learn faster.";
 
   const displayName = user && user.first_name ? `${user.first_name} ${user.last_name}` : defaultName;
   const displayHandle = user && user.email ? `@${user.email.split('@')[0]}` : defaultHandle;
