@@ -79,11 +79,11 @@ export default function LandingPage() {
             {/* 1. HERO SECTION */}
             <section className={styles.hero}>
                 <FadeIn direction="up">
-                    <h1 className={styles.title}>Master any topic in minutes, not months.</h1>
+                    <h1 className={styles.title}>Master any skill with an AI roadmap.</h1>
                 </FadeIn>
                 <FadeIn direction="up" delay={0.1}>
                     <p className={styles.subtitle}>
-                        The AI-powered curriculum designer that adapts to your pace. Turn any goal into a personalized audio-visual playlist instanly.
+                        Our AI builds your path and finds the best learning resources for every step, tailored to your experience and schedule.
                     </p>
                 </FadeIn>
 
