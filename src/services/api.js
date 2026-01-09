@@ -143,7 +143,7 @@ export const communities = {
     getMyCommunities: () => apiFetch('/communities/my-communities'),
     getExplore: () => apiFetch('/communities/explore'),
     get: (id) => apiFetch(`/communities/${id}`),
-    create: (data) => apiFetch('/communities/', {
+    create: (data) => apiFetch('/communities', {
         method: 'POST',
         body: JSON.stringify(data),
     }),
