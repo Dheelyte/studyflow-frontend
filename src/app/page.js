@@ -369,7 +369,7 @@ export default function LandingPage() {
                     </div>
                 </div>
                 <div className={styles.footerBottom}>
-                    <div>&copy; 2024 Studywise Inc.</div>
+                    <div>&copy; {new Date().getFullYear()} Studywise Inc.</div>
                     <div style={{ display: 'flex', gap: '16px' }}>
                         <a href="#" aria-label="Twitter">Twitter</a>
                         <a href="#" aria-label="GitHub">GitHub</a>
