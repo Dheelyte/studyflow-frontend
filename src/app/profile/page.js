@@ -1,34 +1,28 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styles from './page.module.css';
-import { ZapIcon, StarIcon, TrophyIconSimple, TrendingUpIcon } from '@/components/Icons';
+import { ZapIcon, StarIcon, TrophyIconSimple } from '@/components/Icons';
 import { useAuth } from '@/context/AuthContext';
+import { users } from '@/services/api'; 
 import EditProfileModal from '@/components/EditProfileModal';
 
 export default function ProfilePage() {
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, checkUser } = useAuth();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const scrollRef = useRef(null);
 
-  // Mock Data for missing backend fields
-  const mockStats = {
-      level: 5,
-      streak: 12,
-      totalXp: 2450,
-      hours: 48,
-      rank: "Top 5%"
+  // Real Data from AuthContext
+  const stats = {
+      level: user?.level || 1,
+      streak: user?.current_streak || 0,
+      totalXp: user?.total_xp || 0,
+      title: user?.level_name || "Novice" 
   };
 
-  const activeFlows = [
-      { id: 1, title: 'Learn React', progress: 45, color: 'linear-gradient(135deg, #6366f1, #a855f7)', modules: '12/24 modules' },
-      { id: 2, title: 'Data Science', progress: 10, color: 'linear-gradient(135deg, #3b82f6, #06b6d4)', modules: '3/30 modules' },
-      { id: 3, title: 'UX Principles', progress: 75, color: 'linear-gradient(135deg, #10b981, #34d399)', modules: '15/20 modules' },
-  ];
-
-  // Helper to get month labels for the last 12 months from today
   const getLast12Months = () => {
     const months = [];
     const date = new Date();
-    date.setDate(1); // Set to first of current month
+    date.setDate(1); 
     for (let i = 0; i < 12; i++) {
         months.unshift(date.toLocaleString('default', { month: 'short' }));
         date.setMonth(date.getMonth() - 1);
@@ -38,13 +32,84 @@ export default function ProfilePage() {
   
   const monthLabels = getLast12Months();
 
-  // Generate mock heatmap data (365 days)
-  const heatmapData = Array.from({ length: 365 }, () => Math.floor(Math.random() * 5)); 
+  const [heatmapData, setHeatmapData] = useState([]);
+  const [tooltipData, setTooltipData] = useState({ visible: false, x: 0, y: 0, count: 0, date: "" });
 
-  // Defaults if user is null or missing fields
+  const handleInteraction = (e, dayData) => {
+      const rect = e.target.getBoundingClientRect();
+      setTooltipData({
+          x: rect.left + rect.width / 2,
+          y: rect.top,
+          count: dayData.count,
+          date: dayData.date,
+          visible: true
+      });
+  };
+
+  const getIntensityClass = (count) => {
+      if (count === 0) return '';
+      if (count >= 4) return styles.l4;
+      if (count === 3) return styles.l3;
+      if (count === 2) return styles.l2;
+      return styles.l1;
+  };
+
+  useEffect(() => {
+    const fetchActivity = async () => {
+        try {
+            const response = await users.getMyActivity();
+            if (response && response.activities) {
+                const activityMap = new Map();
+                response.activities.forEach(act => {
+                    activityMap.set(act.date, act.activity_count);
+                });
+
+                const data = [];
+                const today = new Date();
+                
+                // Start from ~1 year ago, aligned to Sunday
+                const startDate = new Date(today);
+                startDate.setDate(today.getDate() - 365);
+                const dayOfWeek = startDate.getDay();
+                if (dayOfWeek !== 0) {
+                    startDate.setDate(startDate.getDate() - dayOfWeek);
+                }
+                
+                const itr = new Date(startDate);
+                while (itr <= today) {
+                     const dateStr = itr.getFullYear() + '-' + String(itr.getMonth() + 1).padStart(2, '0') + '-' + String(itr.getDate()).padStart(2, '0');
+                     
+                     const count = activityMap.get(dateStr) || 0;
+                     data.push({ count, date: dateStr });
+                     itr.setDate(itr.getDate() + 1);
+                }
+                setHeatmapData(data);
+            }
+        } catch (error) {
+            console.error("Failed to fetch activity log:", error);
+        }
+    };
+
+    if (user) {
+        fetchActivity();
+    }
+  }, [user?.id]);
+
+  useEffect(() => {
+    checkUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); 
+
+  // Scroll to end (current month) on load
+  useEffect(() => {
+    if (scrollRef.current) {
+        scrollRef.current.scrollLeft = scrollRef.current.scrollWidth;
+    }
+  }, [heatmapData]);
+
   const defaultName = "Delight Gbolahan";
   const defaultHandle = "@delight_dev";
-  const defaultBio = "Full-stack developer in training. Obsessed with React and clean UI. Building StudyFlow to help others learn faster.";
+  const defaultBio = "Full-stack developer in training. Obsessed with React and clean UI. Building Studywise to help others learn faster.";
 
   const displayName = user && user.first_name ? `${user.first_name} ${user.last_name}` : defaultName;
   const displayHandle = user && user.email ? `@${user.email.split('@')[0]}` : defaultHandle;
@@ -76,7 +141,7 @@ export default function ProfilePage() {
             <div className={styles.avatar}>
                {displayName.charAt(0)}
             </div>
-            <div className={styles.levelBadge}>Lvl {mockStats.level}</div>
+            <div className={styles.levelBadge}>Lvl {stats.level}</div>
         </div>
         
         <div className={styles.userInfo}>
@@ -98,7 +163,7 @@ export default function ProfilePage() {
                   <ZapIcon size={24} fill="currentColor" />
               </div>
               <div className={styles.statContent}>
-                  <span className={styles.statValue}>{mockStats.streak}</span>
+                  <span className={styles.statValue}>{stats.streak}</span>
                   <span className={styles.statLabel}>Day Streak</span>
               </div>
           </div>
@@ -107,26 +172,17 @@ export default function ProfilePage() {
                   <StarIcon size={24} fill="currentColor" />
               </div>
               <div className={styles.statContent}>
-                  <span className={styles.statValue}>{mockStats.totalXp}</span>
+                  <span className={styles.statValue}>{stats.totalXp}</span>
                   <span className={styles.statLabel}>Total XP</span>
-              </div>
-          </div>
-          <div className={styles.statCard}>
-              <div className={styles.statIcon} style={{color: '#a855f7'}}>
-                  <TrophyIconSimple size={24} />
-              </div>
-              <div className={styles.statContent}>
-                  <span className={styles.statValue}>{mockStats.hours}h</span>
-                  <span className={styles.statLabel}>Study Time</span>
               </div>
           </div>
            <div className={styles.statCard}>
               <div className={styles.statIcon} style={{color: '#10b981'}}>
-                  <TrendingUpIcon size={24} />
+                  <TrophyIconSimple size={24} />
               </div>
               <div className={styles.statContent}>
-                  <span className={styles.statValue}>{mockStats.rank}</span>
-                  <span className={styles.statLabel}>Rank</span>
+                  <span className={styles.statValue}>{stats.title}</span>
+                  <span className={styles.statLabel}>Level {stats.level}</span>
               </div>
           </div>
       </div>
@@ -135,52 +191,55 @@ export default function ProfilePage() {
       <div className={styles.heatmapSection}>
           <div className={styles.sectionTitle}>
               <span>Activity Log</span>
-              <span style={{fontSize:'0.9rem', color:'var(--secondary)', fontWeight:'400'}}>Last 365 Days</span>
+              <span style={{fontSize:'0.9rem', color:'var(--secondary)', fontWeight:'400'}}>Last Year</span>
           </div>
           
-          <div className={styles.heatmapContainer}>
-              {/* Month Labels */}
-              <div className={styles.monthLabels}>
-                  {monthLabels.map((month, i) => (
-                      <span key={i}>{month}</span>
-                  ))}
-              </div>
+          <div className={styles.heatmapFlexContainer}>
+            {/* Day Labels - Fixed to left */}
+            <div className={styles.dayLabels}>
+                <span></span>
+                <span>Mon</span>
+                <span></span>
+                <span>Wed</span>
+                <span></span>
+                <span>Fri</span>
+                <span></span>
+            </div>
 
-              {/* Grid */}
-              <div className={styles.heatmapGrid}>
-                {heatmapData.map((level, i) => (
-                    <div key={i} className={`${styles.heatBox} ${level > 0 ? styles['l'+level] : ''}`} title={`Activity Level: ${level}`}></div>
-                ))}
+            <div className={styles.heatmapScrollWrapper} ref={scrollRef}>
+                <div className={styles.heatmapInnerContent}>
+                    {/* Month Labels */}
+                    <div className={styles.monthLabels}>
+                        {monthLabels.map((month, i) => (
+                            <span key={i}>{month}</span>
+                        ))}
+                    </div>
+
+                    {/* Grid */}
+                    <div className={styles.heatmapGrid}>
+                        {heatmapData.map((dayData, i) => (
+                            <div 
+                                key={i} 
+                                className={`${styles.heatBox} ${getIntensityClass(dayData.count)}`} 
+                                onMouseEnter={(e) => handleInteraction(e, dayData)}
+                                onClick={(e) => handleInteraction(e, dayData)}
+                                onMouseLeave={() => setTooltipData(prev => ({ ...prev, visible: false }))}
+                            ></div>
+                        ))}
+                    </div>
+                </div>
             </div>
           </div>
       </div>
 
-      {/* Active Flows */}
-       <div className={styles.activeSection}>
-          <h2 className={styles.sectionTitle}>Active Flows</h2>
-          <div className={styles.flowsGrid}>
-              {activeFlows.map(flow => (
-                  <div key={flow.id} className={styles.flowCard}>
-                      <div className={styles.flowHeader} style={{background: flow.color}}>
-                          <span style={{width: 'fit-content', background:'rgba(0,0,0,0.2)', padding:'4px 8px', borderRadius:'6px', fontSize:'0.75rem', backdropFilter:'blur(4px)'}}>
-                              In Progress
-                          </span>
-                      </div>
-                      <div className={styles.flowBody}>
-                          <div className={styles.flowTitle}>{flow.title}</div>
-                           <div className={styles.flowMeta}>
-                              <span>{flow.modules}</span>
-                              <span>{flow.progress}%</span>
-                          </div>
-                          <div className={styles.progressBar}>
-                              <div className={styles.progress} style={{width: `${flow.progress}%`}}></div>
-                          </div>
-                      </div>
-                  </div>
-              ))}
+      {tooltipData.visible && (
+          <div 
+              className={styles.tooltip}
+              style={{ top: tooltipData.y, left: tooltipData.x }}
+          >
+              {tooltipData.count === 0 ? `No activity on ${tooltipData.date}` : `${tooltipData.count} activities on ${tooltipData.date}`}
           </div>
-      </div>
-
+      )}
     </div>
   );
 }

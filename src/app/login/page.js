@@ -1,6 +1,6 @@
 "use client";
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { GoogleIcon, GitHubIcon } from "@/components/Icons";
 import styles from './page.module.css';
 import { useAuth } from '@/context/AuthContext';
@@ -8,6 +8,8 @@ import { useState } from 'react';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get('redirect');
   const { login } = useAuth();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -24,7 +26,7 @@ export default function LoginPage() {
 
     try {
         await login({ email, password });
-        router.push('/dashboard');
+        router.push(redirect || '/dashboard');
     } catch (err) {
         setError(err.message || 'Login failed');
     } finally {
@@ -41,7 +43,7 @@ export default function LoginPage() {
                     <div style={{width:'32px', height:'32px', background:'var(--primary)', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', color:'white'}}>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                     </div>
-                    <span style={{fontWeight:'700', fontSize:'1.2rem', color:'var(--foreground)'}}>StudyFlow</span>
+                    <span style={{fontWeight:'700', fontSize:'1.2rem', color:'var(--foreground)'}}>Studywise</span>
                  </Link>
             </div>
             <h1 className={styles.title}>Welcome Back</h1>

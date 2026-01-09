@@ -1,91 +1,112 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { auth } from '@/services/api';
 import { useRouter } from 'next/navigation';
 
 const AuthContext = createContext();
 
+const IS_LOGGED_IN_KEY = 'studyspotify_is_logged_in';
+const USER_DATA_KEY = 'studyspotify_user_data';
+
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const router = useRouter();
 
-  useEffect(() => {
-    checkUser();
-  }, []);
+    useEffect(() => {
+        checkUser();
+    }, []);
 
-  const checkUser = async () => {
-    try {
-      const { data } = await auth.getMe();
-      setUser(data);
-    } catch (error) {
-      // Not logged in or session expired
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const checkUser = useCallback(async () => {
+        if (typeof window !== 'undefined' && window.location.pathname === '/' || window.location.pathname.startsWith('/playlist/')) {
+            setLoading(false);
+            return;
+        }
+        try {
+            // Always try to fetch the user. The backend (via cookies) is the source of truth.
+            // If valid cookies exist, this will succeed (possibly triggering a refresh).
+            const response = await auth.me(); 
+            // Handle response structure depending on if apiFetch returns { data: user } or just user
+            const userData = response.data || response;
+            
+            setUser(userData);
+            localStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
+            localStorage.setItem(IS_LOGGED_IN_KEY, 'true');
+        } catch (error) {
+            // Not logged in or session expired
+            console.warn("Session check failed:", error);
+            setUser(null);
+            localStorage.removeItem(IS_LOGGED_IN_KEY);
+            localStorage.removeItem(USER_DATA_KEY);
+        } finally {
+            setLoading(false);
+        }
+    }, [setUser, setLoading]);
 
-  const login = async (credentials) => {
-    await auth.login(credentials);
-    return checkUser();
-  };
+    const login = useCallback(async (credentials) => {
+        const { email, password } = credentials;
+        await auth.login(email, password);
+        localStorage.setItem(IS_LOGGED_IN_KEY, 'true');
+        return checkUser();
+    }, [checkUser]);
 
-  const register = async (userData) => {
-    return auth.register(userData);
-  };
+    const register = useCallback(async (userData) => {
+        // Register typically doesn't auto-login in this flow, usually redirects to login
+        return auth.register(userData);
+    }, []);
 
-  const logout = async () => {
-    try {
-      await auth.logout();
-    } catch(e) {
-      console.error('Logout failed', e);
-    }
-    setUser(null);
-    router.push('/login');
-  };
+    const logout = useCallback(async () => {
+        try {
+            await auth.logout();
+        } catch (e) {
+            console.error('Logout failed', e);
+        }
+        setUser(null);
+        localStorage.removeItem(IS_LOGGED_IN_KEY);
+        localStorage.removeItem(USER_DATA_KEY);
+        router.push('/login');
+    }, [router, setUser]);
 
-  const requestPasswordReset = (email) => auth.requestPasswordReset(email);
-  const verifyResetCode = (data) => auth.verifyResetCode(data);
-  const resetPassword = (data) => auth.resetPassword(data);
-  const changePassword = (data) => auth.changePassword(data);
+    const requestPasswordReset = useCallback((email) => auth.requestPasswordReset(email), []);
+    const verifyResetCode = useCallback((data) => auth.verifyResetCode(data), []);
+    const resetPassword = useCallback((data) => auth.resetPassword(data), []);
+    const changePassword = useCallback((data) => auth.changePassword(data), []);
 
-  const updateUser = async (data) => {
-      const response = await auth.updateProfile(data);
-      // Backend returns updated user object in response.data or directly depending on implementation, 
-      // but assuming it returns the updated user or we should re-fetch.
-      // Ideally, the PUT response contains the updated user resource.
-      // If handleResponse returns { data: user } or just user.
-      // Based on api.js handleResponse, it returns the parsed JSON. 
-      // Let's assume response.data is the user.
-      const updatedUser = response.data || response; 
-      setUser(prev => ({ ...prev, ...updatedUser }));
-      return updatedUser; 
-  };
+    const updateUser = useCallback(async (data) => {
+        const response = await auth.updateProfile(data);
+        // Backend returns updated user object
+        const updatedUser = response.data || response;
+        setUser(prev => {
+            const newUser = { ...prev, ...updatedUser };
+            localStorage.setItem(USER_DATA_KEY, JSON.stringify(newUser));
+            return newUser;
+        });
+        return updatedUser;
+    }, [setUser]);
 
-  const value = {
-    user,
-    loading,
-    login,
-    register,
-    logout,
-    requestPasswordReset,
-    verifyResetCode,
-    resetPassword,
-    changePassword,
-    updateUser,
-    checkUser,
-    isAuthenticated: !!user,
-  };
+    const value = {
+        user,
+        loading,
+        login,
+        register,
+        logout,
+        requestPasswordReset,
+        verifyResetCode,
+        resetPassword,
+        changePassword,
+        updateUser,
+        checkUser,
+        isAuthenticated: !!user,
+    };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return context;
 };

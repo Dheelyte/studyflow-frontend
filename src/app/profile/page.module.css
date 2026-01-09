@@ -165,103 +165,91 @@
     gap: 8px;
 }
 
+.heatmapFlexContainer {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start; /* Align to bottom so labels align with grid */
+}
+
+.dayLabels {
+    display: grid;
+    grid-template-rows: repeat(7, 14px);
+    gap: 4px;
+    padding-bottom: 8px; /* Match scrollbar spacing */
+    padding-top: 24px; /* Offset for month labels space */
+    font-size: 0.75rem;
+    color: var(--secondary);
+    text-align: right;
+    min-width: 30px;
+}
+
+/* Center text in label cells */
+.dayLabels span {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+}
+
+.heatmapScrollWrapper {
+    flex: 1;
+    overflow-x: auto;
+    padding-bottom: 8px; /* Space for scrollbar */
+    scrollbar-width: thin;
+}
+
+.heatmapInnerContent {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: max-content; 
+    padding-right: 1px; 
+}
+
 .monthLabels {
+    height: 16px;
+    line-height: 16px;
     display: flex;
     justify-content: space-between;
     font-size: 0.75rem;
     color: var(--secondary);
     padding: 0 4px;
+    margin-left: -10px; /* Slight offset adjustment */
 }
 
 .heatmapGrid {
     display: grid;
-    grid-template-columns: repeat(53, 1fr); /* Approx weeks */
+    /* Use auto-fill or just large number of columns */
+    grid-template-columns: repeat(auto-fill, minmax(14px, 1fr));
+    /* Force specific flow */
+    grid-template-rows: repeat(7, 14px);
+    grid-auto-flow: column; 
     gap: 4px;
-    overflow-x: auto;
-    padding-bottom: 8px;
 }
 
-/* Adjust grid for specific days if needed, currently just boxes */
+/* Override grid columns to be dynamic based on content length or large enough fixed */
+.heatmapGrid {
+    grid-template-columns: repeat(54, 14px); /* 54 weeks cover a year + padding */
+}
+
 
 .heatBox {
     width: 100%;
-    aspect-ratio: 1; /* Keep it square */
+    aspect-ratio: 1; 
     border-radius: 2px;
     background: var(--border);
 }
 
-/* Ensure minimum size */
 @media (min-width: 768px) {
     .heatBox {
         min-width: 10px;
     }
 }
 
-.heatBox.l1 { background: rgba(99, 102, 241, 0.2); }
-.heatBox.l2 { background: rgba(99, 102, 241, 0.5); }
+.heatBox.l1 { background: rgba(99, 102, 241, 0.4); }
+.heatBox.l2 { background: rgba(99, 102, 241, 0.6); }
 .heatBox.l3 { background: rgba(99, 102, 241, 0.8); }
 .heatBox.l4 { background: #6366f1; }
-
-/* Active Flows */
-.flowsGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 24px;
-}
-
-.flowCard {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.flowCard:hover {
-    transform: translateY(-4px);
-    border-color: var(--primary);
-}
-
-.flowHeader {
-    height: 100px;
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    color: white;
-}
-
-.flowBody {
-    padding: 20px;
-}
-
-.flowTitle {
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: 8px;
-}
-
-.flowMeta {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.85rem;
-    color: var(--secondary);
-}
-
-.progressBar {
-    height: 4px;
-    background: var(--border);
-    margin-top: 16px;
-    border-radius: 2px;
-    overflow: hidden;
-}
-
-.progress {
-    height: 100%;
-    background: var(--primary);
-    border-radius: 2px;
-}
 
 .headerInfo {
     display: flex;
@@ -311,4 +299,19 @@
         max-width: 200px;
         justify-content: center;
     }
+}
+
+.tooltip {
+    position: fixed;
+    background: rgba(15, 23, 42, 0.95);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    pointer-events: none;
+    z-index: 1000;
+    transform: translate(-50%, -120%);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+    border: 1px solid rgba(255,255,255,0.1);
 }

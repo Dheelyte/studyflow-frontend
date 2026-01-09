@@ -1,0 +1,50 @@
+.bottomNav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 70px; /* Standard tab bar height */
+    background: color-mix(in srgb, var(--card) 95%, transparent); /* High opacity for usability */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 1000;
+    padding-bottom: env(safe-area-inset-bottom); /* Handle iPhone home indicator */
+}
+
+/* Hide on desktop */
+@media (min-width: 769px) {
+    .bottomNav {
+        display: none;
+    }
+}
+
+.navItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    color: var(--secondary);
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-weight: 500;
+    width: 100%;
+    height: 100%;
+    transition: all 0.2s;
+}
+
+.navItem.active {
+    color: var(--primary);
+}
+
+.navItem:active {
+    transform: scale(0.95);
+}
+
+.icon {
+    margin-bottom: 2px;
+}

@@ -40,4 +40,7 @@
     .desktopSidebarCollapsed .mainWrapper {
         margin-left: 0;
     }
+    .contentScroll {
+        padding-bottom: 90px;
+    }
 }

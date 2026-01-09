@@ -5,7 +5,7 @@ import { SearchIcon, ZapIcon } from "@/components/Icons";
 import CustomDropdown from "@/components/CustomDropdown";
 import styles from './IntegratedSearchBar.module.css';
 
-export default function IntegratedSearchBar({ redirect = false, onSearch }) {
+export default function IntegratedSearchBar({ redirect = false, onSearch, shadow = true }) {
     const router = useRouter();
     const [themeQuery, setQuery] = useState('');
     const [experience, setExperience] = useState('');
@@ -18,10 +18,10 @@ export default function IntegratedSearchBar({ redirect = false, onSearch }) {
     ];
 
     const durationOptions = [
+      { value: 'No Fixed Duration', label: 'No Fixed Learning Duration', description: 'Complete zero-to-hero journey.' },
       { value: '1 Day', label: '1 Day', description: 'Intensive crash course.' },
       { value: '7 Days', label: '7 Days', description: 'Standard weekly sprint.' },
-      { value: '1 Month', label: '1 Month', description: 'In-depth mastery path.' },
-      { value: '3 Months', label: '3 Months', description: 'Complete zero-to-hero journey.' }
+      { value: '1 Month', label: '1 Month', description: 'In-depth mastery path.' }
     ];
 
     const handleStart = () => {
@@ -42,14 +42,14 @@ export default function IntegratedSearchBar({ redirect = false, onSearch }) {
             // or directly to playlist generation if that was the flow.
             // Let's redirect to dashboard with search params so dashboard can pick it up if we wanted.
             // For MVP simplicity, let's redirect to playlist generation directly!
-             router.push(`/playlist/1?${queryString}`);
+             router.push(`/curriculum?${queryString}`);
         } else if (onSearch) {
             onSearch({ topic: themeQuery, experience: finalExperience, duration: finalDuration });
         }
     };
 
     return (
-        <div className={styles.integratedSearchBar}>
+        <div className={`${styles.integratedSearchBar} ${!shadow ? styles.noShadow : ""}`}>
             {/* Group Input and Icon together for mobile alignment */}
             <div className={styles.inputGroup}>
                 <div className={styles.searchIconWrapper}>
@@ -72,7 +72,7 @@ export default function IntegratedSearchBar({ redirect = false, onSearch }) {
                 options={experienceOptions}
                 value={experience}
                 onChange={setExperience}
-                placeholder="Experience Level"
+                placeholder="Your Experience Level"
             />
 
             <div className={styles.divider}></div>
@@ -81,7 +81,7 @@ export default function IntegratedSearchBar({ redirect = false, onSearch }) {
                 options={durationOptions}
                 value={duration}
                 onChange={setDuration}
-                placeholder="Duration"
+                placeholder="Learning Duration"
             />
 
             <button className={styles.searchButton} onClick={handleStart}>

@@ -10,7 +10,7 @@
   gap: 16px;
   overflow-x: auto;
   padding: 16px 4px;
-  margin-bottom: 24px;
+  margin-bottom: 0px; /* Changed from 24px to 0px */
   scrollbar-width: none; /* Firefox */
   max-width: 100%;
   scroll-behavior: smooth;

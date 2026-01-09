@@ -1,9 +1,63 @@
 "use client";
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styles from './page.module.css';
-import Card from "@/components/Card";
+import { useAuth } from '@/context/AuthContext';
+import { curriculum } from '@/services/api';
+import Card from '@/components/Card';
+import SkeletonCard from '@/components/SkeletonCard';
 
 export default function LibraryPage() {
+  const { user } = useAuth();
+  const [playlists, setPlaylists] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPlaylists = async () => {
+        try {
+            const response = await curriculum.getMyPlaylists();
+            if (Array.isArray(response)) {
+                
+                const colors = [
+                    'linear-gradient(135deg, #6366f1, #a855f7)', 
+                    'linear-gradient(135deg, #3b82f6, #06b6d4)', 
+                    'linear-gradient(135deg, #10b981, #34d399)', 
+                    'linear-gradient(135deg, #f59e0b, #fbbf24)', 
+                    'linear-gradient(135deg, #ec4899, #f472b6)' 
+                ];
+
+                const mapped = response.map((item, index) => ({
+                    id: item.id,
+                    title: item.playlist?.title || "Untitled Playlist",
+                    description: "Your personalized curriculum", 
+                    progress: item.progress?.percentage || 0,
+                    completedModules: item.progress?.completed_modules || 0,
+                    totalModules: item.progress?.total_modules || 0,
+                    level: item.playlist?.level,
+                    color: colors[index % colors.length],
+                    link: `/playlist/${item.playlist?.id || 1}`
+                }));
+                setPlaylists(mapped);
+            }
+        } catch (error) {
+             console.error("Failed to fetch playlists:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (user) {
+        fetchPlaylists();
+    } else {
+        // If not authenticated, we could redirect or just show empty state.
+        // AuthGuard should handle this, but setting loading false safe-guards against infinite loading.
+        const timeout = setTimeout(() => {
+             if (!user) setLoading(false); 
+        }, 1000);
+        return () => clearTimeout(timeout);
+    }
+  }, [user]);
+
   return (
     <div className={styles.page}>
       <div className={styles.header}>
@@ -12,18 +66,34 @@ export default function LibraryPage() {
       </div>
 
       <div className={styles.grid}>
-         <Link href="/playlist/1" style={{display: 'contents'}}>
-             <Card title="Learn React" description="45% Complete • Last active 2h ago" color="linear-gradient(135deg, #6366f1, #8b5cf6)" />
-         </Link>
-         <Link href="/playlist/1" style={{display: 'contents'}}>
-             <Card title="Python Data Science" description="Stats and Probability • Module 4" color="linear-gradient(135deg, #ec4899, #f43f5e)" />
-         </Link>
-         <Link href="/playlist/1" style={{display: 'contents'}}>
-             <Card title="UX Design Principles" description="Just Started" color="linear-gradient(135deg, #10b981, #06b6d4)" />
-         </Link>
-          <Link href="/playlist/1" style={{display: 'contents'}}>
-             <Card title="Financial Literacy" description="Investing 101 • Completed" color="linear-gradient(135deg, #228b22, #333)" />
-         </Link>
+         {loading ? (
+             <>
+                <div style={{minWidth: 0}}><SkeletonCard /></div>
+                <div style={{minWidth: 0}}><SkeletonCard /></div>
+                <div style={{minWidth: 0}}><SkeletonCard /></div>
+                <div style={{minWidth: 0}}><SkeletonCard /></div>
+                <div style={{minWidth: 0}}><SkeletonCard /></div>
+                <div style={{minWidth: 0}}><SkeletonCard /></div>
+             </>
+         ) : playlists.length > 0 ? (
+            playlists.map(playlist => (
+                 <Link key={playlist.id} href={playlist.link} style={{display: 'block', textDecoration: 'none'}}>
+                     <Card 
+                        title={playlist.title} 
+                        description={playlist.description}
+                        color={playlist.color}
+                        progress={playlist.progress}
+                        completedModules={playlist.completedModules}
+                        totalModules={playlist.totalModules}
+                        level={playlist.level}
+                     />
+                 </Link>
+            ))
+         ) : (
+            <div style={{gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: 'var(--secondary)'}}>
+                No playlists found. Start a new topic from the Dashboard!
+            </div>
+         )}
       </div>
     </div>
   );
