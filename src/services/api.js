@@ -137,8 +137,7 @@ export const users = {
 
 export const communities = {
     list: (params) => {
-        const searchParams = new URLSearchParams(params);
-        return apiFetch(`/communities/?${searchParams.toString()}`);
+        return apiFetch(`/communities`);
     },
     getMyCommunities: () => apiFetch('/communities/my-communities'),
     getExplore: () => apiFetch('/communities/explore'),
