@@ -4,20 +4,31 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { GoogleIcon, GitHubIcon } from "@/components/Icons";
 import styles from './page.module.css';
 import { useAuth } from '@/context/AuthContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useToast } from '@/context/ToastContext';
 
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get('redirect');
-  const { login } = useAuth();
+  const { login, user, loading: authLoading } = useAuth();
+  const { addToast } = useToast();
+  
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.push('/dashboard');
+    }
+  }, [user, authLoading, router]);
+
   const [error, setError] = useState('');
+  const [validationErrors, setValidationErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setValidationErrors({});
     setLoading(true);
     
     // Get values directly from form elements
@@ -28,7 +39,12 @@ export default function LoginPage() {
         await login({ email, password });
         router.push(redirect || '/dashboard');
     } catch (err) {
-        setError(err.message || 'Login failed');
+        if (err.validationErrors) {
+            setValidationErrors(err.validationErrors);
+            addToast('Please check the highlighted fields.', 'error');
+        } else {
+            addToast(err.message || 'Login failed', 'error');
+        }
     } finally {
         setLoading(false);
     }
@@ -47,10 +63,10 @@ export default function LoginPage() {
                  </Link>
             </div>
             <h1 className={styles.title}>Welcome Back</h1>
-            <p className={styles.subtitle}>Sign in to continue your flow</p>
+            
         </div>
 
-        {error && <div style={{color: 'red', textAlign: 'center', marginBottom: '1rem'}}>{error}</div>}
+        
 
         {!showEmailForm ? (
             <div className={styles.socialButtons}>
@@ -79,6 +95,7 @@ export default function LoginPage() {
                     </button>
                 </div>
 
+
                 <div className={styles.inputGroup}>
                     <label className={styles.label} htmlFor="email">Email</label>
                     <input 
@@ -89,6 +106,7 @@ export default function LoginPage() {
                         className={styles.input} 
                         required 
                     />
+                    {validationErrors.email && <div style={{color: '#ef4444', fontSize: '0.85rem', marginTop: '4px'}}>{validationErrors.email}</div>}
                 </div>
                 
                 <div className={styles.inputGroup}>
@@ -104,6 +122,7 @@ export default function LoginPage() {
                         className={styles.input} 
                         required 
                     />
+                     {validationErrors.password && <div style={{color: '#ef4444', fontSize: '0.85rem', marginTop: '4px'}}>{validationErrors.password}</div>}
                 </div>
 
                 <button type="submit" className={styles.primaryButton} disabled={loading}>

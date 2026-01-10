@@ -2,6 +2,8 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import ClientLayout from "@/components/ClientLayout";
 import { AuthProvider } from "@/context/AuthContext";
+import { ToastProvider } from "@/context/ToastContext";
+import ToastContainer from "@/components/Toast";
 
 export const metadata = {
   title: "Studywise",
@@ -14,9 +16,12 @@ export default function RootLayout({ children }) {
       <body>
         <ThemeProvider>
           <AuthProvider>
-            <ClientLayout>
-                {children}
-            </ClientLayout>
+            <ToastProvider>
+                <ClientLayout>
+                    {children}
+                </ClientLayout>
+                <ToastContainer />
+            </ToastProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

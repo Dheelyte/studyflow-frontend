@@ -4,12 +4,15 @@ import { useRouter } from 'next/navigation';
 import { GoogleIcon, GitHubIcon } from "@/components/Icons";
 import styles from '../login/page.module.css';
 import { useAuth } from '@/context/AuthContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useToast } from '@/context/ToastContext';
 
 export default function SignupPage() {
   const router = useRouter();
-  const { register, checkUser } = useAuth(); // Use checkUser to sync state if needed
+  const { register, checkUser, user, loading: authLoading } = useAuth();
+  const { addToast } = useToast();
   const [error, setError] = useState('');
+  const [validationErrors, setValidationErrors] = useState({});
   const [loading, setLoading] = useState(false);
   
   // flow state: 'social' -> 'names' -> 'credentials'
@@ -38,6 +41,7 @@ export default function SignupPage() {
   const handleFinalSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setValidationErrors({});
     setLoading(true);
 
     try {
@@ -51,7 +55,17 @@ export default function SignupPage() {
         // 3. Redirect to Dashboard
         router.push('/dashboard');
     } catch (err) {
-        setError(err.message || 'Signup failed');
+        if (err.validationErrors) {
+            setValidationErrors(err.validationErrors);
+            if (err.validationErrors.first_name || err.validationErrors.last_name) {
+                 setStep('names');
+                 addToast('Please correct your details.', 'error');
+            } else {
+                 addToast('Please check the highlighted fields.', 'error');
+            }
+        } else {
+            addToast(err.message || 'Signup failed', 'error');
+        }
     } finally {
         setLoading(false);
     }
@@ -74,14 +88,10 @@ export default function SignupPage() {
                  </Link>
             </div>
             <h1 className={styles.title}>Create Account</h1>
-            <p className={styles.subtitle}>
-                {step === 'names' ? "What should we call you?" : 
-                 step === 'credentials' ? "Secure your account" : 
-                 "Start your learning journey today"}
-            </p>
+
         </div>
 
-        {error && <div style={{color: 'red', textAlign: 'center', marginBottom: '1rem'}}>{error}</div>}
+        
 
         {step === 'social' && (
             <div className={styles.socialButtons}>
@@ -112,6 +122,7 @@ export default function SignupPage() {
                     </button>
                 </div>
 
+
                 <div className={styles.inputGroup}>
                     <label className={styles.label} htmlFor="first_name">First Name</label>
                     <input 
@@ -125,6 +136,7 @@ export default function SignupPage() {
                         required 
                         autoFocus
                     />
+                    {validationErrors.first_name && <div style={{color: '#ef4444', fontSize: '0.85rem', marginTop: '4px'}}>{validationErrors.first_name}</div>}
                 </div>
 
                 <div className={styles.inputGroup}>
@@ -139,6 +151,7 @@ export default function SignupPage() {
                         className={styles.input} 
                         required 
                     />
+                    {validationErrors.last_name && <div style={{color: '#ef4444', fontSize: '0.85rem', marginTop: '4px'}}>{validationErrors.last_name}</div>}
                 </div>
 
                 <button type="submit" className={styles.primaryButton}>
@@ -159,6 +172,7 @@ export default function SignupPage() {
                     </button>
                 </div>
 
+
                 <div className={styles.inputGroup}>
                     <label className={styles.label} htmlFor="email">Email</label>
                     <input 
@@ -172,6 +186,8 @@ export default function SignupPage() {
                         required 
                         autoFocus
                     />
+                    {validationErrors.email && <div style={{color: '#ef4444', fontSize: '0.85rem', marginTop: '4px'}}>{validationErrors.email}</div>}
+                    {validationErrors.first_name && <div style={{color: '#ef4444', fontSize: '0.85rem', marginTop: '4px'}}>{validationErrors.first_name}</div>}
                 </div>
                 
                 <div className={styles.inputGroup}>
@@ -186,6 +202,7 @@ export default function SignupPage() {
                         className={styles.input} 
                         required 
                     />
+                     {validationErrors.password && <div style={{color: '#ef4444', fontSize: '0.85rem', marginTop: '4px'}}>{validationErrors.password}</div>}
                 </div>
 
                 <button type="submit" className={styles.primaryButton} disabled={loading}>

@@ -15,7 +15,7 @@ export default function ClientLayout({ children }) {
   const pathname = usePathname();
 
   // Hide sidebar on auth pages AND Landing Page (root /)
-  const isAuthPage = pathname?.startsWith('/login') || pathname?.startsWith('/signup') || pathname === '/';
+  const isAuthPage = pathname?.startsWith('/login') || pathname?.startsWith('/signup') || pathname?.startsWith('/forgot-password') || pathname?.startsWith('/reset-password') || pathname === '/';
 
   // Check screen size for responsiveness
   useEffect(() => {
