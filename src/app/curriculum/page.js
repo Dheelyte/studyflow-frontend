@@ -195,11 +195,29 @@ export default function CurriculumPage() {
 
     if (error) {
         return (
-            <div className={styles.container} style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+            <div className={styles.container} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '24px' }}>
                 <div style={{ color: 'var(--text-error)', textAlign: 'center' }}>
                     <h2>Error</h2>
-                    <p>{error}</p>
+                    <p>An error occurred, please try again</p>
                 </div>
+                <button 
+                    onClick={() => window.location.reload()}
+                    style={{
+                        padding: '12px 24px',
+                        background: 'var(--primary)',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '24px',
+                        fontSize: '1rem',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        transition: 'transform 0.2s'
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                    onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                    Try again
+                </button>
             </div>
         );
     }

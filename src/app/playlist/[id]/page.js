@@ -255,7 +255,7 @@ export default function PlaylistPage({ params }) {
     }, [playlistId, searchParams]);
 
     const toggleModule = (id) => {
-        setExpandedModules(prev => ({ ...prev, 1: true }));
+        setExpandedModules(prev => ({ ...prev, [id]: !prev[id] }));
     };
 
     const handlePlay = () => {
@@ -335,15 +335,7 @@ export default function PlaylistPage({ params }) {
         // Ensure first module is expanded
         setExpandedModules(prev => ({ ...prev, 1: true }));
 
-        // Scroll and highlight
-        setTimeout(() => {
-            const firstResource = document.getElementById("first-resource");
-            if (firstResource) {
-                firstResource.scrollIntoView({ behavior: "smooth", block: "center" });
-                setHighlightResource(true);
-                setTimeout(() => setHighlightResource(false), 4500); // Remove highlight after user has definitely seen it
-            }
-        }, 100);
+
     };
 
     // Sync completion percentage when data changes
@@ -546,7 +538,7 @@ export default function PlaylistPage({ params }) {
                                                             >
                                                                 {resource.isNextUp && <div className={styles.nextUpBadge}>Next Up</div>}
 
-                                                                <div className={styles.resourceIcon}>
+                                                                <div className={`${styles.resourceIcon} ${styles.mediaIcon}`}>
                                                                     {resource.type === "Video" ? <VideoIcon size={20} /> : <BookOpenIcon size={20} />}
                                                                 </div>
                                                                 <div className={styles.resourceInfo}>

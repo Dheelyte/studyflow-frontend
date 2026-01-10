@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { auth } from '@/services/api';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 const AuthContext = createContext();
 
@@ -13,16 +13,23 @@ export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
+    const pathname = usePathname();
 
     useEffect(() => {
         checkUser();
     }, []);
 
-    const checkUser = useCallback(async () => {
-        if (typeof window !== 'undefined' && window.location.pathname === '/' || window.location.pathname.startsWith('/playlist/')) {
+    const checkUser = useCallback(async (force = false) => {
+        if (!force && typeof window !== 'undefined' && (pathname === '/' || pathname.startsWith('/playlist/') || pathname.startsWith('/library') || pathname.startsWith('/curriculum'))) {
             setLoading(false);
             return;
         }
+        // Optimization: Don't check session if we know user isn't logged in locally
+        if (!force && typeof window !== 'undefined' && !localStorage.getItem(IS_LOGGED_IN_KEY)) {
+            setLoading(false);
+            return;
+        }
+
         try {
             // Always try to fetch the user. The backend (via cookies) is the source of truth.
             // If valid cookies exist, this will succeed (possibly triggering a refresh).
@@ -42,13 +49,13 @@ export function AuthProvider({ children }) {
         } finally {
             setLoading(false);
         }
-    }, [setUser, setLoading]);
+    }, [setUser, setLoading, pathname]);
 
     const login = useCallback(async (credentials) => {
         const { email, password } = credentials;
         await auth.login(email, password);
         localStorage.setItem(IS_LOGGED_IN_KEY, 'true');
-        return checkUser();
+        return checkUser(true);
     }, [checkUser]);
 
     const register = useCallback(async (userData) => {

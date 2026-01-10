@@ -46,16 +46,7 @@ export default function LibraryPage() {
         }
     };
 
-    if (user) {
-        fetchPlaylists();
-    } else {
-        // If not authenticated, we could redirect or just show empty state.
-        // AuthGuard should handle this, but setting loading false safe-guards against infinite loading.
-        const timeout = setTimeout(() => {
-             if (!user) setLoading(false); 
-        }, 1000);
-        return () => clearTimeout(timeout);
-    }
+    fetchPlaylists();
   }, [user]);
 
   return (

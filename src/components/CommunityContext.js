@@ -118,7 +118,7 @@ export function CommunityProvider({ children }) {
   };
 
   const fetchData = useCallback(async () => {
-    if (typeof window !== 'undefined' && (window.location.pathname === '/' || window.location.pathname.startsWith('/playlist/'))) {
+    if (typeof window !== 'undefined' && (pathname === '/' || pathname.startsWith('/playlist/') || pathname === '/profile' || pathname.startsWith('/library') || pathname === '/login' || pathname === '/signup' || pathname.startsWith('/curriculum'))) {
         setLoading(false);
         return;
     }

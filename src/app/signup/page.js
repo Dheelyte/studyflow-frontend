@@ -1,6 +1,6 @@
 "use client";
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { GoogleIcon, GitHubIcon } from "@/components/Icons";
 import styles from '../login/page.module.css';
 import { useAuth } from '@/context/AuthContext';
@@ -9,6 +9,8 @@ import { useToast } from '@/context/ToastContext';
 
 export default function SignupPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get('redirect');
   const { register, checkUser, user, loading: authLoading } = useAuth();
   const { addToast } = useToast();
   const [error, setError] = useState('');
@@ -50,7 +52,7 @@ export default function SignupPage() {
         
         // 2. Sync user state (optional, but good practice if the cookie is ready)
         // Alternatively, the dashboard protection will handle this check.
-        await checkUser();
+        await checkUser(true);
 
         // 3. Redirect to Dashboard
         router.push('/dashboard');
@@ -212,7 +214,8 @@ export default function SignupPage() {
         )}
 
         <div className={styles.footer}>
-            Already have an account? <Link href="/login" className={styles.link}>Log in</Link>
+            Already have an account? {/* Dynamic link based on redirect */}
+            <Link href={redirect ? `/login?redirect=${encodeURIComponent(redirect)}` : "/login"} className={styles.link}>Log in</Link>
         </div>
       </div>
     </div>

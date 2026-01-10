@@ -91,7 +91,7 @@ export default function LoginPage() {
                         onClick={() => setShowEmailForm(false)}
                         style={{background:'none', border:'none', cursor:'pointer', display:'flex', alignItems:'center', gap:'4px', color:'var(--foreground-muted)', fontSize:'0.9rem'}}
                     >
-                        ← Back to options
+                        &lt; Back
                     </button>
                 </div>
 
@@ -132,7 +132,8 @@ export default function LoginPage() {
         )}
 
         <div className={styles.footer}>
-            Don&apos;t have an account? <Link href="/signup" className={styles.link}>Sign up</Link>
+            Don&apos;t have an account? {/* Dynamic link based on redirect */}
+            <Link href={redirect ? `/signup?redirect=${encodeURIComponent(redirect)}` : "/signup"} className={styles.link}>Sign up</Link>
         </div>
       </div>
     </div>
