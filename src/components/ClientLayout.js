@@ -67,7 +67,7 @@ export default function ClientLayout({ children }) {
         {isMobile && !isAuthPage && <BottomNav />}
         <div className={styles.mainWrapper}>
             {!isAuthPage && <MobileHeader onMenuClick={toggleSidebar} />}
-            <main className={styles.contentScroll}>
+            <main className={`${styles.contentScroll} ${!isAuthPage ? styles.withBottomNav : ''}`}>
                 {children}
             </main>
         </div>

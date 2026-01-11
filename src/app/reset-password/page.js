@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import styles from '../login/page.module.css';
 import { useAuth } from '@/context/AuthContext';
 
+import LoadingLogo from '@/components/LoadingLogo';
 function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -236,7 +237,7 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
     return (
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div style={{display:'flex', justifyContent:'center', padding:'20px'}}><LoadingLogo /></div>}>
             <ResetPasswordForm />
         </Suspense>
     );

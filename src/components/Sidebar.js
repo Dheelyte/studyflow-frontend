@@ -95,11 +95,6 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
               <span>Home</span>
             </Link>
 
-            <Link href="/profile" className={styles.navItem} onClick={handleProtectedNav}>
-                <UserIcon />
-                <span>Profile</span>
-             </Link>
-
             {/* Library Link (Simplified) */}
             <Link href="/library" className={styles.navItem} onClick={handleProtectedNav} title="Library">
                 <LibraryIcon />
@@ -112,19 +107,20 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
                 <span>Community</span>
             </Link>
 
+            <Link href="/profile" className={styles.navItem} onClick={handleProtectedNav}>
+                <UserIcon />
+                <span>Profile</span>
+             </Link>
+
           </nav>
 
           <div className={styles.footer}>
              
-            {!user ? (
+            {!user && (
                 <div className={styles.authButtons}>
                     <Link href="/login" className={styles.loginBtn} onClick={handleNavClick}>Log In</Link>
                     <Link href="/signup" className={styles.signupBtn} onClick={handleNavClick}>Sign Up</Link>
                 </div>
-            ) : (
-               <div className={styles.authButtons}>
-                    <button onClick={() => { logout(); handleNavClick(); }} className={styles.loginBtn} style={{width:'100%', cursor:'pointer'}}>Log Out</button>
-               </div>
             )}
           </div>
         </aside>

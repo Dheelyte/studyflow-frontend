@@ -6,7 +6,6 @@ import Link from 'next/link';
 import styles from './page.module.css';
 import { ZapIcon, TrophyIconSimple, CheckIcon, UsersIcon, SearchIcon, PlayIcon, StarIcon, PlusIcon, ChevronRight } from '@/components/Icons';
 import IntegratedSearchBar from '@/components/IntegratedSearchBar';
-import ThemeToggle from '@/components/ThemeToggle';
 import TypingText from '@/components/TypingText';
 import FadeIn from '@/components/FadeIn';
 
@@ -72,7 +71,6 @@ export default function LandingPage() {
                 <div className={styles.headerActions}>
                     <Link href="/login" style={{ color: 'var(--foreground)', fontWeight: '600', textDecoration: 'none' }}>Log In</Link>
                     <Link href="/signup" className={styles.ctaSmall}>Sign Up</Link>
-                    <ThemeToggle />
                 </div>
             </header>
 
@@ -160,7 +158,7 @@ export default function LandingPage() {
                                     {/* 3. WHY STUDYWISE (DYNAMIC STACK) SECTION */}
             <section className={styles.stackedSection} ref={container}>
                 <FadeIn>
-                     <h2 className={styles.sectionHeading} style={{ textAlign: 'center', marginBottom: '40px' }}>Why Studywise?</h2>
+                     <h2 className={styles.sectionHeading} style={{ textAlign: 'center', marginBottom: '40px', marginTop: '40px' }}>Why Studywise?</h2>
                 </FadeIn>
                 <div className={styles.stackedContainer}>
                 {
@@ -339,15 +337,13 @@ export default function LandingPage() {
                         <div style={{ display: 'flex', gap: '8px', fontWeight: '800', fontSize: '1.2rem', alignItems: 'center' }}>
                             <ZapIcon size={24} fill="var(--primary)" /> Studywise
                         </div>
-                        <p>The AI-powered curriculum designer that helps you master any topic. Flow state on demand.</p>
+                        <p>The AI-powered curriculum designer that helps you master any topic.</p>
                     </div>
                     <div className={styles.footerColumn}>
                         <h4>Product</h4>
                         <div className={styles.footerLinks}>
                             <Link href="/dashboard">Curriculum</Link>
                             <Link href="/community">Community</Link>
-                            <Link href="#">Gamification</Link>
-                            <Link href="#">Pricing</Link>
                         </div>
                     </div>
                     <div className={styles.footerColumn}>
@@ -386,8 +382,8 @@ function FAQSection() {
 
     const questions = [
         { q: "Is Studywise really free?", a: "Yes! You can generate unlimited curriculums on the free plan. We may introduce premium features later." },
-        { q: "How accurate is the AI?", a: "We use Gemini Ultra 1.5 to curate high-quality resources. The content is constantly vetted by our algorithm." },
-        { q: "Can I customize the curriculum?", a: "Absolutely. You can edit, remove, or reorder modules as you see fit." },
+        { q: "How accurate is the AI?", a: "We use Gemini 3 Pro to curate high-quality resources. The content is constantly vetted by our algorithm." },
+        { q: "Can I customize the curriculum?", a: "Not yet. But in future versions, you should be able to edit, remove, or reorder modules as you see fit." },
         { q: "Is there a mobile app?", a: "Studywise is fully responsive and works great on any device. A native app is coming soon!" }
     ];
 
@@ -437,7 +433,7 @@ function Card({ i, title, subtitle, description, color, children, progress, rang
         style={{ scale, top: `calc(-5% + ${i * 25}px)` }}
       >
         <div className={styles.dynamicCardContent}>
-             <h3 style={{ fontSize: '2.5rem', marginBottom: '8px', fontWeight: '800' }}>{title}</h3><div style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--primary)', marginBottom: '24px', letterSpacing: '0px', textTransform: 'none' }}>{subtitle}</div>
+             <h3 style={{ fontSize: '2rem', marginBottom: '8px', fontWeight: '800' }}>{title}</h3><div style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--primary)', marginBottom: '24px', letterSpacing: '0px', textTransform: 'none' }}>{subtitle}</div>
              <p style={{ fontSize: '1.2rem', color: 'var(--secondary)', lineHeight: '1.6' }}>{description}</p>
         </div>
         <div className={styles.dynamicCardVisual} style={{ background: color }}>

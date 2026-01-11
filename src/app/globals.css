@@ -53,23 +53,6 @@ a {
   text-decoration: none;
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--card);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--secondary);
-}
 
 /* Mobile Responsive */
 @media (max-width: 768px) {

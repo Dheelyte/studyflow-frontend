@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter, usePathname } from 'next/navigation';
 
+import LoadingLogo from './LoadingLogo';
 const PUBLIC_PATHS = ['/login', '/signup', '/curriculum', '/community'];
 
 export default function AuthGuard({ children }) {
@@ -22,7 +23,7 @@ export default function AuthGuard({ children }) {
     }, [user, loading, pathname, router]);
 
     if (loading) {
-        return <div style={{height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--foreground)'}}>Loading...</div>;
+        return <div style={{height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--foreground)'}}><LoadingLogo size={48} /></div>;
     }
 
     const isPublicPath = pathname === '/' || PUBLIC_PATHS.some(path => pathname.startsWith(path));

@@ -11,7 +11,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 140px 24px 80px;
+  padding: 140px 12px 80px;
   background: radial-gradient(circle at 50% 30%, rgba(99, 102, 241, 0.15) 0%, transparent 60%);
   gap: 32px;
 }
@@ -848,7 +848,7 @@
 
 /* Dynamic Stacked Cards Section */
 .stackedSection {
-    padding: 40px 24px 80px; /* Extra bottom padding for scroll space */
+    padding: 40px 12px 80px; /* Extra bottom padding for scroll space */
     background: var(--background);
     margin-bottom: 80px; /* separate from next section */
 }
@@ -907,7 +907,7 @@
         min-height: 600px;
     }
     .dynamicCardContent {
-        padding: 40px;
+        padding: 20px;
     }
     .dynamicCardVisual {
         min-height: 300px;

@@ -7,7 +7,7 @@ import { users } from '@/services/api';
 import EditProfileModal from '@/components/EditProfileModal';
 
 export default function ProfilePage() {
-  const { user, updateUser, checkUser } = useAuth();
+  const { user, updateUser, checkUser, logout } = useAuth();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const scrollRef = useRef(null);
 
@@ -152,7 +152,6 @@ export default function ProfilePage() {
                 </div>
                 <button className={styles.editBtn} onClick={() => setIsEditModalOpen(true)}>Edit Profile</button>
             </div>
-            <p className={styles.bio}>{displayBio}</p>
         </div>
       </div>
 
@@ -231,6 +230,12 @@ export default function ProfilePage() {
             </div>
           </div>
       </div>
+
+      <div className={styles.logoutSection}> 
+          <button onClick={logout} className={styles.logoutBtn}> 
+              Log Out 
+          </button> 
+      </div> 
 
       {tooltipData.visible && (
           <div 

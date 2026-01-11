@@ -1,5 +1,5 @@
 .page {
-  padding: 32px;
+  padding: 32px 24px;
   max-width: 1200px;
   margin: 0 auto;
   min-height: 100vh;
@@ -8,13 +8,18 @@
   gap: 40px;
 }
 
+@media (max-width: 768px) {
+  .page {
+    padding: 32px 12px;
+  }
+}
+
 /* Header Section */
 .header {
   display: flex;
   align-items: center;
   gap: 32px;
   padding-bottom: 32px;
-  border-bottom: 1px solid var(--border);
 }
 
 .avatarContainer {
@@ -102,14 +107,14 @@
 .statsGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 24px;
+    gap: 12px;
 }
 
 .statCard {
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 16px;
-    padding: 24px;
+    padding: 12px;
     display: flex;
     align-items: center;
     gap: 16px;
@@ -147,7 +152,7 @@
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 20px;
-    padding: 32px;
+    padding: 24px 16px;
 }
 
 .sectionTitle {
@@ -203,7 +208,6 @@
     flex-direction: column;
     gap: 8px;
     min-width: max-content; 
-    padding-right: 1px; 
 }
 
 .monthLabels {
@@ -299,6 +303,35 @@
         max-width: 200px;
         justify-content: center;
     }
+}
+
+.logoutSection {
+  margin-top: auto;
+  padding-top: 40px;
+  padding-bottom: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.logoutBtn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--secondary);
+    padding: 12px 32px;
+    border-radius: 99px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logoutBtn:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
 }
 
 .tooltip {

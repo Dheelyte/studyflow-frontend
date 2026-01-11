@@ -59,7 +59,7 @@ export default function IntegratedSearchBar({ redirect = false, onSearch, shadow
                 <input 
                     type="text" 
                     className={styles.searchInput} 
-                    placeholder="What do you want to learn today?" 
+                    placeholder="What do you want to learn?" 
                     value={themeQuery}
                     onChange={(e) => setQuery(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleStart()}
