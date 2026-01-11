@@ -173,7 +173,7 @@ function CommunityDetailContent({ slug }) {
                          {/* Metadata and Button Row */}
                          <div style={{display:'flex', gap:'8px', alignItems:'center', flexWrap:'wrap'}}>
                              <span style={{fontSize:'0.9rem', fontWeight:'600', color:'var(--foreground)'}}>
-                                {community.memberCount !== undefined ? community.memberCount : '...'} <span style={{fontWeight:'400', color:'var(--secondary)'}}>Members</span>
+                                {community.memberCount !== undefined ? community.memberCount : '...'} <span style={{fontWeight:'400', color:'var(--secondary)'}}>{community.memberCount === 1 ? 'Member' : 'Members'}</span>
                              </span>
                              
                              <span style={{color:'var(--border)'}}>|</span>
@@ -238,7 +238,7 @@ function CommunityDetailContent({ slug }) {
                 <p style={{color:'var(--secondary)', lineHeight:'1.5'}}>{community.description}</p>
                 <div style={{marginTop:'16px', display:'flex', gap:'8px', alignItems:'center', color:'var(--secondary)'}}>
                      {/* Redundant Member count but sidebar usually has it too */}
-                    <span style={{fontWeight:'700', color:'var(--foreground)'}}>{community.memberCount || 0}</span> Members
+                    <span style={{fontWeight:'700', color:'var(--foreground)'}}>{community.memberCount || 0}</span> {community.memberCount === 1 ? 'Member' : 'Members'}
                 </div>
                 
                 <div style={{marginTop: '20px'}}>

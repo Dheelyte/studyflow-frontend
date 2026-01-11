@@ -1,12 +1,12 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import styles from "./page.module.css";
 import Card from "@/components/Card";
 import SkeletonCard from "@/components/SkeletonCard";
 import IntegratedSearchBar from "@/components/IntegratedSearchBar";
-import { ZapIcon, StarIcon, TrophyIconSimple } from '@/components/Icons';
+import { ZapIcon, StarIcon, TrophyIconSimple, UsersIcon } from '@/components/Icons';
 import { useAuth } from '@/context/AuthContext';
 import { curriculum, communities } from '@/services/api';
 
@@ -16,7 +16,10 @@ export default function Dashboard() {
     const [loadingPlaylists, setLoadingPlaylists] = useState(true);
     const [exploreCommunities, setExploreCommunities] = useState([]);
     const [loadingCommunities, setLoadingCommunities] = useState(true);
+    const [myCommunities, setMyCommunities] = useState([]);
+    const [loadingMyCommunities, setLoadingMyCommunities] = useState(true);
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { user, checkUser } = useAuth();
 
     // Initial Check & Greeting
@@ -27,16 +30,25 @@ export default function Dashboard() {
         else if (hour < 18) setGreeting('Good afternoon');
         else setGreeting('Good evening');
 
-        checkUser();
-    }, []); // Run ONCE on mount
+        // Check for login_success from Google Auth redirect
+        if (searchParams && searchParams.get('login_success')) {
+            // Force check to update local session state from HttpOnly cookie
+            checkUser(true);
+            // Clean URL without refresh
+            window.history.replaceState({}, '', '/dashboard');
+        } else {
+            checkUser();
+        }
+    },[]); // Run ONCE on mount
 
     // Fetch Playlists and Communities when User is available
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
                 // Parallel fetch
-                const [playlistsRes, communitiesRes] = await Promise.all([
+                const [playlistsRes, myCommunitiesRes, exploreCommunitiesRes] = await Promise.all([
                     curriculum.getMyPlaylists().catch(e => []),
+                    communities.getMyCommunities().catch(e => []),
                     communities.getExplore().catch(e => [])
                 ]);
 
@@ -63,9 +75,14 @@ export default function Dashboard() {
                     setPlaylists(mapped);
                 }
 
-                // Process Communities
-                if (Array.isArray(communitiesRes)) {
-                    setExploreCommunities(communitiesRes.slice(0, 3));
+                // Process My Communities
+                if (Array.isArray(myCommunitiesRes)) {
+                    setMyCommunities(myCommunitiesRes);
+                }
+
+                // Process Explore Communities
+                if (Array.isArray(exploreCommunitiesRes)) {
+                    setExploreCommunities(exploreCommunitiesRes.slice(0, 3));
                 }
 
             } catch (error) {
@@ -73,6 +90,7 @@ export default function Dashboard() {
             } finally {
                 setLoadingCommunities(false);
                 setLoadingPlaylists(false);
+                setLoadingMyCommunities(false);
             }
         };
 
@@ -167,6 +185,38 @@ export default function Dashboard() {
                 </div>
             </section>
 
+             {/* My Communities Section */}
+             <section className={styles.section}>
+                <div className={styles.sectionHeader}>
+                    <h2 className={styles.sectionTitle}>My Communities</h2>
+                    <Link href="/community" className={styles.showAll}>View All</Link>
+                </div>
+                <div className={styles.scrollContainer}>
+                    {loadingMyCommunities ? (
+                        <>
+                            <div style={{ minWidth: '280px', height: '100%' }}><SkeletonCard /></div>
+                            <div style={{ minWidth: '280px', height: '100%' }}><SkeletonCard /></div>
+                        </>
+                    ) : myCommunities.length > 0 ? (
+                        myCommunities.map((comm) => (
+                            <Link key={comm.id} href={'/community/' + comm.id} style={{ minWidth: '280px', display: 'block', textDecoration: 'none' }}>
+                                <Card 
+                                    title={comm.name} 
+                                    description={comm.member_count + ' Members • ' + (comm.description || 'Join the discussion')}
+                                    color="linear-gradient(135deg, #4f46e5, #818cf8)" 
+                                    icon={UsersIcon} 
+                                />
+                            </Link>
+                        ))
+                    ) : (
+                        <div style={{ color: 'var(--secondary)', padding: '20px', minWidth: '300px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            <span>You haven&apos;t joined any communities yet.</span>
+                             <Link href="/community" style={{ color: 'var(--primary)', fontWeight: '600', textDecoration: 'none' }}>Find a community →</Link>
+                        </div>
+                    )}
+                </div>
+            </section>
+
             {/* Explore Communities Section */}
             <section className={styles.section}>
                 <div className={styles.sectionHeader}>
@@ -187,6 +237,7 @@ export default function Dashboard() {
                                     title={comm.name} 
                                     description={comm.member_count + ' Members • ' + (comm.description || 'Join the discussion')}
                                     color="linear-gradient(135deg, #0f172a, #334155)" 
+                                    icon={UsersIcon} 
                                 />
                             </Link>
                         ))

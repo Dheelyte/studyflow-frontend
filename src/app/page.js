@@ -247,26 +247,26 @@ export default function LandingPage() {
                 <div className={styles.marqueeContainer} style={{ marginBottom: '24px' }}>
                     <div className={styles.marqueeTrack}>
                         {marqueeTopics.map((topic, i) => (
-                            <Link href="/dashboard" key={`${topic}-${i}-1`} className={styles.topicCard} style={{ minWidth: '220px' }}>
+                            <div key={`${topic}-${i}-1`} className={styles.topicCard} style={{ minWidth: '220px' }}>
                                 <div className={styles.topicTitle}>{topic}</div>
                                 <div className={styles.topicMeta}>
                                     <span>{40 + i} Resources</span>
                                     <span>{1200 + (i * 123)} Learners</span>
                                 </div>
-                            </Link>
+                            </div>
                         ))}
                     </div>
                 </div>
                 <div className={styles.marqueeContainer}>
                     <div className={styles.marqueeTrackReverse}>
                         {marqueeTopicsReverse.map((topic, i) => (
-                            <Link href="/dashboard" key={`${topic}-${i}-2`} className={styles.topicCard} style={{ minWidth: '220px' }}>
+                            <div key={`${topic}-${i}-2`} className={styles.topicCard} style={{ minWidth: '220px' }}>
                                 <div className={styles.topicTitle}>{topic}</div>
                                 <div className={styles.topicMeta}>
                                     <span>{30 + i} Resources</span>
                                     <span>{800 + (i * 45)} Learners</span>
                                 </div>
-                            </Link>
+                            </div>
                         ))}
                     </div>
                 </div>

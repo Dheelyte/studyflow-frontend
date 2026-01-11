@@ -21,10 +21,12 @@ export default function QuizModal({ isOpen, onClose, moduleTitle, moduleId, onCo
     const PASS_MARK = 70;
 
     useEffect(() => {
-        if (isOpen && moduleId) {
-            loadQuiz();
-        } else {
+        if (!isOpen || !moduleId) {
             resetQuizState();
+        } else {
+            // Reset questions when opening a new module so we don't show old ones while waiting to start
+            setQuestions([]); 
+            resetQuizState(); 
         }
     }, [isOpen, moduleId]);
 
@@ -57,20 +59,31 @@ export default function QuizModal({ isOpen, onClose, moduleTitle, moduleId, onCo
         }
     };
 
-    const handleStart = () => {
+    const handleStart = async () => {
         if (loading) return; // Prevent start if still loading
         
         if (questions.length === 0) {
-            // Fallback or retry loading if failed? 
-            // For now assume if not loading and empty, maybe error.
-            // But let's just ignore or try to reload? 
-            // In a better UX we would show error state.
-            // For now, let's just trust unexpected empty state is handled by not rendering questions.
-            return; 
+            try {
+                setLoading(true);
+                const data = await curriculum.getQuiz(moduleId, {
+                    curriculum_title: curriculumTitle,
+                    experience_level: experienceLevel
+                });
+                
+                if (data && data.questions && data.questions.length > 0) {
+                    setQuestions(data.questions);
+                    setStep('QUESTION');
+                    setTimeout(scrollToTop, 0);
+                }
+            } catch (err) {
+                console.error("Failed to load quiz", err);
+            } finally {
+                setLoading(false);
+            }
+            return;
         }
 
         setStep('QUESTION');
-        // Scroll to top when starting
         setTimeout(scrollToTop, 0);
     };
 
@@ -120,7 +133,7 @@ export default function QuizModal({ isOpen, onClose, moduleTitle, moduleId, onCo
         if (finalScore >= PASS_MARK) {
             try {
                 const payload = { answers: answers || {}, questions: questions || [] }; console.log('QuizModal submitting:', payload); await curriculum.submitQuiz(moduleId, payload);
-                if (onComplete) onComplete(finalScore);
+                // onComplete deferred to button click
             } catch (err) {
                 console.error("Failed to submit quiz", err);
             }
@@ -292,7 +305,7 @@ export default function QuizModal({ isOpen, onClose, moduleTitle, moduleId, onCo
                             </p>
                             <div className={styles.footer} style={{ width: '100%', justifyContent: 'center', gap: '1rem', border: 'none' }}>
                                 {isPassed ? (
-                                    <button className={styles.primaryBtn} onClick={onClose}>
+                                    <button className={styles.primaryBtn} onClick={() => onComplete(score)}>
                                         Complete & Continue
                                     </button>
                                 ) : (

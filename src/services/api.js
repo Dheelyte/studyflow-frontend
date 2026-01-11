@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1';
 
 // Internal state for robust refresh logic
 let isRefreshing = false;
@@ -29,13 +29,27 @@ async function apiFetch(endpoint, options = {}) {
     // Auto-include credentials (cookies)
     config.credentials = 'include';
 
-    const response = await fetch(`${API_URL}${endpoint}`, config);
+    let response;
+    try {
+        response = await fetch(`${API_URL}${endpoint}`, config);
+    } catch (error) {
+        if (error.message === 'Failed to fetch') {
+            throw new Error('An error occurred, please try again');
+        }
+        throw error;
+    }
     if (!response.ok) {
         // Handle common errors like 401
         if (response.status === 401) {
             // Don't attempt to refresh if the error comes from login or register endpoints
             if (endpoint.includes('/auth/login') || endpoint.includes('/auth/register')) {
-                throw new Error('Invalid credentials');
+                // Try to get a more specific error message if possible
+                let errorMessage = 'Invalid credentials';
+                try {
+                    const errorData = await response.json();
+                    if (errorData.detail) errorMessage = errorData.detail;
+                } catch (e) { /* ignore */ }
+                throw new Error(errorMessage);
             }
             const { _retry } = options;
             
@@ -86,7 +100,28 @@ async function apiFetch(endpoint, options = {}) {
                 throw new Error('Session expired');
             }
         }
-        throw new Error(`API Error: (${response.status}) ${response.statusText}`);
+
+        // Handle other errors (400, 422, 500 etc)
+        let errorData = null;
+        try {
+            errorData = await response.json();
+        } catch (e) {
+            // Failed to parse JSON, fall back to status text
+        }
+
+        const errorMessage = errorData?.detail || `API Error: (${response.status}) ${response.statusText}`;
+        const error = new Error(errorMessage);
+        error.status = response.status;
+        error.data = errorData;
+
+        // Attach validation errors specifically if present (usually 422)
+        if (response.status === 422) {
+             error.validationErrors = errorData;
+        } else if (errorData?.errors) {
+            error.validationErrors = errorData.errors;
+        }
+
+        throw error;
     }
 
     // safe parsing

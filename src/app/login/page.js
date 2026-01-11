@@ -1,23 +1,35 @@
 "use client";
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { GoogleIcon, GitHubIcon } from "@/components/Icons";
+import { GoogleIcon, GitHubIcon, AppleIcon } from "@/components/Icons";
+import { API_URL } from '@/services/api';
 import styles from './page.module.css';
 import { useAuth } from '@/context/AuthContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useToast } from '@/context/ToastContext';
 
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get('redirect');
-  const { login } = useAuth();
+  const { login, user, loading: authLoading } = useAuth();
+  const { addToast } = useToast();
+  
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.push('/dashboard');
+    }
+  }, [user, authLoading, router]);
+
   const [error, setError] = useState('');
+  const [validationErrors, setValidationErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [showEmailForm, setShowEmailForm] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setValidationErrors({});
     setLoading(true);
     
     // Get values directly from form elements
@@ -28,7 +40,12 @@ export default function LoginPage() {
         await login({ email, password });
         router.push(redirect || '/dashboard');
     } catch (err) {
-        setError(err.message || 'Login failed');
+        if (err.validationErrors) {
+            setValidationErrors(err.validationErrors);
+            addToast('Please check the highlighted fields.', 'error');
+        } else {
+            addToast(err.message || 'Login failed', 'error');
+        }
     } finally {
         setLoading(false);
     }
@@ -47,20 +64,24 @@ export default function LoginPage() {
                  </Link>
             </div>
             <h1 className={styles.title}>Welcome Back</h1>
-            <p className={styles.subtitle}>Sign in to continue your flow</p>
+            
         </div>
 
-        {error && <div style={{color: 'red', textAlign: 'center', marginBottom: '1rem'}}>{error}</div>}
+        
 
         {!showEmailForm ? (
             <div className={styles.socialButtons}>
-                <button className={styles.socialButton} type="button">
+                <a href={`${API_URL}/auth/login/google`} className={styles.socialButton} style={{textDecoration: 'none', color: 'inherit'}}>
                     <GoogleIcon size={20} />
                     Continue with Google
-                </button>
-                <button className={styles.socialButton} type="button">
+                </a>
+                <a href={`${API_URL}/auth/login/github`} className={styles.socialButton} style={{textDecoration: 'none', color: 'inherit'}}>
                     <GitHubIcon size={20} />
                     Continue with GitHub
+                </a>
+                <button className={styles.socialButton} type="button" disabled style={{opacity: 0.6, cursor: 'not-allowed', backgroundColor: 'rgba(255,255,255,0.05)'}}>
+                    <AppleIcon size={20} />
+                    Continue with Apple (Coming Soon)
                 </button>
                  <button className={styles.socialButton} type="button" onClick={() => setShowEmailForm(true)}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
@@ -75,9 +96,10 @@ export default function LoginPage() {
                         onClick={() => setShowEmailForm(false)}
                         style={{background:'none', border:'none', cursor:'pointer', display:'flex', alignItems:'center', gap:'4px', color:'var(--foreground-muted)', fontSize:'0.9rem'}}
                     >
-                        ← Back to options
+                        &lt; Back
                     </button>
                 </div>
+
 
                 <div className={styles.inputGroup}>
                     <label className={styles.label} htmlFor="email">Email</label>
@@ -89,6 +111,7 @@ export default function LoginPage() {
                         className={styles.input} 
                         required 
                     />
+                    {validationErrors.email && <div style={{color: '#ef4444', fontSize: '0.85rem', marginTop: '4px'}}>{validationErrors.email}</div>}
                 </div>
                 
                 <div className={styles.inputGroup}>
@@ -104,6 +127,7 @@ export default function LoginPage() {
                         className={styles.input} 
                         required 
                     />
+                     {validationErrors.password && <div style={{color: '#ef4444', fontSize: '0.85rem', marginTop: '4px'}}>{validationErrors.password}</div>}
                 </div>
 
                 <button type="submit" className={styles.primaryButton} disabled={loading}>
@@ -113,7 +137,8 @@ export default function LoginPage() {
         )}
 
         <div className={styles.footer}>
-            Don&apos;t have an account? <Link href="/signup" className={styles.link}>Sign up</Link>
+            Don&apos;t have an account? {/* Dynamic link based on redirect */}
+            <Link href={redirect ? `/signup?redirect=${encodeURIComponent(redirect)}` : "/signup"} className={styles.link}>Sign up</Link>
         </div>
       </div>
     </div>
