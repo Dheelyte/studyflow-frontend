@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { GoogleIcon, GitHubIcon } from "@/components/Icons";
+import { API_URL } from '@/services/api';
 import styles from '../login/page.module.css';
 import { useAuth } from '@/context/AuthContext';
 import { useState, useEffect } from 'react';
@@ -97,10 +98,10 @@ export default function SignupPage() {
 
         {step === 'social' && (
             <div className={styles.socialButtons}>
-                <button className={styles.socialButton} type="button">
+                <a href={`${API_URL}/auth/login/google`} className={styles.socialButton} style={{textDecoration: 'none', color: 'inherit'}}>
                     <GoogleIcon size={20} />
                     Sign up with Google
-                </button>
+                </a>
                 <button className={styles.socialButton} type="button">
                     <GitHubIcon size={20} />
                     Sign up with GitHub
