@@ -6,7 +6,7 @@ const PlayIcon = () => (
     </svg>
 )
 
-export default function Card({ title, description, color, progress, completedModules, totalModules, level }) {
+export default function Card({ title, description, color, progress, completedModules, totalModules, level, icon: Icon }) {
   const hasModuleInfo = typeof completedModules === 'number' && typeof totalModules === 'number';
 
   return (
@@ -14,7 +14,7 @@ export default function Card({ title, description, color, progress, completedMod
       <div className={styles.image} style={{ background: color || 'linear-gradient(45deg, #333, #555)' }}>
         {level && <div className={styles.levelBadge}>{level}</div>}
         <div className={styles.playButton}>
-            <PlayIcon />
+            {Icon ? <Icon size={24} fill="currentColor" /> : <PlayIcon />}
         </div>
         <div className={styles.titleOverlay}>
             <div className={styles.title}>{title}</div>
