@@ -222,18 +222,6 @@ export default function LandingPage() {
                             <span>💬 5</span>
                         </div>
                     </FadeIn>
-                    <FadeIn direction="left" delay={0.4} className={`${styles.mockPostCard} ${styles.mockPostCard2}`}>
-                        <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
-                            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #f59e0b, #ef4444)' }}></div>
-                            <div>
-                                <div style={{ fontWeight: '700', fontSize: '0.9rem' }}>David C.</div>
-                                <div style={{ fontSize: '0.75rem', color: 'var(--secondary)' }}>2h ago • #Python</div>
-                            </div>
-                        </div>
-                        <div style={{ fontSize: '0.9rem', lineHeight: '1.5', marginBottom: '12px' }}>
-                            Anyone want to pair program on the Data Science capstone? 🐍
-                        </div>
-                    </FadeIn>
                 </div>
             </section>
 
@@ -284,7 +272,7 @@ export default function LandingPage() {
                         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                             <div className={styles.avatarRing}><div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'var(--card)' }}></div></div>
                             <div>
-                                <div style={{ fontWeight: '700' }}>Marcus L.</div>
+                                <div style={{ fontWeight: '700' }}>Chinedu O.</div>
                                 <div style={{ fontSize: '0.8rem', color: 'var(--secondary)' }}>Frontend Dev</div>
                             </div>
                         </div>
@@ -297,7 +285,7 @@ export default function LandingPage() {
                         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                             <div className={styles.avatarRing} style={{ background: 'linear-gradient(135deg, #10b981, #3b82f6)' }}><div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'var(--card)' }}></div></div>
                             <div>
-                                <div style={{ fontWeight: '700' }}>Elena R.</div>
+                                <div style={{ fontWeight: '700' }}>Amara N.</div>
                                 <div style={{ fontSize: '0.8rem', color: 'var(--secondary)' }}>Student</div>
                             </div>
                         </div>
@@ -310,7 +298,7 @@ export default function LandingPage() {
                         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                             <div className={styles.avatarRing} style={{ background: 'linear-gradient(135deg, #f59e0b, #ec4899)' }}><div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'var(--card)' }}></div></div>
                             <div>
-                                <div style={{ fontWeight: '700' }}>James K.</div>
+                                <div style={{ fontWeight: '700' }}>Yusuf I.</div>
                                 <div style={{ fontSize: '0.8rem', color: 'var(--secondary)' }}>Data Analyst</div>
                             </div>
                         </div>
@@ -349,18 +337,16 @@ export default function LandingPage() {
                     <div className={styles.footerColumn}>
                         <h4>Company</h4>
                         <div className={styles.footerLinks}>
-                            <Link href="#">About Us</Link>
-                            <Link href="#">Careers</Link>
-                            <Link href="#">Blog</Link>
-                            <Link href="#">Contact</Link>
+                            <Link href="/about">About Us</Link>
+                            <Link href="/contact">Contact</Link>
                         </div>
                     </div>
                     <div className={styles.footerColumn}>
                         <h4>Legal</h4>
                         <div className={styles.footerLinks}>
-                            <Link href="#">Privacy Policy</Link>
-                            <Link href="#">Terms of Service</Link>
-                            <Link href="#">Cookie Policy</Link>
+                            <Link href="/privacy-policy">Privacy Policy</Link>
+                            <Link href="/terms-of-service">Terms of Service</Link>
+                            <Link href="/cookie-policy">Cookie Policy</Link>
                         </div>
                     </div>
                 </div>
@@ -432,6 +418,23 @@ function Card({ i, title, subtitle, description, color, children, progress, rang
         className={styles.dynamicCard}
         style={{ scale, top: `calc(-5% + ${i * 25}px)` }}
       >
+        {/* Floating Background Particles */} 
+        {[...Array(15)].map((_, idx) => ( 
+            <div 
+                key={idx} 
+                className={styles.particle} 
+                style={{ 
+                    top: `${Math.random() * 100}%`, 
+                    left: `${Math.random() * 100}%`, 
+                    width: `${Math.random() * 200 + 50}px`, 
+                    height: `${Math.random() * 200 + 50}px`, 
+                    opacity: Math.random() * 0.09 + 0.03, 
+                    animationDuration: `${Math.random() * 10 + 20}s`, 
+                    animationDelay: `${Math.random() * 5}s`, 
+                    background: color,
+                }} 
+            /> 
+        ))}
         <div className={styles.dynamicCardContent}>
              <h3 style={{ fontSize: '2rem', marginBottom: '8px', fontWeight: '800' }}>{title}</h3><div style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--primary)', marginBottom: '24px', letterSpacing: '0px', textTransform: 'none' }}>{subtitle}</div>
              <p style={{ fontSize: '1.2rem', color: 'var(--secondary)', lineHeight: '1.6' }}>{description}</p>

@@ -20,7 +20,7 @@
   font-size: 4rem;
   font-weight: 800;
   line-height: 1.1;
-  background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+  background: linear-gradient(135deg, var(--foreground) 0%, var(--primary) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   max-width: 800px;
@@ -121,7 +121,9 @@
     font-size: 2.5rem;
     font-weight: 800;
     margin-bottom: 60px;
-    color: var(--foreground);
+    background: linear-gradient(135deg, var(--foreground) 0%, var(--primary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .ctaSection {
@@ -136,6 +138,9 @@
 .ctaSection h2 {
     font-size: 3rem;
     font-weight: 800;
+    background: linear-gradient(135deg, var(--foreground) 0%, var(--primary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .ctaSection p {
@@ -194,7 +199,7 @@
   font-size: 2.5rem;
   font-weight: 800;
   margin-bottom: 16px;
-  background: linear-gradient(135deg, var(--foreground) 0%, var(--secondary) 100%);
+  background: linear-gradient(135deg, var(--foreground) 0%, var(--primary) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -238,6 +243,7 @@
 }
 
 .mockPostCard {
+  text-align: left;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 16px;
@@ -549,41 +555,6 @@
 }
 
 
-/* Post Cards Mobile Stacking: RESTORED ABSOLUTE POSITIONING */
-@media (max-width: 768px) {
-    .communityVisual {
-        width: 100%;
-        min-height: 0;
-        padding: 0;
-        display: block;
-        position: relative;
-        margin-top: 40px;
-        margin-bottom: 40px;
-        flex: none;
-        height: 420px;
-    }
-    
-    .mockPostCard1, .mockPostCard2 {
-        position: absolute;
-        width: 85%;
-        max-width: 320px;
-    }
-
-    .mockPostCard1 {
-        top: 0;
-        left: 0;
-        transform: none;
-        z-index: 1;
-    }
-
-    .mockPostCard2 {
-        top: 160px;
-        right: 20px;
-        left: auto;
-        transform: none;
-        z-index: 2;
-    }
-}
 
 
 /* Restoring Mobile Styles */
@@ -814,7 +785,7 @@
     font-size: 2rem;
     font-weight: 800;
     margin-bottom: 16px;
-    background: linear-gradient(135deg, var(--foreground) 0%, var(--secondary) 100%);
+    background: linear-gradient(135deg, var(--foreground) 0%, var(--primary) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -871,7 +842,7 @@
     width: 100%;
     max-width: 900px;
     height: 500px;
-    background: var(--card);
+    background-color: var(--card);
     border-radius: 32px;
     padding: 0;
     overflow: hidden;
@@ -880,6 +851,23 @@
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     display: flex;
     transform-origin: top center;
+}
+
+.particle {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--primary);
+    filter: blur(20px);
+    z-index: 0;
+    pointer-events: none;
+    animation: floatParticle 20s infinite ease-in-out;
+}
+
+@keyframes floatParticle {
+    0%, 100% { transform: translate(0, 0); }
+    25% { transform: translate(50px, -50px); }
+    50% { transform: translate(-20px, 60px); }
+    75% { transform: translate(-60px, -20px); }
 }
 
 .dynamicCardContent {
@@ -907,7 +895,7 @@
         min-height: 600px;
     }
     .dynamicCardContent {
-        padding: 20px;
+        padding: 32px 20px;
     }
     .dynamicCardVisual {
         min-height: 300px;
@@ -917,7 +905,7 @@
 /* FAQ Styles */
 .faqSection {
     padding: 100px 24px;
-    background: var(--background);
+    background: var(--card);
 }
 
 .faqContainer {
