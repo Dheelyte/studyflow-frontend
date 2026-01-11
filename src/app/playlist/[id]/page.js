@@ -545,11 +545,16 @@ export default function PlaylistPage({ params }) {
                                                                     <div className={styles.resourceHeaderRow}>
                                                                         <div className={styles.resourceTitleGroup}>
                                                                             <span className={styles.resourceLabel}>{resource.label}</span>
-                                                                            <span className={styles.resourceTypeBadge}>{resource.type}</span>
                                                                         </div>
-                                                                        {resource.is_completed && <div className={styles.completedIcon}><CheckCircleIcon size={20} fill="#10b981" /></div>}
                                                                     </div>
                                                                     <p className={styles.resourceDescription}>{resource.description}</p>
+                                                                </div>
+                                                                <div className={styles.badgeContainer}>
+                                                                    <span className={styles.xpBadge}>+11 XP</span>
+                                                                <span className={styles.resourceTypeBadge}>
+                                                                    {resource.type === "Video" ? <VideoIcon size={12} /> : <BookOpenIcon size={12} />}
+                                                                    {resource.type}
+                                                                </span>
                                                                 </div>
                                                             </a>
                                                         );

@@ -326,15 +326,20 @@ export default function CurriculumPage() {
                                                                 onClick={(e) => handleResourceClick(e)}
                                                                 title="Click 'Start Learning' to create your playlist first"
                                                             >
-                                                                <div className={styles.resourceIcon}>
-                                                                    {resource.type === "Video" ? <VideoIcon size={20} /> : <BookOpenIcon size={20} />}
-                                                                </div>
                                                                 <div className={styles.resourceInfo}>
                                                                     <div className={styles.resourceHeaderRow}>
-                                                                        <span className={styles.resourceLabel}>{resource.label}</span>
-                                                                        <span className={styles.resourceTypeBadge}>{resource.type}</span>
+                                                                        <div className={styles.resourceTitleGroup}>
+                                                                            <span className={styles.resourceLabel}>{resource.label}</span>
+                                                                        </div>
                                                                     </div>
                                                                     <p className={styles.resourceDescription}>{resource.description}</p>
+                                                                </div>
+                                                                <div className={styles.badgeContainer}>
+                                                                    <span className={styles.xpBadge}>+11 XP</span>
+                                                                    <span className={styles.resourceTypeBadge}>
+                                                                        {resource.type === "Video" ? <VideoIcon size={12} /> : <BookOpenIcon size={12} />}
+                                                                        {resource.type}
+                                                                    </span>
                                                                 </div>
                                                             </div>
                                                         );

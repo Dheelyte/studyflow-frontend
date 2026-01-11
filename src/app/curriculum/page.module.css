@@ -413,13 +413,20 @@
 }
 
 .resourceTypeBadge {
-    font-size: 0.75rem;
+    font-size: 0.65rem;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: var(--primary); /* Use primary color for visibility */
+    color: var(--primary);
     background: rgba(99, 102, 241, 0.1);
-    padding: 2px 8px;
-    border-radius: 4px;
+    padding: 4px 8px;
+    border-radius: 0 12px 0 0;
+    border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+    border-left: 1px solid rgba(99, 102, 241, 0.2);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .resourceDescription {
@@ -478,4 +485,40 @@
 .resourceDisabled:hover {
   transform: none;
   border-color: rgba(99, 102, 241, 0.2);
+}
+
+.resourceCard {
+    position: relative;
+}
+
+.resourceTitleGroup {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    padding-top: 12px;
+}
+
+.badgeContainer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 10;
+    display: flex;
+    align-items: stretch;
+}
+
+.xpBadge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #d97706;
+    background: rgba(217, 119, 6, 0.1);
+    padding: 4px 8px;
+    border-radius: 0 0 0 12px;
+    white-space: nowrap;
+    border-bottom: 1px solid rgba(217, 119, 6, 0.2);
+    border-left: 1px solid rgba(217, 119, 6, 0.2);
+    display: flex;
+    align-items: center;
+    backdrop-filter: blur(4px);
 }

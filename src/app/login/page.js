@@ -17,9 +17,9 @@ export default function LoginPage() {
   
   useEffect(() => {
     if (!authLoading && user) {
-      router.push('/dashboard');
+      router.push(redirect || '/dashboard');
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, router, redirect]);
 
   const [error, setError] = useState('');
   const [validationErrors, setValidationErrors] = useState({});
