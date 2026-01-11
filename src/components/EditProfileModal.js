@@ -6,7 +6,6 @@ export default function EditProfileModal({ user, onClose, onSave }) {
     first_name: user?.first_name || '',
     last_name: user?.last_name || '',
     email: user?.email || '',
-    bio: user?.bio || '', 
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -100,21 +99,6 @@ export default function EditProfileModal({ user, onClose, onSave }) {
               />
               <div style={{fontSize: '0.75rem', color: 'var(--secondary)', marginTop: '4px'}}>Email cannot be changed directly.</div>
           </div>
-
-           <div>
-              <label style={{ display: 'block', fontSize: '0.9rem', fontWeight: '600', marginBottom: '8px', color: 'var(--secondary)' }}>Bio</label>
-              <textarea 
-                value={formData.bio}
-                onChange={(e) => setFormData({...formData, bio: e.target.value})}
-                rows={4}
-                style={{
-                  width: '100%', padding: '10px', borderRadius: '8px', 
-                  border: '1px solid var(--border)', background: 'var(--background)',
-                  color: 'var(--foreground)', fontSize: '1rem', resize: 'vertical'
-                }}
-                placeholder="Tell us a bit about yourself..."
-              />
-            </div>
 
             <button 
               type="submit" 

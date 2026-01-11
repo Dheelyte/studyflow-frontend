@@ -1,0 +1,16 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo {
+  animation: pulse 1.5s infinite ease-in-out;
+  color: var(--primary);
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.9); opacity: 0.5; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.5; }
+}

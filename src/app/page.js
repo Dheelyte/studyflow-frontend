@@ -6,7 +6,6 @@ import Link from 'next/link';
 import styles from './page.module.css';
 import { ZapIcon, TrophyIconSimple, CheckIcon, UsersIcon, SearchIcon, PlayIcon, StarIcon, PlusIcon, ChevronRight } from '@/components/Icons';
 import IntegratedSearchBar from '@/components/IntegratedSearchBar';
-import ThemeToggle from '@/components/ThemeToggle';
 import TypingText from '@/components/TypingText';
 import FadeIn from '@/components/FadeIn';
 
@@ -72,7 +71,6 @@ export default function LandingPage() {
                 <div className={styles.headerActions}>
                     <Link href="/login" style={{ color: 'var(--foreground)', fontWeight: '600', textDecoration: 'none' }}>Log In</Link>
                     <Link href="/signup" className={styles.ctaSmall}>Sign Up</Link>
-                    <ThemeToggle />
                 </div>
             </header>
 
@@ -160,7 +158,7 @@ export default function LandingPage() {
                                     {/* 3. WHY STUDYWISE (DYNAMIC STACK) SECTION */}
             <section className={styles.stackedSection} ref={container}>
                 <FadeIn>
-                     <h2 className={styles.sectionHeading} style={{ textAlign: 'center', marginBottom: '40px' }}>Why Studywise?</h2>
+                     <h2 className={styles.sectionHeading} style={{ textAlign: 'center', marginBottom: '40px', marginTop: '40px' }}>Why Studywise?</h2>
                 </FadeIn>
                 <div className={styles.stackedContainer}>
                 {
@@ -224,18 +222,6 @@ export default function LandingPage() {
                             <span>💬 5</span>
                         </div>
                     </FadeIn>
-                    <FadeIn direction="left" delay={0.4} className={`${styles.mockPostCard} ${styles.mockPostCard2}`}>
-                        <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
-                            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #f59e0b, #ef4444)' }}></div>
-                            <div>
-                                <div style={{ fontWeight: '700', fontSize: '0.9rem' }}>David C.</div>
-                                <div style={{ fontSize: '0.75rem', color: 'var(--secondary)' }}>2h ago • #Python</div>
-                            </div>
-                        </div>
-                        <div style={{ fontSize: '0.9rem', lineHeight: '1.5', marginBottom: '12px' }}>
-                            Anyone want to pair program on the Data Science capstone? 🐍
-                        </div>
-                    </FadeIn>
                 </div>
             </section>
 
@@ -286,7 +272,7 @@ export default function LandingPage() {
                         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                             <div className={styles.avatarRing}><div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'var(--card)' }}></div></div>
                             <div>
-                                <div style={{ fontWeight: '700' }}>Marcus L.</div>
+                                <div style={{ fontWeight: '700' }}>Chinedu O.</div>
                                 <div style={{ fontSize: '0.8rem', color: 'var(--secondary)' }}>Frontend Dev</div>
                             </div>
                         </div>
@@ -299,7 +285,7 @@ export default function LandingPage() {
                         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                             <div className={styles.avatarRing} style={{ background: 'linear-gradient(135deg, #10b981, #3b82f6)' }}><div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'var(--card)' }}></div></div>
                             <div>
-                                <div style={{ fontWeight: '700' }}>Elena R.</div>
+                                <div style={{ fontWeight: '700' }}>Amara N.</div>
                                 <div style={{ fontSize: '0.8rem', color: 'var(--secondary)' }}>Student</div>
                             </div>
                         </div>
@@ -312,7 +298,7 @@ export default function LandingPage() {
                         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                             <div className={styles.avatarRing} style={{ background: 'linear-gradient(135deg, #f59e0b, #ec4899)' }}><div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'var(--card)' }}></div></div>
                             <div>
-                                <div style={{ fontWeight: '700' }}>James K.</div>
+                                <div style={{ fontWeight: '700' }}>Yusuf I.</div>
                                 <div style={{ fontSize: '0.8rem', color: 'var(--secondary)' }}>Data Analyst</div>
                             </div>
                         </div>
@@ -339,32 +325,28 @@ export default function LandingPage() {
                         <div style={{ display: 'flex', gap: '8px', fontWeight: '800', fontSize: '1.2rem', alignItems: 'center' }}>
                             <ZapIcon size={24} fill="var(--primary)" /> Studywise
                         </div>
-                        <p>The AI-powered curriculum designer that helps you master any topic. Flow state on demand.</p>
+                        <p>The AI-powered curriculum designer that helps you master any topic.</p>
                     </div>
                     <div className={styles.footerColumn}>
                         <h4>Product</h4>
                         <div className={styles.footerLinks}>
                             <Link href="/dashboard">Curriculum</Link>
                             <Link href="/community">Community</Link>
-                            <Link href="#">Gamification</Link>
-                            <Link href="#">Pricing</Link>
                         </div>
                     </div>
                     <div className={styles.footerColumn}>
                         <h4>Company</h4>
                         <div className={styles.footerLinks}>
-                            <Link href="#">About Us</Link>
-                            <Link href="#">Careers</Link>
-                            <Link href="#">Blog</Link>
-                            <Link href="#">Contact</Link>
+                            <Link href="/about">About Us</Link>
+                            <Link href="/contact">Contact</Link>
                         </div>
                     </div>
                     <div className={styles.footerColumn}>
                         <h4>Legal</h4>
                         <div className={styles.footerLinks}>
-                            <Link href="#">Privacy Policy</Link>
-                            <Link href="#">Terms of Service</Link>
-                            <Link href="#">Cookie Policy</Link>
+                            <Link href="/privacy-policy">Privacy Policy</Link>
+                            <Link href="/terms-of-service">Terms of Service</Link>
+                            <Link href="/cookie-policy">Cookie Policy</Link>
                         </div>
                     </div>
                 </div>
@@ -386,8 +368,8 @@ function FAQSection() {
 
     const questions = [
         { q: "Is Studywise really free?", a: "Yes! You can generate unlimited curriculums on the free plan. We may introduce premium features later." },
-        { q: "How accurate is the AI?", a: "We use Gemini Ultra 1.5 to curate high-quality resources. The content is constantly vetted by our algorithm." },
-        { q: "Can I customize the curriculum?", a: "Absolutely. You can edit, remove, or reorder modules as you see fit." },
+        { q: "How accurate is the AI?", a: "We use Gemini 3 Pro to curate high-quality resources. The content is constantly vetted by our algorithm." },
+        { q: "Can I customize the curriculum?", a: "Not yet. But in future versions, you should be able to edit, remove, or reorder modules as you see fit." },
         { q: "Is there a mobile app?", a: "Studywise is fully responsive and works great on any device. A native app is coming soon!" }
     ];
 
@@ -436,8 +418,25 @@ function Card({ i, title, subtitle, description, color, children, progress, rang
         className={styles.dynamicCard}
         style={{ scale, top: `calc(-5% + ${i * 25}px)` }}
       >
+        {/* Floating Background Particles */} 
+        {[...Array(15)].map((_, idx) => ( 
+            <div 
+                key={idx} 
+                className={styles.particle} 
+                style={{ 
+                    top: `${Math.random() * 100}%`, 
+                    left: `${Math.random() * 100}%`, 
+                    width: `${Math.random() * 200 + 50}px`, 
+                    height: `${Math.random() * 200 + 50}px`, 
+                    opacity: Math.random() * 0.09 + 0.03, 
+                    animationDuration: `${Math.random() * 10 + 20}s`, 
+                    animationDelay: `${Math.random() * 5}s`, 
+                    background: color,
+                }} 
+            /> 
+        ))}
         <div className={styles.dynamicCardContent}>
-             <h3 style={{ fontSize: '2.5rem', marginBottom: '8px', fontWeight: '800' }}>{title}</h3><div style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--primary)', marginBottom: '24px', letterSpacing: '0px', textTransform: 'none' }}>{subtitle}</div>
+             <h3 style={{ fontSize: '2rem', marginBottom: '8px', fontWeight: '800' }}>{title}</h3><div style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--primary)', marginBottom: '24px', letterSpacing: '0px', textTransform: 'none' }}>{subtitle}</div>
              <p style={{ fontSize: '1.2rem', color: 'var(--secondary)', lineHeight: '1.6' }}>{description}</p>
         </div>
         <div className={styles.dynamicCardVisual} style={{ background: color }}>

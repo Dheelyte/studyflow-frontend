@@ -1,7 +1,7 @@
 "use client";
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { GoogleIcon, GitHubIcon, AppleIcon } from "@/components/Icons";
+import { GoogleIcon, GitHubIcon } from "@/components/Icons";
 import { API_URL } from '@/services/api';
 import styles from '../login/page.module.css';
 import { useAuth } from '@/context/AuthContext';
@@ -106,10 +106,6 @@ export default function SignupPage() {
                     <GitHubIcon size={20} />
                     Sign up with GitHub
                 </a>
-                <button className={styles.socialButton} type="button" disabled style={{opacity: 0.6, cursor: 'not-allowed', backgroundColor: 'rgba(255,255,255,0.05)'}}>
-                    <AppleIcon size={20} />
-                    Sign up with Apple (Coming Soon)
-                </button>
                  <button className={styles.socialButton} type="button" onClick={handleSocialClick}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                     Sign up with Email
@@ -220,7 +216,7 @@ export default function SignupPage() {
 
         <div className={styles.footer}>
             Already have an account? {/* Dynamic link based on redirect */}
-            <Link href={redirect ? `/login?redirect=${encodeURIComponent(redirect)}` : "/login"} className={styles.link}>Log in</Link>
+            <Link href={redirect ? `/signup?redirect=${encodeURIComponent(redirect)}` : "/login"} className={styles.link}>Log in</Link>
         </div>
       </div>
     </div>

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from './Icons';
 import styles from './CommunityStories.module.css';
 import { useCommunity } from './CommunityContext';
+import LoadingLogo from './LoadingLogo';
 
 export default function CommunityStories() {
   const { communities, user, loading } = useCommunity();
@@ -66,7 +67,7 @@ export default function CommunityStories() {
             fontWeight: '700',
             marginLeft: '4px'
         }}>
-           {loading ? "Loading..." : title}
+           {loading ? <LoadingLogo size={20} /> : title}
         </div>
 
         <div className={styles.container}>
