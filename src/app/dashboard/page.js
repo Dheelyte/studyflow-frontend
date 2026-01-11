@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import styles from "./page.module.css";
 import Card from "@/components/Card";
@@ -17,6 +17,7 @@ export default function Dashboard() {
     const [exploreCommunities, setExploreCommunities] = useState([]);
     const [loadingCommunities, setLoadingCommunities] = useState(true);
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { user, checkUser } = useAuth();
 
     // Initial Check & Greeting
@@ -27,7 +28,15 @@ export default function Dashboard() {
         else if (hour < 18) setGreeting('Good afternoon');
         else setGreeting('Good evening');
 
-        checkUser();
+        // Check for login_success from Google Auth redirect
+        if (searchParams && searchParams.get('login_success')) {
+            // Force check to update local session state from HttpOnly cookie
+            checkUser(true);
+            // Clean URL without refresh
+            window.history.replaceState({}, '', '/dashboard');
+        } else {
+            checkUser();
+        }
     }, []); // Run ONCE on mount
 
     // Fetch Playlists and Communities when User is available
