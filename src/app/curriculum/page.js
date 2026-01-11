@@ -347,7 +347,7 @@ export default function CurriculumPage() {
                                                 </div>
                                             </div>
                                         ))}
-                                        <div style={{ marginTop: '1.5rem', padding: '0 1rem 1.5rem 1rem' }}>
+                                        <div style={{ marginTop: '1.5rem' }}>
                                             <button className={styles.resourceCard} style={{ 
                                                 width: '100%', 
                                                 background: 'linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,165,0,0.05))',

@@ -141,6 +141,7 @@ export default function PlaylistPage({ params }) {
 
     const [showShareModal, setShowShareModal] = useState(false);
     const [highlightResource, setHighlightResource] = useState(false);
+    const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     const [showQuizModal, setShowQuizModal] = useState(false);
     const [activeQuizModule, setActiveQuizModule] = useState(null);
 
@@ -409,7 +410,17 @@ export default function PlaylistPage({ params }) {
                 <div className={styles.playlistInfo}>
                     <span className={styles.type}>{(curriculumData.level || "Beginner").toUpperCase()}</span>
                     <h1 className={styles.title}>{curriculumData.curriculum_title}</h1>
-                    <p className={styles.description}>{curriculumData.overview}</p>
+                    <p className={styles.description}>
+                        {isDescriptionExpanded ? curriculumData.overview : (curriculumData.overview?.slice(0, 200) + (curriculumData.overview?.length > 200 ? "..." : ""))}
+                        {curriculumData.overview?.length > 200 && (
+                            <button
+                                onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                                className={styles.showMoreButton}
+                            >
+                                {isDescriptionExpanded ? "Show less" : "Show more"}
+                            </button>
+                        )}
+                    </p>
                 </div>
             </div>
 
@@ -563,7 +574,7 @@ export default function PlaylistPage({ params }) {
                                             </div>
                                         ))}
 
-                                        <div style={{ marginTop: '1.5rem', padding: '0 1rem 1.5rem 1rem' }}>
+                                        <div style={{ marginTop: '1.5rem' }}>
                                             <button
                                                 id={module.isQuizNextUp ? "next-up-resource" : null}
                                                 className={`${styles.resourceCard} ${module.isQuizNextUp ? styles.highlight : ''}`}
