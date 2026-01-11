@@ -141,6 +141,7 @@ export default function PlaylistPage({ params }) {
 
     const [showShareModal, setShowShareModal] = useState(false);
     const [highlightResource, setHighlightResource] = useState(false);
+    const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     const [showQuizModal, setShowQuizModal] = useState(false);
     const [activeQuizModule, setActiveQuizModule] = useState(null);
 
@@ -409,7 +410,17 @@ export default function PlaylistPage({ params }) {
                 <div className={styles.playlistInfo}>
                     <span className={styles.type}>{(curriculumData.level || "Beginner").toUpperCase()}</span>
                     <h1 className={styles.title}>{curriculumData.curriculum_title}</h1>
-                    <p className={styles.description}>{curriculumData.overview}</p>
+                    <p className={styles.description}>
+                        {isDescriptionExpanded ? curriculumData.overview : (curriculumData.overview?.slice(0, 200) + (curriculumData.overview?.length > 200 ? "..." : ""))}
+                        {curriculumData.overview?.length > 200 && (
+                            <button
+                                onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                                className={styles.showMoreButton}
+                            >
+                                {isDescriptionExpanded ? "Show less" : "Show more"}
+                            </button>
+                        )}
+                    </p>
                 </div>
             </div>
 
@@ -545,11 +556,16 @@ export default function PlaylistPage({ params }) {
                                                                     <div className={styles.resourceHeaderRow}>
                                                                         <div className={styles.resourceTitleGroup}>
                                                                             <span className={styles.resourceLabel}>{resource.label}</span>
-                                                                            <span className={styles.resourceTypeBadge}>{resource.type}</span>
                                                                         </div>
-                                                                        {resource.is_completed && <div className={styles.completedIcon}><CheckCircleIcon size={20} fill="#10b981" /></div>}
                                                                     </div>
                                                                     <p className={styles.resourceDescription}>{resource.description}</p>
+                                                                </div>
+                                                                <div className={styles.badgeContainer}>
+                                                                    <span className={styles.xpBadge}>+11 XP</span>
+                                                                <span className={styles.resourceTypeBadge}>
+                                                                    {resource.type === "Video" ? <VideoIcon size={12} /> : <BookOpenIcon size={12} />}
+                                                                    {resource.type}
+                                                                </span>
                                                                 </div>
                                                             </a>
                                                         );
@@ -558,7 +574,7 @@ export default function PlaylistPage({ params }) {
                                             </div>
                                         ))}
 
-                                        <div style={{ marginTop: '1.5rem', padding: '0 1rem 1.5rem 1rem' }}>
+                                        <div style={{ marginTop: '1.5rem' }}>
                                             <button
                                                 id={module.isQuizNextUp ? "next-up-resource" : null}
                                                 className={`${styles.resourceCard} ${module.isQuizNextUp ? styles.highlight : ''}`}

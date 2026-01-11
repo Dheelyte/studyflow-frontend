@@ -14,6 +14,13 @@ export default function SignupPage() {
   const redirect = searchParams.get('redirect');
   const { register, checkUser, user, loading: authLoading } = useAuth();
   const { addToast } = useToast();
+  
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.push(redirect || '/dashboard');
+    }
+  }, [user, authLoading, router, redirect]);
+
   const [error, setError] = useState('');
   const [validationErrors, setValidationErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -56,7 +63,7 @@ export default function SignupPage() {
         await checkUser(true);
 
         // 3. Redirect to Dashboard
-        router.push('/dashboard');
+        router.push(redirect || '/dashboard');
     } catch (err) {
         if (err.validationErrors) {
             setValidationErrors(err.validationErrors);

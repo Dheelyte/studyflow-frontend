@@ -121,7 +121,7 @@
     border-radius: 32px;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 12px; justify-content: center;
     font-size: 1.1rem;
     font-weight: 700;
     border: none;
@@ -191,7 +191,7 @@
 .content {
     max-width: 1000px;
     margin: 0 auto;
-    padding: 0 24px;
+    padding: 0 12px;
 }
 
 /* Learning Objectives */
@@ -215,12 +215,12 @@
     padding: 0;
     margin: 0;
     display: grid;
-    gap: 12px;
+    gap: 12px; justify-content: center;
 }
 
 .objectiveItem {
     display: flex;
-    gap: 12px;
+    gap: 12px; justify-content: center;
     align-items: flex-start;
     color: var(--secondary);
     font-size: 0.95rem;
@@ -323,7 +323,7 @@
     margin-bottom: 16px;
     display: flex;
     align-items: flex-start;
-    gap: 12px;
+    gap: 12px; justify-content: center;
 }
 
 .topicsLabel {
@@ -335,7 +335,7 @@
 
 .topicsContainer {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 8px;
 }
 
@@ -355,7 +355,7 @@
 .resourcesList {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 12px; justify-content: center;
 }
 
 .resourceCard {
@@ -364,7 +364,6 @@
     gap: 16px;
     padding: 16px;
     background: rgba(99, 102, 241, 0.05);
-    /* Lighter background for better contrast */
     border: 1px solid rgba(99, 102, 241, 0.2);
     border-radius: 12px;
     text-decoration: none;
@@ -398,21 +397,20 @@
 
 .nextUpBadge {
     position: absolute;
-    top: -10px;
-    right: 16px;
+    top: -24px;
+    right: 0;
     background: var(--primary);
     color: white;
     font-size: 0.7rem;
     font-weight: 700;
-    padding: 2px 8px;
-    border-radius: 10px;
+    padding: 4px 12px;
+    border-radius: 6px 6px 0 0;
     text-transform: uppercase;
     letter-spacing: 1px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    z-index: 2;
+    box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1);
+    z-index: 11;
 }
 
-/* Highlight Animation */
 @keyframes pulseHighlight {
     0% {
         box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
@@ -461,6 +459,7 @@
     align-items: center;
     gap: 8px;
     flex: 1;
+    padding-top: 12px;
 }
 
 .completedIcon {
@@ -478,14 +477,45 @@
     color: var(--foreground);
 }
 
+.badgeContainer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 10;
+    display: flex;
+    align-items: stretch;
+}
+
+.xpBadge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #d97706;
+    background: rgba(217, 119, 6, 0.1);
+    padding: 4px 8px;
+    border-radius: 0 0 0 12px;
+    white-space: nowrap;
+    border-bottom: 1px solid rgba(217, 119, 6, 0.2);
+    border-left: 1px solid rgba(217, 119, 6, 0.2);
+    display: flex;
+    align-items: center;
+    backdrop-filter: blur(4px);
+}
+
 .resourceTypeBadge {
-    font-size: 0.75rem;
+    font-size: 0.65rem;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     color: var(--primary);
     background: rgba(99, 102, 241, 0.1);
-    padding: 2px 8px;
-    border-radius: 4px;
+    padding: 4px 8px;
+    border-radius: 0 12px 0 0;
+    border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+    border-left: 1px solid rgba(99, 102, 241, 0.2);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .resourceDescription {
@@ -497,7 +527,7 @@
 
 @media (max-width: 768px) {
     .header {
-        padding: 40px 32px;
+        padding: 40px 20px;
         flex-direction: column;
         align-items: flex-start;
     }
@@ -515,23 +545,21 @@
     .objectivesSection,
     .moduleHeader,
     .moduleContent {
-        padding: 24px 16px;
+        padding: 24px 12px;
     }
 
     .lesson {
-        padding: 16px;
+        padding: 12px;
     }
 
-    /* UPDATED: Add padding to controls on mobile */
     .controls {
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         padding: 0 24px;
         width: 100%;
         gap: 12px;
-        /* Reduce gap slightly if needed for wrap */
+        justify-content: center;
     }
 
-    /* UPDATED: Add padding to progress container on mobile */
     .progressContainer {
         padding: 0 24px;
     }
@@ -539,4 +567,27 @@
     .mediaIcon {
         display: none;
     }
+}
+
+@media (max-width: 768px) {
+    .playButton {
+        padding: 12px 24px !important;
+        font-size: 0.95rem;
+        flex: 1;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+.showMoreButton {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 8px;
+    font-size: inherit;
 }

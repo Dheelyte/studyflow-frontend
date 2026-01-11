@@ -97,35 +97,35 @@
 }
 
 .controls {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 16px; 
-  margin-bottom: 24px;
-  z-index: 1;
-  position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    z-index: 1;
+    position: relative;
 }
 
 .playButton {
-  padding: 16px 48px;
-  background-color: var(--primary);
-  color: white;
-  border-radius: 32px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
+    padding: 16px 48px;
+    background-color: var(--primary);
+    color: white;
+    border-radius: 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px; justify-content: center;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.4);
 }
 
 .playButton:hover {
-  background-color: var(--primary-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 20px 30px -10px rgba(79, 70, 229, 0.6);
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 20px 30px -10px rgba(79, 70, 229, 0.6);
 }
 
 .iconButton {
@@ -183,7 +183,7 @@
 .content {
     max-width: 1000px;
     margin: 0 auto;
-    padding: 0 24px; /* Added padding to prevent edge touching */
+    padding: 0 12px; /* Added padding to prevent edge touching */
     /* Removed unified background to allow separation */
 }
 
@@ -413,13 +413,20 @@
 }
 
 .resourceTypeBadge {
-    font-size: 0.75rem;
+    font-size: 0.65rem;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: var(--primary); /* Use primary color for visibility */
+    color: var(--primary);
     background: rgba(99, 102, 241, 0.1);
-    padding: 2px 8px;
-    border-radius: 4px;
+    padding: 4px 8px;
+    border-radius: 0 12px 0 0;
+    border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+    border-left: 1px solid rgba(99, 102, 241, 0.2);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .resourceDescription {
@@ -447,15 +454,19 @@
     }
     
     .objectivesSection, .moduleHeader, .moduleContent {
-        padding: 24px 16px;
+        padding: 24px 12px;
     }
     
     .lesson {
-        padding: 16px;
+        padding: 12px;
     }
     
     .controls {
-        flex-wrap: wrap; 
+        flex-wrap: nowrap;
+        padding: 0 24px;
+        width: 100%;
+        gap: 12px;
+        justify-content: center;
     }
 }
 
@@ -478,4 +489,40 @@
 .resourceDisabled:hover {
   transform: none;
   border-color: rgba(99, 102, 241, 0.2);
+}
+
+.resourceCard {
+    position: relative;
+}
+
+.resourceTitleGroup {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    padding-top: 12px;
+}
+
+.badgeContainer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 10;
+    display: flex;
+    align-items: stretch;
+}
+
+.xpBadge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #d97706;
+    background: rgba(217, 119, 6, 0.1);
+    padding: 4px 8px;
+    border-radius: 0 0 0 12px;
+    white-space: nowrap;
+    border-bottom: 1px solid rgba(217, 119, 6, 0.2);
+    border-left: 1px solid rgba(217, 119, 6, 0.2);
+    display: flex;
+    align-items: center;
+    backdrop-filter: blur(4px);
 }
