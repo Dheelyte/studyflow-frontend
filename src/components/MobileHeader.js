@@ -1,7 +1,7 @@
 "use client";
 import styles from './MobileHeader.module.css';
 import { ZapIcon } from "./Icons";
-import ThemeToggle from './ThemeToggle';
+
 import Link from 'next/link';
 
 export default function MobileHeader({ onMenuClick }) {
@@ -11,7 +11,7 @@ export default function MobileHeader({ onMenuClick }) {
         <ZapIcon size={24} fill="var(--primary)" /> Studywise
       </Link>
       <div style={{display:'flex', alignItems:'center'}}>
-        <ThemeToggle />
+        
       </div>
     </header>
   );

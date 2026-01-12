@@ -118,7 +118,20 @@ export function CommunityProvider({ children }) {
   };
 
   const fetchData = useCallback(async () => {
-    if (typeof window !== 'undefined' && (pathname === '/' || pathname.startsWith('/playlist/') || pathname === '/profile' || pathname.startsWith('/library') || pathname === '/login' || pathname === '/signup' || pathname.startsWith('/curriculum'))) {
+        if (typeof window !== 'undefined' && (
+        pathname === '/' || 
+        pathname.startsWith('/playlist/') || 
+        pathname === '/profile' || 
+        pathname.startsWith('/library') || 
+        pathname === '/login' || 
+        pathname === '/signup' || 
+        pathname.startsWith('/curriculum') ||
+        pathname === '/about' ||
+        pathname === '/contact' ||
+        pathname === '/privacy-policy' ||
+        pathname === '/terms-of-service' ||
+        pathname === '/cookie-policy'
+    )) {
         setLoading(false);
         return;
     }

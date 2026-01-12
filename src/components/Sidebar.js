@@ -4,26 +4,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import styles from './Sidebar.module.css';
 import { HomeIcon, LibraryIcon, ZapIcon, ChevronLeft, ChevronRight, XIcon, LaptopIcon, UserIcon, SunIcon, MoonIcon, UsersIcon } from './Icons';
-import { useTheme } from './ThemeProvider';
 import { useAuth } from '@/context/AuthContext';
 
 export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse, isMobile }) {
   const router = useRouter();
   const { user, logout } = useAuth();
-  const { theme, setTheme } = useTheme();
 
-  const handleToggleTheme = () => {
-      if (theme === 'system') setTheme('light');
-      else if (theme === 'light') setTheme('dark');
-      else setTheme('system');
-  };
 
-  const getThemeIcon = () => {
-      if (theme === 'system') return <LaptopIcon size={14} />;
-      if (theme === 'light') return <SunIcon size={14} />; 
-      return <MoonIcon size={14} />; 
-  };
-  
   const handleNavClick = () => {
       if (isMobile && onClose) {
           onClose();
@@ -72,16 +59,7 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
                     {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
                 </button>
 
-                <button 
-                  className={styles.toggleCollapseBtn}
-                  onClick={handleToggleTheme}
-                  title="Cycle Theme"
-                  style={{
-                      top: '56px', 
-                  }}
-                >
-                   {getThemeIcon()}
-                </button>
+                
               </>
           )}
 

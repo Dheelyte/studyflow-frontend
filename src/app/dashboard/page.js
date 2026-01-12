@@ -123,7 +123,7 @@ export default function Dashboard() {
 
 
             <div className={styles.heroSection}>
-                <h1 className={styles.greeting}>{greeting || 'Hello'}, {user?.first_name || 'Alex'}. Ready to flow?</h1>
+                <h1 className={styles.greeting}>{greeting || 'Hello'}, {user?.first_name || 'Learner'}. Ready to flow?</h1>
                 <IntegratedSearchBar redirect={true} shadow={false} />
             </div>
 
