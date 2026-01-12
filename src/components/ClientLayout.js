@@ -1,6 +1,7 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import React, { useState, useEffect, useRef } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { ChevronLeft } from './Icons';
 import Sidebar from './Sidebar';
 import BottomNav from './BottomNav';
 import MobileHeader from './MobileHeader';
@@ -13,9 +14,28 @@ export default function ClientLayout({ children }) {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  const mainRef = useRef(null);
 
-  // Hide sidebar on auth pages AND Landing Page (root /)
-  const isAuthPage = pathname?.startsWith('/login') || pathname?.startsWith('/signup') || pathname?.startsWith('/forgot-password') || pathname?.startsWith('/reset-password') || pathname === '/';
+  // Reset scroll on pathname change
+  useEffect(() => {
+    if (mainRef.current) {
+      mainRef.current.scrollTop = 0;
+    }
+  }, [pathname]);
+
+  // Hide sidebar on auth pages AND Landing Page (root /) AND Info Pages
+  const isAuthPage = 
+    pathname?.startsWith('/login') || 
+    pathname?.startsWith('/signup') || 
+    pathname?.startsWith('/forgot-password') || 
+    pathname?.startsWith('/reset-password') || 
+    pathname === '/' ||
+    pathname === '/about' ||
+    pathname === '/contact' ||
+    pathname === '/privacy-policy' ||
+    pathname === '/terms-of-service' ||
+    pathname === '/cookie-policy';
 
   // Check screen size for responsiveness
   useEffect(() => {
@@ -67,7 +87,26 @@ export default function ClientLayout({ children }) {
         {isMobile && !isAuthPage && <BottomNav />}
         <div className={styles.mainWrapper}>
             {!isAuthPage && <MobileHeader onMenuClick={toggleSidebar} />}
-            <main className={`${styles.contentScroll} ${!isAuthPage ? styles.withBottomNav : ''}`}>
+             
+            <main ref={mainRef} className={`${styles.contentScroll} ${!isAuthPage ? styles.withBottomNav : ''}`}>
+                {(pathname === '/about' || pathname === '/contact' || pathname === '/privacy-policy' || pathname === '/terms-of-service' || pathname === '/cookie-policy') && (
+                    <div 
+                        onClick={() => router.back()} 
+                        style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            color: '#8A2BE2', 
+                            cursor: 'pointer', 
+                            padding: '20px 20px 0 20px', 
+                            fontSize: '17px', 
+                            fontWeight: '500',
+                            marginBottom: '0px',
+                            flexShrink: 0
+                        }}
+                    >
+                        <ChevronLeft size={24} /> Back
+                    </div>
+                )}
                 {children}
             </main>
         </div>

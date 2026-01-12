@@ -3,11 +3,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import styles from './page.module.css';
 import { ZapIcon, StarIcon, TrophyIconSimple } from '@/components/Icons';
 import { useAuth } from '@/context/AuthContext';
+import { useTheme } from '@/components/ThemeProvider';
 import { users } from '@/services/api'; 
 import EditProfileModal from '@/components/EditProfileModal';
 
 export default function ProfilePage() {
   const { user, updateUser, checkUser, logout } = useAuth();
+  const { theme, setTheme } = useTheme();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const scrollRef = useRef(null);
 
@@ -107,18 +109,18 @@ export default function ProfilePage() {
     }
   }, [heatmapData]);
 
-  const defaultName = "Delight Gbolahan";
-  const defaultHandle = "@delight_dev";
-  const defaultBio = "Full-stack developer in training. Obsessed with React and clean UI. Building Studywise to help others learn faster.";
+  const defaultName = "Learner";
+  const defaultHandle = "@learner";
+  const defaultBio = "Learning every day.";
 
   const displayName = user && user.first_name ? `${user.first_name} ${user.last_name}` : defaultName;
   const displayHandle = user && user.email ? `@${user.email.split('@')[0]}` : defaultHandle;
   const displayBio = user && user.bio ? user.bio : defaultBio;
 
   const effectiveUser = user || {
-    first_name: 'Delight',
-    last_name: 'Gbolahan',
-    email: 'delight@example.com',
+    first_name: 'Learner',
+    last_name: '',
+    email: 'learner@example.com',
     bio: defaultBio
   };
 
@@ -231,7 +233,29 @@ export default function ProfilePage() {
           </div>
       </div>
 
-      <div className={styles.logoutSection}> 
+      
+      {/* Settings Section */}
+      <div className={styles.settingsSection}>
+          <div className={styles.sectionTitle}>
+              <span>Appearance</span>
+          </div>
+          <div className={styles.settingRow}>
+               <div className={styles.settingLabel}>
+                   <span>Dark Mode</span>
+                   <span className={styles.settingDesc}>Use a dark color scheme</span>
+               </div>
+               <label className={styles.switch}>
+                   <input 
+                       type="checkbox" 
+                       checked={theme === 'dark'}
+                       onChange={(e) => setTheme(e.target.checked ? 'dark' : 'light')}
+                   />
+                   <span className={styles.slider}></span>
+               </label>
+          </div>
+      </div>
+
+<div className={styles.logoutSection}> 
           <button onClick={logout} className={styles.logoutBtn}> 
               Log Out 
           </button> 

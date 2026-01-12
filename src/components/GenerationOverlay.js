@@ -51,36 +51,38 @@ export default function GenerationOverlay({ topic, experience, onComplete, isFin
 
     // Progress and Logs timer with stall logic
     useEffect(() => {
-        // Base duration to reach 90%
-        const simulatedDuration = 8000; 
+        // Base duration to reach 99% (40 seconds)
+        const simulatedDuration = 40000; 
         const startTime = Date.now();
         
         const interval = setInterval(() => {
             const elapsed = Date.now() - startTime;
             
-            // Calculate simulated progress up to 90%
-            let p = Math.min((elapsed / simulatedDuration) * 90, 90);
-
-            // If API is finished, we can go past 90% to 100%
+            // If finished, we want to complete quickly
             if (isFinished) {
-               // Fast forward to complete
-               setProgress(prev => {
-                   if (prev >= 100) {
-                       clearInterval(interval);
-                       return 100;
-                   }
-                   return Math.min(prev + 5, 100); // Fast increment
-               });
+                setProgress(prev => {
+                    if (prev >= 100) {
+                        clearInterval(interval);
+                        return 100;
+                    }
+                    // Jump to 100% faster if finished
+                    return Math.min(prev + 5, 100);
+                });
             } else {
-                // If not finished, cap at 90%
-                if (p >= 90) p = 90;
+                // Not finished yet: calculate steady progress
+                // Linear interpolation from 0 to 99 over 40000ms
+                let p = (elapsed / simulatedDuration) * 99;
+                
+                // Cap at 99% if not finished
+                if (p > 99) p = 99;
+                
                 setProgress(p);
             }
 
-            // Logic to drive logs based on progress (still works roughly the same)
-            // Map 0-90% to the first 5 logs, last log reserved for finish
-            const logProgress = isFinished ? 100 : p;
-            const logIndex = Math.floor((logProgress / 100) * LOG_MESSAGES.length);
+            // Logic to drive logs based on progress
+            // Map 0-99% to the available log messages
+            const currentP = isFinished ? 100 : (Math.min((elapsed / simulatedDuration) * 99, 99));
+            const logIndex = Math.floor((currentP / 100) * LOG_MESSAGES.length);
             
             if (logIndex < LOG_MESSAGES.length && LOG_MESSAGES[logIndex]) {
                  setLogs(prev => {

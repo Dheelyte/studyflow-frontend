@@ -233,3 +233,24 @@
     0%, 100% { opacity: 1; }
     50% { opacity: 0; }
 }
+
+
+/* Responsiveness for small height screens */
+@media (max-height: 800px) {
+    /* Scale the entire wrapper down without changing internal dimensions to avoid clipping SVG */
+    .centerWrapper {
+        transform: scale(0.75);
+    }
+    
+    .statusBar {
+        bottom: 20px;
+    }
+    
+    .factBox {
+        padding: 10px;
+    }
+    
+    .logContainer {
+        height: 60px;
+    }
+}
