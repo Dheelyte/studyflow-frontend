@@ -7,6 +7,7 @@ import styles from './page.module.css';
 import { useAuth } from '@/context/AuthContext';
 import { useState, useEffect } from 'react';
 import { useToast } from '@/context/ToastContext';
+import Spinner from '@/components/Spinner';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -98,21 +99,8 @@ export default function LoginPage() {
 
         {verifyingSocialLogin ? (
             <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 0'}}>
-                <div className={styles.spinner} style={{
-                    width: '32px', 
-                    height: '32px', 
-                    border: '3px solid rgba(var(--primary-rgb), 0.3)', 
-                    borderTopColor: 'var(--primary)', 
-                    borderRadius: '50%', 
-                    animation: 'spin 1s linear infinite'
-                }}></div>
+                <Spinner size={32} />
                 <p style={{marginTop: '16px', color: 'var(--foreground-muted)'}}>Verifying login...</p>
-                <style jsx>{`
-                    @keyframes spin {
-                        0% { transform: rotate(0deg); }
-                        100% { transform: rotate(360deg); }
-                    }
-                `}</style>
             </div>
         ) : (
             <>
