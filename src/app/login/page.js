@@ -12,10 +12,39 @@ export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get('redirect');
-  const { login, user, loading: authLoading } = useAuth();
+  const loginSuccess = searchParams.get('login_success');
+  const { login, checkUser, user, loading: authLoading } = useAuth();
   const { addToast } = useToast();
   
+  // New state to track if we are currently verifying a social login
+  const [verifyingSocialLogin, setVerifyingSocialLogin] = useState(false);
+
+  // Effect to handle social login success callback
   useEffect(() => {
+    const handleSocialLogin = async () => {
+        if (loginSuccess === 'true' && !user) {
+            setVerifyingSocialLogin(true);
+            try {
+                // Force a session check because the backend set the cookie
+                await checkUser(true);
+                // The main auth effect below will handle the redirect when 'user' becomes available
+            } catch (err) {
+                console.error("Social login verification failed", err);
+                addToast('Social login failed to verify session', 'error');
+                setVerifyingSocialLogin(false);
+            }
+        }
+    };
+    
+    // Only run if we aren't already logged in or loading
+    if (!authLoading) {
+        handleSocialLogin();
+    }
+  }, [loginSuccess, authLoading, checkUser, addToast, user]);
+
+  useEffect(() => {
+    // If we have a user, redirect. 
+    // This works for both normal login and successful social login (after checkUser updates user)
     if (!authLoading && user) {
       router.push(redirect || '/dashboard');
     }
@@ -67,69 +96,89 @@ export default function LoginPage() {
             
         </div>
 
-        
-
-        {!showEmailForm ? (
-            <div className={styles.socialButtons}>
-                <a href={`${API_URL}/auth/login/google`} className={styles.socialButton} style={{textDecoration: 'none', color: 'inherit'}}>
-                    <GoogleIcon size={20} />
-                    Continue with Google
-                </a>
-                <a href={`${API_URL}/auth/login/github`} className={styles.socialButton} style={{textDecoration: 'none', color: 'inherit'}}>
-                    <GitHubIcon size={20} />
-                    Continue with GitHub
-                </a>
-                 <button className={styles.socialButton} type="button" onClick={() => setShowEmailForm(true)}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                    Continue with Email
-                </button>
+        {verifyingSocialLogin ? (
+            <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 0'}}>
+                <div className={styles.spinner} style={{
+                    width: '32px', 
+                    height: '32px', 
+                    border: '3px solid rgba(var(--primary-rgb), 0.3)', 
+                    borderTopColor: 'var(--primary)', 
+                    borderRadius: '50%', 
+                    animation: 'spin 1s linear infinite'
+                }}></div>
+                <p style={{marginTop: '16px', color: 'var(--foreground-muted)'}}>Verifying login...</p>
+                <style jsx>{`
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                `}</style>
             </div>
         ) : (
-            <form className={styles.form} onSubmit={handleSubmit}>
-                <div style={{marginBottom: '16px'}}>
-                    <button 
-                        type="button" 
-                        onClick={() => setShowEmailForm(false)}
-                        style={{background:'none', border:'none', cursor:'pointer', display:'flex', alignItems:'center', gap:'4px', color:'var(--foreground-muted)', fontSize:'0.9rem'}}
-                    >
-                        &lt; Back
-                    </button>
-                </div>
-
-
-                <div className={styles.inputGroup}>
-                    <label className={styles.label} htmlFor="email">Email</label>
-                    <input 
-                        type="email" 
-                        id="email" 
-                        name="email"
-                        placeholder="you@example.com" 
-                        className={styles.input} 
-                        required 
-                    />
-                    {validationErrors.email && <div style={{color: '#ef4444', fontSize: '0.85rem', marginTop: '4px'}}>{validationErrors.email}</div>}
-                </div>
-                
-                <div className={styles.inputGroup}>
-                    <div style={{display:'flex', justifyContent:'space-between'}}>
-                        <label className={styles.label} htmlFor="password">Password</label>
-                        <Link href="/forgot-password" className={styles.link} style={{fontSize:'0.85rem'}}>Forgot?</Link>
+            <>
+                {!showEmailForm ? (
+                    <div className={styles.socialButtons}>
+                        <a href={`${API_URL}/auth/login/google`} className={styles.socialButton} style={{textDecoration: 'none', color: 'inherit'}}>
+                            <GoogleIcon size={20} />
+                            Continue with Google
+                        </a>
+                        <a href={`${API_URL}/auth/login/github`} className={styles.socialButton} style={{textDecoration: 'none', color: 'inherit'}}>
+                            <GitHubIcon size={20} />
+                            Continue with GitHub
+                        </a>
+                        <button className={styles.socialButton} type="button" onClick={() => setShowEmailForm(true)}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                            Continue with Email
+                        </button>
                     </div>
-                    <input 
-                        type="password" 
-                        id="password" 
-                        name="password"
-                        placeholder="••••••••" 
-                        className={styles.input} 
-                        required 
-                    />
-                     {validationErrors.password && <div style={{color: '#ef4444', fontSize: '0.85rem', marginTop: '4px'}}>{validationErrors.password}</div>}
-                </div>
+                ) : (
+                    <form className={styles.form} onSubmit={handleSubmit}>
+                        <div style={{marginBottom: '16px'}}>
+                            <button 
+                                type="button" 
+                                onClick={() => setShowEmailForm(false)}
+                                style={{background:'none', border:'none', cursor:'pointer', display:'flex', alignItems:'center', gap:'4px', color:'var(--foreground-muted)', fontSize:'0.9rem'}}
+                            >
+                                &lt; Back
+                            </button>
+                        </div>
 
-                <button type="submit" className={styles.primaryButton} disabled={loading}>
-                    {loading ? 'Signing In...' : 'Sign In'}
-                </button>
-            </form>
+
+                        <div className={styles.inputGroup}>
+                            <label className={styles.label} htmlFor="email">Email</label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email"
+                                placeholder="you@example.com" 
+                                className={styles.input} 
+                                required 
+                            />
+                            {validationErrors.email && <div style={{color: '#ef4444', fontSize: '0.85rem', marginTop: '4px'}}>{validationErrors.email}</div>}
+                        </div>
+                        
+                        <div className={styles.inputGroup}>
+                            <div style={{display:'flex', justifyContent:'space-between'}}>
+                                <label className={styles.label} htmlFor="password">Password</label>
+                                <Link href="/forgot-password" className={styles.link} style={{fontSize:'0.85rem'}}>Forgot?</Link>
+                            </div>
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password"
+                                placeholder="••••••••" 
+                                className={styles.input} 
+                                required 
+                            />
+                            {validationErrors.password && <div style={{color: '#ef4444', fontSize: '0.85rem', marginTop: '4px'}}>{validationErrors.password}</div>}
+                        </div>
+
+                        <button type="submit" className={styles.primaryButton} disabled={loading}>
+                            {loading ? 'Signing In...' : 'Sign In'}
+                        </button>
+                    </form>
+                )}
+            </>
         )}
 
         <div className={styles.footer}>
