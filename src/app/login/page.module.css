@@ -1,6 +1,13 @@
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .container {
@@ -19,12 +26,12 @@
   border: 1px solid var(--border);
   border-radius: 24px;
   padding: 40px 15px;
-  box-shadow: 0 20px 40px -10px rgba(0,0,0,0.3);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(20px);
   display: flex;
   flex-direction: column;
   gap: 32px;
-  
+
   /* Animation */
   opacity: 0;
   animation: fadeInUp 0.6s ease-out forwards;
@@ -65,7 +72,7 @@
 }
 
 .input {
-  background: rgba(255,255,255,0.03);
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 12px 16px;
@@ -104,7 +111,7 @@
 }
 
 .primaryButton:active {
-    transform: translateY(0);
+  transform: translateY(0);
 }
 
 .divider {
@@ -148,7 +155,7 @@
   background: var(--hover);
   border-color: var(--secondary);
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px -3px rgba(0,0,0,0.1);
+  box-shadow: 0 5px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 .footer {
@@ -180,7 +187,7 @@
 
 .backButton {
   position: absolute;
-  left: 0; 
+  left: 0;
   display: flex;
   align-items: center;
   gap: 4px;
