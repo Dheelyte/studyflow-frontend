@@ -8,7 +8,8 @@
     backdrop-filter: blur(5px);
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
+    overflow-y: auto;
     z-index: 9999;
     padding: 20px;
     animation: fadeIn 0.2s ease-out;
@@ -25,6 +26,7 @@
 }
 
 .modal {
+    margin: auto;
     background: var(--background, #fff);
     /* Fallback or theme var */
     padding: 30px;
@@ -36,7 +38,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    overflow: hidden;
+    overflow: visible;
 }
 
 /* Dark mode generic reset if vars aren't set perfectly */
@@ -88,8 +90,8 @@
 
 /* The Card Styling */
 .shareCard {
-    width: 600px;
-    height: 350px;
+    width: 500px;
+    height: 500px;
     flex-shrink: 0;
     background: #0f172a;
     /* Always dark Slate 900 for the card for premium look */
@@ -160,7 +162,7 @@
     align-items: center;
     position: relative;
     z-index: 10;
-    margin-bottom: 30px;
+    margin-bottom: 40px;
 }
 
 .appLogo {
@@ -281,14 +283,17 @@
     margin: 0 20px;
 }
 
-.footerMsg {
-    margin-top: 24px;
+.footerDomain {
+    margin-top: auto;
+    margin-bottom: 20px;
     text-align: center;
     font-size: 0.9rem;
     color: #64748b;
     position: relative;
     z-index: 10;
-    font-style: italic;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    opacity: 0.8;
 }
 
 .downloadBtn {

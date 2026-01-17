@@ -62,7 +62,6 @@ export default function StatShareModal({ isOpen, onClose, stats, user }) {
                         <div className={styles.gradientBg}></div>
                         <div className={styles.circle1}></div>
                         <div className={styles.circle2}></div>
-                        <div className={styles.gridOverlay}></div>
 
                         <div className={styles.cardHeader}>
                             <div className={styles.appLogo}>
@@ -78,7 +77,6 @@ export default function StatShareModal({ isOpen, onClose, stats, user }) {
                             </div>
                             <div className={styles.userDetails}>
                                 <div className={styles.userName}>{username}</div>
-                                <div className={styles.userHandle}>{handle}</div>
                             </div>
                             <div className={styles.badge}>
                                 {stats.title}
@@ -109,9 +107,8 @@ export default function StatShareModal({ isOpen, onClose, stats, user }) {
                                 </div>
                             </div>
                         </div>
-
-                        <div className={styles.footerMsg}>
-                            Make every day count.
+                        <div className={styles.footerDomain}>
+                            www.studywise.com
                         </div>
                     </div>
                 </div>
