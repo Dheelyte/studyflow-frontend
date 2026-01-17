@@ -6,14 +6,16 @@ import styles from "./page.module.css";
 import Card from "@/components/Card";
 import SkeletonCard from "@/components/SkeletonCard";
 import IntegratedSearchBar from "@/components/IntegratedSearchBar";
-import { ZapIcon, StarIcon, TrophyIconSimple, UsersIcon } from '@/components/Icons';
+import { ZapIcon, StarIcon, TrophyIconSimple, UsersIcon, ShareIcon } from '@/components/Icons';
 import { useAuth } from '@/context/AuthContext';
 import { curriculum, communities } from '@/services/api';
+import StatShareModal from '@/components/StatShareModal';
 
 export default function Dashboard() {
     const [greeting, setGreeting] = useState('');
     const [playlists, setPlaylists] = useState([]);
     const [loadingPlaylists, setLoadingPlaylists] = useState(true);
+    const [isShareModalOpen, setIsShareModalOpen] = useState(false);
     const [exploreCommunities, setExploreCommunities] = useState([]);
     const [loadingCommunities, setLoadingCommunities] = useState(true);
     const [myCommunities, setMyCommunities] = useState([]);
@@ -39,7 +41,7 @@ export default function Dashboard() {
         } else {
             checkUser();
         }
-    },[]); // Run ONCE on mount
+    }, []); // Run ONCE on mount
 
     // Fetch Playlists and Communities when User is available
     useEffect(() => {
@@ -130,6 +132,9 @@ export default function Dashboard() {
             {/* Stats Grid */}
             <div className={styles.statsGrid}>
                 <div className={styles.statCard}>
+                    <button className={styles.shareBtn} onClick={() => setIsShareModalOpen(true)} title="Share Stats">
+                        <ShareIcon size={16} />
+                    </button>
                     <div className={styles.statIcon} style={{ color: '#eab308' }}>
                         <ZapIcon size={24} fill="currentColor" />
                     </div>
@@ -139,6 +144,9 @@ export default function Dashboard() {
                     </div>
                 </div>
                 <div className={styles.statCard}>
+                    <button className={styles.shareBtn} onClick={() => setIsShareModalOpen(true)} title="Share Stats">
+                        <ShareIcon size={16} />
+                    </button>
                     <div className={styles.statIcon} style={{ color: '#3b82f6' }}>
                         <StarIcon size={24} fill="currentColor" />
                     </div>
@@ -148,6 +156,9 @@ export default function Dashboard() {
                     </div>
                 </div>
                 <div className={styles.statCard}>
+                    <button className={styles.shareBtn} onClick={() => setIsShareModalOpen(true)} title="Share Stats">
+                        <ShareIcon size={16} />
+                    </button>
                     <div className={styles.statIcon} style={{ color: '#10b981' }}>
                         <TrophyIconSimple size={24} />
                     </div>
@@ -185,8 +196,8 @@ export default function Dashboard() {
                 </div>
             </section>
 
-             {/* My Communities Section */}
-             <section className={styles.section}>
+            {/* My Communities Section */}
+            <section className={styles.section}>
                 <div className={styles.sectionHeader}>
                     <h2 className={styles.sectionTitle}>My Communities</h2>
                     <Link href="/community" className={styles.showAll}>View All</Link>
@@ -200,18 +211,18 @@ export default function Dashboard() {
                     ) : myCommunities.length > 0 ? (
                         myCommunities.map((comm) => (
                             <Link key={comm.id} href={'/community/' + comm.id} style={{ minWidth: '280px', display: 'block', textDecoration: 'none' }}>
-                                <Card 
-                                    title={comm.name} 
+                                <Card
+                                    title={comm.name}
                                     description={comm.member_count + ' Members • ' + (comm.description || 'Join the discussion')}
-                                    color="linear-gradient(135deg, #4f46e5, #818cf8)" 
-                                    icon={UsersIcon} 
+                                    color="linear-gradient(135deg, #4f46e5, #818cf8)"
+                                    icon={UsersIcon}
                                 />
                             </Link>
                         ))
                     ) : (
                         <div style={{ color: 'var(--secondary)', padding: '20px', minWidth: '300px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                             <span>You haven&apos;t joined any communities yet.</span>
-                             <Link href="/community" style={{ color: 'var(--primary)', fontWeight: '600', textDecoration: 'none' }}>Find a community →</Link>
+                            <Link href="/community" style={{ color: 'var(--primary)', fontWeight: '600', textDecoration: 'none' }}>Find a community →</Link>
                         </div>
                     )}
                 </div>
@@ -233,11 +244,11 @@ export default function Dashboard() {
                     ) : exploreCommunities.length > 0 ? (
                         exploreCommunities.map((comm) => (
                             <Link key={comm.id} href={'/community/' + comm.id} style={{ minWidth: '280px', display: 'block', textDecoration: 'none' }}>
-                                <Card 
-                                    title={comm.name} 
+                                <Card
+                                    title={comm.name}
                                     description={comm.member_count + ' Members • ' + (comm.description || 'Join the discussion')}
-                                    color="linear-gradient(135deg, #0f172a, #334155)" 
-                                    icon={UsersIcon} 
+                                    color="linear-gradient(135deg, #0f172a, #334155)"
+                                    icon={UsersIcon}
                                 />
                             </Link>
                         ))
@@ -250,6 +261,13 @@ export default function Dashboard() {
             </section>
 
 
+
+            <StatShareModal
+                isOpen={isShareModalOpen}
+                onClose={() => setIsShareModalOpen(false)}
+                stats={stats}
+                user={user}
+            />
         </div>
     );
 }

@@ -1,0 +1,337 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    padding: 20px;
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.modal {
+    background: var(--background, #fff);
+    /* Fallback or theme var */
+    padding: 30px;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 700px;
+    position: relative;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* Dark mode generic reset if vars aren't set perfectly */
+:global([data-theme='dark']) .modal {
+    background: #1e293b;
+    border: 1px solid #334155;
+}
+
+.closeBtn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--secondary, #64748b);
+    padding: 5px;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.closeBtn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--foreground, #000);
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--foreground, #0f172a);
+}
+
+.subtitle {
+    color: var(--secondary, #64748b);
+    margin-bottom: 24px;
+    font-size: 0.95rem;
+}
+
+.previewContainer {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+    overflow-x: auto;
+    padding: 10px;
+    background: transparent;
+}
+
+/* The Card Styling */
+.shareCard {
+    width: 600px;
+    height: 350px;
+    flex-shrink: 0;
+    background: #0f172a;
+    /* Always dark Slate 900 for the card for premium look */
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+    border: 1px solid #334155;
+    background-image: linear-gradient(to bottom right, #0f172a, #1e293b);
+}
+
+.gradientBg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.15), transparent 40%),
+        radial-gradient(circle at bottom left, rgba(236, 72, 153, 0.15), transparent 40%);
+    pointer-events: none;
+}
+
+.circle1 {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    background: #6366f1;
+    border-radius: 50%;
+    top: -100px;
+    right: -50px;
+    opacity: 0.1;
+    filter: blur(60px);
+}
+
+.circle2 {
+    position: absolute;
+    width: 250px;
+    height: 250px;
+    background: #ec4899;
+    border-radius: 50%;
+    bottom: -80px;
+    left: -40px;
+    opacity: 0.1;
+    filter: blur(60px);
+}
+
+.gridOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 30px 30px;
+    opacity: 0.5;
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 10;
+    margin-bottom: 30px;
+}
+
+.appLogo {
+    display: flex;
+    align-items: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    gap: 8px;
+    color: #f8fafc;
+}
+
+.logoIcon {
+    font-size: 1.2rem;
+}
+
+.date {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.userInfo {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+    z-index: 10;
+    margin-bottom: auto;
+}
+
+.avatar {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.userDetails {
+    display: flex;
+    flex-direction: column;
+}
+
+.userName {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #f8fafc;
+}
+
+.userHandle {
+    font-size: 0.9rem;
+    color: #94a3b8;
+}
+
+.badge {
+    margin-left: auto;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #cbd5e1;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.statsRow {
+    display: flex;
+    z-index: 10;
+    background: rgba(30, 41, 59, 0.6);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    padding: 20px 30px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    justify-content: space-between;
+    align-items: center;
+}
+
+.statBox {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex: 1;
+}
+
+.statLabel {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #94a3b8;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+.statValue {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.statUnit {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #64748b;
+    margin-left: 4px;
+}
+
+.divider {
+    width: 1px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 0 20px;
+}
+
+.footerMsg {
+    margin-top: 24px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #64748b;
+    position: relative;
+    z-index: 10;
+    font-style: italic;
+}
+
+.downloadBtn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #0f172a;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+:global([data-theme='dark']) .downloadBtn {
+    background: #fff;
+    color: #0f172a;
+}
+
+.downloadBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.downloadBtn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 640px) {
+    .previewContainer {
+        justify-content: flex-start;
+        /* Alignment for scroll */
+    }
+
+    .shareCard {
+        transform-origin: left center;
+        /* We can scale it down if we want it to fit without scrolling, but scrolling is also fine. */
+    }
+}
