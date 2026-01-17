@@ -18,7 +18,7 @@ export default function StatShareModal({ isOpen, onClose, stats, user }) {
             await new Promise(resolve => setTimeout(resolve, 500));
 
             const canvas = await html2canvas(cardRef.current, {
-                scale: 3, // High resolution
+                scale: 2, // Retina resolution (2x) for better performance/size
                 backgroundColor: null,
                 useCORS: true,
                 logging: false,
