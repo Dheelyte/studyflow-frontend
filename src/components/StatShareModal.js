@@ -60,15 +60,33 @@ export default function StatShareModal({ isOpen, onClose, stats, user }) {
                     <div className={styles.shareCard} ref={cardRef}>
                         {/* Background abstract shapes */}
                         <div className={styles.gradientBg}></div>
-                        <div className={styles.circle1}></div>
-                        <div className={styles.circle2}></div>
+                        <div className={styles.confetti1}></div>
+                        <div className={styles.confetti2}></div>
+                        <div className={styles.confetti3}></div>
 
                         <div className={styles.cardHeader}>
-                            <div className={styles.appLogo}>
-                                <span className={styles.logoIcon}>⚡</span>
-                                <span>Studywise</span>
+                            <div className={styles.funTagline}>
+                                I&apos;m on fire! 🔥
                             </div>
-                            <div className={styles.date}>{new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                        </div>
+
+                        <div className={styles.mainStats}>
+                            <div className={styles.mainStatItem}>
+                                <div className={styles.mainStatValue}>{stats.streak}</div>
+                                <div className={styles.mainStatLabel}>Day Streak</div>
+                            </div>
+                        </div>
+
+                        <div className={styles.secondaryStatsRow}>
+                            <div className={styles.secondaryStat}>
+                                <span className={styles.secValue}>{stats.totalXp >= 1000 ? (stats.totalXp / 1000).toFixed(1) + 'k' : stats.totalXp}</span>
+                                <span className={styles.secLabel}>Total XP</span>
+                            </div>
+                            <div className={styles.divider}></div>
+                            <div className={styles.secondaryStat}>
+                                <span className={styles.secValue}>{stats.level}</span>
+                                <span className={styles.secLabel}>Level</span>
+                            </div>
                         </div>
 
                         <div className={styles.userInfo}>
@@ -77,38 +95,14 @@ export default function StatShareModal({ isOpen, onClose, stats, user }) {
                             </div>
                             <div className={styles.userDetails}>
                                 <div className={styles.userName}>{username}</div>
-                            </div>
-                            <div className={styles.badge}>
-                                {stats.title}
+                                <div className={styles.userBadge}>{stats.title}</div>
                             </div>
                         </div>
 
-                        <div className={styles.statsRow}>
-                            <div className={styles.statBox}>
-                                <div className={styles.statLabel}>Day Streak</div>
-                                <div className={styles.statValue} style={{ color: '#facc15' }}>
-                                    {stats.streak}
-                                    <span className={styles.statUnit}>days</span>
-                                </div>
-                            </div>
-                            <div className={styles.divider}></div>
-                            <div className={styles.statBox}>
-                                <div className={styles.statLabel}>Total XP</div>
-                                <div className={styles.statValue} style={{ color: '#60a5fa' }}>
-                                    {stats.totalXp >= 1000 ? (stats.totalXp / 1000).toFixed(1) + 'k' : stats.totalXp}
-                                    <span className={styles.statUnit}>xp</span>
-                                </div>
-                            </div>
-                            <div className={styles.divider}></div>
-                            <div className={styles.statBox}>
-                                <div className={styles.statLabel}>Current Level</div>
-                                <div className={styles.statValue} style={{ color: '#34d399' }}>
-                                    {stats.level}
-                                </div>
-                            </div>
-                        </div>
                         <div className={styles.footerDomain}>
-                            www.studywise.com
+                            <span>Join me on </span>
+                            <span className={styles.brandName}>Studywise</span>
+                            <span className={styles.brandUrl}>www.studywise.com</span>
                         </div>
                     </div>
                 </div>
