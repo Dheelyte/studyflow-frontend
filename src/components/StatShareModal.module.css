@@ -11,7 +11,7 @@
     align-items: flex-start;
     overflow-y: auto;
     z-index: 9999;
-    padding: 20px;
+    padding: 10px;
     animation: fadeIn 0.2s ease-out;
 }
 
@@ -28,7 +28,7 @@
 .modal {
     margin: auto;
     background: var(--background, #fff);
-    padding: 30px;
+    padding: 40px 10px 30px;
     border-radius: 24px;
     width: 100%;
     max-width: 700px;
@@ -356,10 +356,15 @@
 /* Mobile Adjustments */
 @media (max-width: 640px) {
     .previewContainer {
-        justify-content: flex-start;
+        justify-content: center;
+        overflow: hidden;
+        height: 310px;
+        /* Match scaled height (500 * 0.6 + wiggle room) */
     }
 
     .shareCard {
-        transform-origin: left center;
+        transform: scale(0.6);
+        transform-origin: center top;
+        /* Pull content up since scale doesn't affect flow */
     }
 }
