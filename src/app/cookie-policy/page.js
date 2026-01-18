@@ -3,7 +3,7 @@ export default function CookiePolicy() {
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '120px 24px 80px' }}>
       <h1 style={{ fontSize: '3rem', fontWeight: '800', marginBottom: '24px' }}>Cookie Policy</h1>
       <p style={{ color: 'var(--secondary)', marginBottom: '40px' }}>Last updated: January 11, 2026</p>
-      
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', lineHeight: '1.6' }}>
         <section>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '16px' }}>1. What Are Cookies</h2>
@@ -31,17 +31,17 @@ export default function CookiePolicy() {
         </section>
 
         <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '16px' }}>4. Your Choices</h2>
-            <p style={{ color: 'var(--secondary)' }}>
-                If you'd like to delete cookies or instruct your web browser to delete or refuse cookies, please visit the help pages of your web browser. Please note, however, that if you delete cookies or refuse to accept them, you might not be able to use all of the features we offer, you may not be able to store your preferences, and some of our pages might not display properly.
-            </p>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '16px' }}>4. Your Choices</h2>
+          <p style={{ color: 'var(--secondary)' }}>
+            If you'd like to delete cookies or instruct your web browser to delete or refuse cookies, please visit the help pages of your web browser. Please note, however, that if you delete cookies or refuse to accept them, you might not be able to use all of the features we offer, you may not be able to store your preferences, and some of our pages might not display properly.
+          </p>
         </section>
-        
+
         <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '16px' }}>5. Contact Us</h2>
-            <p style={{ color: 'var(--secondary)' }}>
-                If you have any questions about this Cookie Policy, please contact us at: support@studywise.example.com
-            </p>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '16px' }}>5. Contact Us</h2>
+          <p style={{ color: 'var(--secondary)' }}>
+            If you have any questions about this Cookie Policy, please contact us at: SkillPrima@gmail.com
+          </p>
         </section>
       </div>
     </div>

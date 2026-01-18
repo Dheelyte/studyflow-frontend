@@ -25,7 +25,7 @@ export default function StatShareModal({ isOpen, onClose, stats, user }) {
             });
 
             const link = document.createElement('a');
-            link.download = `studywise-stats-${Date.now()}.png`;
+            link.download = `SkillPrima-stats-${Date.now()}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
         } catch (err) {
@@ -43,7 +43,6 @@ export default function StatShareModal({ isOpen, onClose, stats, user }) {
     }
 
     const username = user?.first_name ? `${user.first_name} ${user.last_name || ''}` : 'Learner';
-    const handle = user?.email ? `@${user.email.split('@')[0]}` : '@studywise';
 
     return (
         <div className={styles.overlay} onClick={handleOverlayClick}>
@@ -101,8 +100,8 @@ export default function StatShareModal({ isOpen, onClose, stats, user }) {
 
                         <div className={styles.footerDomain}>
                             <span>Join me on </span>
-                            <span className={styles.brandName}>Studywise</span>
-                            <span className={styles.brandUrl}>www.studywise.com</span>
+                            <span className={styles.brandName}>SkillPrima</span>
+                            <span className={styles.brandUrl}>www.skillprima.com</span>
                         </div>
                     </div>
                 </div>

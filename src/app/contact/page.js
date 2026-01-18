@@ -5,25 +5,25 @@ export default function ContactPage() {
       <p style={{ fontSize: '1.25rem', color: 'var(--secondary)', marginBottom: '60px', lineHeight: '1.6' }}>
         Have questions, feedback, or just want to say hello? We'd love to hear from you.
       </p>
-      
+
       <div style={{ display: 'grid', gap: '40px' }}>
         <div style={{ background: 'var(--card)', padding: '32px', borderRadius: '24px', border: '1px solid var(--border)' }}>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '20px' }}>Get in Touch</h2>
-          
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <div>
               <div style={{ fontWeight: '600', marginBottom: '4px' }}>Email Support</div>
-              <a href="mailto:support@studywise.example.com" style={{ color: 'var(--primary)', fontSize: '1.1rem', textDecoration: 'none' }}>support@studywise.example.com</a>
+              <a href="mailto:skillprima@gmail.com" style={{ color: 'var(--primary)', fontSize: '1.1rem', textDecoration: 'none' }}>SkillPrima@gmail.com.com</a>
             </div>
-            
+
             <div>
               <div style={{ fontWeight: '600', marginBottom: '4px' }}>Twitter / X</div>
-              <a href="https://twitter.com/studywise" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', fontSize: '1.1rem', textDecoration: 'none' }}>@studywise</a>
+              <a href="https://twitter.com/SkillPrima" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', fontSize: '1.1rem', textDecoration: 'none' }}>@SkillPrima</a>
             </div>
-            
+
             <div>
               <div style={{ fontWeight: '600', marginBottom: '4px' }}>Join our Discord</div>
-              <a href="#" style={{ color: 'var(--primary)', fontSize: '1.1rem', textDecoration: 'none' }}>Studywise Community</a>
+              <a href="#" style={{ color: 'var(--primary)', fontSize: '1.1rem', textDecoration: 'none' }}>SkillPrima Community</a>
             </div>
           </div>
         </div>

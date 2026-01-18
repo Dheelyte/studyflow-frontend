@@ -66,7 +66,7 @@ export default function LandingPage() {
 
             <header className={styles.header}>
                 <div className={styles.headerBrand}>
-                    <ZapIcon size={24} fill="var(--primary)" /> Studywise
+                    <ZapIcon size={24} fill="var(--primary)" /> SkillPrima
                 </div>
                 <div className={styles.headerActions}>
                     <Link href="/login" style={{ color: 'var(--foreground)', fontWeight: '600', textDecoration: 'none' }}>Log In</Link>
@@ -86,7 +86,7 @@ export default function LandingPage() {
                 </FadeIn>
 
                 <FadeIn direction="up" delay={0.2} className={styles.heroFooter} style={{ width: '100%', flexDirection: 'column' }}>
-                   <div className={styles.marqueeContainer} style={{ maxWidth: '900px', margin: '0 auto', maskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)' }}>
+                    <div className={styles.marqueeContainer} style={{ maxWidth: '900px', margin: '0 auto', maskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)' }}>
                         <div className={styles.marqueeTrack} style={{ animationDuration: '60s' }}>
                             {marqueeExamples.map((ex, i) => (
                                 <span key={`${ex}-${i}`} className={styles.examplePill} style={{ whiteSpace: 'nowrap' }}>
@@ -94,7 +94,7 @@ export default function LandingPage() {
                                 </span>
                             ))}
                         </div>
-                   </div>
+                    </div>
                 </FadeIn>
 
                 <FadeIn direction="up" delay={0.3} style={{ width: '100%', maxWidth: '900px', marginTop: '12px' }}>
@@ -155,41 +155,41 @@ export default function LandingPage() {
                 </div>
             </section>
 
-                                    {/* 3. WHY STUDYWISE (DYNAMIC STACK) SECTION */}
+            {/* 3. WHY SkillPrima (DYNAMIC STACK) SECTION */}
             <section className={styles.stackedSection} ref={container}>
                 <FadeIn>
-                     <h2 className={styles.sectionHeading} style={{ textAlign: 'center', marginBottom: '40px', marginTop: '40px' }}>Why Studywise?</h2>
+                    <h2 className={styles.sectionHeading} style={{ textAlign: 'center', marginBottom: '40px', marginTop: '40px' }}>Why SkillPrima?</h2>
                 </FadeIn>
                 <div className={styles.stackedContainer}>
-                {
-                    [
-                        {
-                            title: "AI-Curated Paths", subtitle: "Personalized curriculum tailored to you",
-                            desc: "We don't just serve you random videos. Our Gemini-powered engine analyzes thousands of resources to create a cohesive, step-by-step curriculum.",
-                            color: "linear-gradient(135deg, #6366f1, #8b5cf6)", 
-                            visual: (<div className={styles.visualMockup}><div className={styles.pathContainer}><div className={styles.pathLine}></div><div className={styles.pathNode}><div className={styles.pathIcon}><PlayIcon size={12} fill="var(--primary)" /></div><span style={{fontSize: "0.9rem", fontWeight: "600"}}>React Basics</span></div><div className={styles.pathNode}><div className={styles.pathIcon}><ZapIcon size={12} fill="var(--primary)" /></div><span style={{fontSize: "0.9rem", fontWeight: "600"}}>Advanced Hooks</span></div><div className={styles.pathNode}><div className={styles.pathIcon}><StarIcon size={12} fill="var(--primary)" /></div><span style={{fontSize: "0.9rem", fontWeight: "600"}}>Capstone Project</span></div></div></div>)
-                        },
-                        {
-                            title: "Gamified Motivation", subtitle: "Track progress with streaks and XP",
-                            desc: "Stay consistent with streaks, XP, and daily goals. We turn learning into a game you actually want to play.",
-                            color: "linear-gradient(135deg, #eab308, #f59e0b)",
-                            visual: (<div className={styles.streakCard}><div className={styles.streakFlame}>🔥</div><div className={styles.streakText}>12 Day Streak</div></div>)
-                        },
-                        {
-                            title: "Community Powered", subtitle: "Join communities for every topic",
-                            desc: "Never learn alone. Join niche communities for every topic. Share your notes and ask questions.",
-                            color: "linear-gradient(135deg, #ec4899, #f43f5e)",
-                            visual: (<div className={styles.chatContainer}><div className={`${styles.chatBubble} ${styles.chatLeft}`}>Has anyone finished module 4? 🙋‍♀️</div><div className={`${styles.chatBubble} ${styles.chatRight}`}>Yes! The visualizer helps properly.</div></div>)
-                        }
-                    ].map((card, i) => {
-                        const targetScale = 1 - ( (3 - i) * 0.05);
-                        return <Card key={i} i={i} {...card} progress={scrollYProgress} range={[i * 0.25, 1]} targetScale={targetScale}>{card.visual}</Card>
-                    })
-                }
+                    {
+                        [
+                            {
+                                title: "AI-Curated Paths", subtitle: "Personalized curriculum tailored to you",
+                                desc: "We don't just serve you random videos. Our Gemini-powered engine analyzes thousands of resources to create a cohesive, step-by-step curriculum.",
+                                color: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                                visual: (<div className={styles.visualMockup}><div className={styles.pathContainer}><div className={styles.pathLine}></div><div className={styles.pathNode}><div className={styles.pathIcon}><PlayIcon size={12} fill="var(--primary)" /></div><span style={{ fontSize: "0.9rem", fontWeight: "600" }}>React Basics</span></div><div className={styles.pathNode}><div className={styles.pathIcon}><ZapIcon size={12} fill="var(--primary)" /></div><span style={{ fontSize: "0.9rem", fontWeight: "600" }}>Advanced Hooks</span></div><div className={styles.pathNode}><div className={styles.pathIcon}><StarIcon size={12} fill="var(--primary)" /></div><span style={{ fontSize: "0.9rem", fontWeight: "600" }}>Capstone Project</span></div></div></div>)
+                            },
+                            {
+                                title: "Gamified Motivation", subtitle: "Track progress with streaks and XP",
+                                desc: "Stay consistent with streaks, XP, and daily goals. We turn learning into a game you actually want to play.",
+                                color: "linear-gradient(135deg, #eab308, #f59e0b)",
+                                visual: (<div className={styles.streakCard}><div className={styles.streakFlame}>🔥</div><div className={styles.streakText}>12 Day Streak</div></div>)
+                            },
+                            {
+                                title: "Community Powered", subtitle: "Join communities for every topic",
+                                desc: "Never learn alone. Join niche communities for every topic. Share your notes and ask questions.",
+                                color: "linear-gradient(135deg, #ec4899, #f43f5e)",
+                                visual: (<div className={styles.chatContainer}><div className={`${styles.chatBubble} ${styles.chatLeft}`}>Has anyone finished module 4? 🙋‍♀️</div><div className={`${styles.chatBubble} ${styles.chatRight}`}>Yes! The visualizer helps properly.</div></div>)
+                            }
+                        ].map((card, i) => {
+                            const targetScale = 1 - ((3 - i) * 0.05);
+                            return <Card key={i} i={i} {...card} progress={scrollYProgress} range={[i * 0.25, 1]} targetScale={targetScale}>{card.visual}</Card>
+                        })
+                    }
                 </div>
             </section>
 
-{/* 4. LEARN BETTER TOGETHER (COMMUNITY) SECTION */}
+            {/* 4. LEARN BETTER TOGETHER (COMMUNITY) SECTION */}
             <section className={styles.communitySection}>
                 <div className={styles.communityContent}>
                     <FadeIn direction="right">
@@ -268,7 +268,7 @@ export default function LandingPage() {
                         <div style={{ marginBottom: '24px', display: 'flex', gap: '4px', color: '#eab308' }}>
                             {[1, 2, 3, 4, 5].map(i => <StarIcon key={i} size={16} fill="currentColor" stroke="none" />)}
                         </div>
-                        <p className={styles.quote}>&quot;I was overwhelmed by the amount of React tutorials online. Studywise curated exactly what I needed.&quot;</p>
+                        <p className={styles.quote}>&quot;I was overwhelmed by the amount of React tutorials online. SkillPrima curated exactly what I needed.&quot;</p>
                         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                             <div className={styles.avatarRing}><div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'var(--card)' }}></div></div>
                             <div>
@@ -323,7 +323,7 @@ export default function LandingPage() {
                 <div className={styles.footerGrid}>
                     <div className={styles.footerBrand}>
                         <div style={{ display: 'flex', gap: '8px', fontWeight: '800', fontSize: '1.2rem', alignItems: 'center' }}>
-                            <ZapIcon size={24} fill="var(--primary)" /> Studywise
+                            <ZapIcon size={24} fill="var(--primary)" /> SkillPrima
                         </div>
                         <p>The AI-powered curriculum designer that helps you master any topic.</p>
                     </div>
@@ -351,7 +351,7 @@ export default function LandingPage() {
                     </div>
                 </div>
                 <div className={styles.footerBottom}>
-                    <div>&copy; {new Date().getFullYear()} Studywise Inc.</div>
+                    <div>&copy; {new Date().getFullYear()} SkillPrima Inc.</div>
                     <div style={{ display: 'flex', gap: '16px' }}>
                         <a href="#" aria-label="Twitter">Twitter</a>
                         <a href="#" aria-label="GitHub">GitHub</a>
@@ -367,10 +367,10 @@ function FAQSection() {
     const [openIndex, setOpenIndex] = useState(0);
 
     const questions = [
-        { q: "Is Studywise really free?", a: "Yes! You can generate unlimited curriculums on the free plan. We may introduce premium features later." },
+        { q: "Is SkillPrima really free?", a: "Yes! You can generate unlimited curriculums on the free plan. We may introduce premium features later." },
         { q: "How accurate is the AI?", a: "We use Gemini 3 Pro to curate high-quality resources. The content is constantly vetted by our algorithm." },
         { q: "Can I customize the curriculum?", a: "Not yet. But in future versions, you should be able to edit, remove, or reorder modules as you see fit." },
-        { q: "Is there a mobile app?", a: "Studywise is fully responsive and works great on any device. A native app is coming soon!" }
+        { q: "Is there a mobile app?", a: "SkillPrima is fully responsive and works great on any device. A native app is coming soon!" }
     ];
 
     return (
@@ -403,48 +403,48 @@ function FAQSection() {
 
 
 function Card({ i, title, subtitle, description, color, children, progress, range, targetScale }) {
-  const container = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: container,
-    offset: ['start end', 'start start']
-  });
+    const container = useRef(null);
+    const { scrollYProgress } = useScroll({
+        target: container,
+        offset: ['start end', 'start start']
+    });
 
-  const imageScale = useTransform(scrollYProgress, [0, 1], [1.1, 1]);
-  const scale = useTransform(progress, range, [1, targetScale]);
+    const imageScale = useTransform(scrollYProgress, [0, 1], [1.1, 1]);
+    const scale = useTransform(progress, range, [1, targetScale]);
 
-  return (
-    <div ref={container} className={styles.cardContainer} style={{top: `${i * 25}px`}}>
-      <motion.div 
-        className={styles.dynamicCard}
-        style={{ scale, top: `calc(-5% + ${i * 25}px)` }}
-      >
-        {/* Floating Background Particles */} 
-        {[...Array(15)].map((_, idx) => ( 
-            <div 
-                key={idx} 
-                className={styles.particle} 
-                style={{ 
-                    top: `${Math.random() * 100}%`, 
-                    left: `${Math.random() * 100}%`, 
-                    width: `${Math.random() * 200 + 50}px`, 
-                    height: `${Math.random() * 200 + 50}px`, 
-                    opacity: Math.random() * 0.09 + 0.03, 
-                    animationDuration: `${Math.random() * 10 + 20}s`, 
-                    animationDelay: `${Math.random() * 5}s`, 
-                    background: color,
-                }} 
-            /> 
-        ))}
-        <div className={styles.dynamicCardContent}>
-             <h3 style={{ fontSize: '2rem', marginBottom: '8px', fontWeight: '800' }}>{title}</h3><div style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--primary)', marginBottom: '24px', letterSpacing: '0px', textTransform: 'none' }}>{subtitle}</div>
-             <p style={{ fontSize: '1.2rem', color: 'var(--secondary)', lineHeight: '1.6' }}>{description}</p>
+    return (
+        <div ref={container} className={styles.cardContainer} style={{ top: `${i * 25}px` }}>
+            <motion.div
+                className={styles.dynamicCard}
+                style={{ scale, top: `calc(-5% + ${i * 25}px)` }}
+            >
+                {/* Floating Background Particles */}
+                {[...Array(15)].map((_, idx) => (
+                    <div
+                        key={idx}
+                        className={styles.particle}
+                        style={{
+                            top: `${Math.random() * 100}%`,
+                            left: `${Math.random() * 100}%`,
+                            width: `${Math.random() * 200 + 50}px`,
+                            height: `${Math.random() * 200 + 50}px`,
+                            opacity: Math.random() * 0.09 + 0.03,
+                            animationDuration: `${Math.random() * 10 + 20}s`,
+                            animationDelay: `${Math.random() * 5}s`,
+                            background: color,
+                        }}
+                    />
+                ))}
+                <div className={styles.dynamicCardContent}>
+                    <h3 style={{ fontSize: '2rem', marginBottom: '8px', fontWeight: '800' }}>{title}</h3><div style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--primary)', marginBottom: '24px', letterSpacing: '0px', textTransform: 'none' }}>{subtitle}</div>
+                    <p style={{ fontSize: '1.2rem', color: 'var(--secondary)', lineHeight: '1.6' }}>{description}</p>
+                </div>
+                <div className={styles.dynamicCardVisual} style={{ background: color }}>
+                    <motion.div style={{ scale: imageScale, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {children}
+                    </motion.div>
+                </div>
+            </motion.div>
         </div>
-        <div className={styles.dynamicCardVisual} style={{ background: color }}>
-             <motion.div style={{scale: imageScale, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                {children}
-             </motion.div>
-        </div>
-      </motion.div>
-    </div>
-  )
+    )
 }

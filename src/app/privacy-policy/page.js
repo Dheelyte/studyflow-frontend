@@ -3,13 +3,13 @@ export default function PrivacyPolicy() {
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '120px 24px 80px' }}>
       <h1 style={{ fontSize: '3rem', fontWeight: '800', marginBottom: '24px' }}>Privacy Policy</h1>
       <p style={{ color: 'var(--secondary)', marginBottom: '40px' }}>Last updated: January 11, 2026</p>
-      
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', lineHeight: '1.6' }}>
         <section>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '16px' }}>1. Introduction</h2>
           <p style={{ color: 'var(--secondary)' }}>
-            Welcome to Studywise. We respect your privacy and are committed to protecting your personal data. 
-            This privacy policy will inform you as to how we look after your personal data when you visit our website 
+            Welcome to SkillPrima. We respect your privacy and are committed to protecting your personal data.
+            This privacy policy will inform you as to how we look after your personal data when you visit our website
             and tell you about your privacy rights and how the law protects you.
           </p>
         </section>
@@ -45,12 +45,12 @@ export default function PrivacyPolicy() {
             We have put in place appropriate security measures to prevent your personal data from being accidentally lost, used or accessed in an unauthorized way, altered or disclosed.
           </p>
         </section>
-        
+
         <section>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '16px' }}>5. Contact Us</h2>
-            <p style={{ color: 'var(--secondary)' }}>
-                If you have any questions about this privacy policy or our privacy practices, please contact us at: support@studywise.example.com
-            </p>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '16px' }}>5. Contact Us</h2>
+          <p style={{ color: 'var(--secondary)' }}>
+            If you have any questions about this privacy policy or our privacy practices, please contact us at: SkillPrima@gmail.com
+          </p>
         </section>
       </div>
     </div>

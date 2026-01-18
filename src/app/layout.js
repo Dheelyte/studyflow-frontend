@@ -6,7 +6,7 @@ import { ToastProvider } from "@/context/ToastContext";
 import ToastContainer from "@/components/Toast";
 
 export const metadata = {
-  title: "Studywise",
+  title: "SkillPrima",
   description: "Your personalized learning curriculum, visualized.",
 };
 
@@ -17,10 +17,10 @@ export default function RootLayout({ children }) {
         <ThemeProvider>
           <AuthProvider>
             <ToastProvider>
-                <ClientLayout>
-                    {children}
-                </ClientLayout>
-                <ToastContainer />
+              <ClientLayout>
+                {children}
+              </ClientLayout>
+              <ToastContainer />
             </ToastProvider>
           </AuthProvider>
         </ThemeProvider>
