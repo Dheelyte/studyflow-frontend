@@ -6,8 +6,11 @@ import { ToastProvider } from "@/context/ToastContext";
 import ToastContainer from "@/components/Toast";
 
 export const metadata = {
-  title: "Primerly",
-  description: "Your personalized learning curriculum, visualized.",
+  title: {
+    template: '%s | Primerly',
+    default: 'Primerly',
+  },
+  description: "Learn Anything With An AI Roadmap",
 };
 
 export default function RootLayout({ children }) {
