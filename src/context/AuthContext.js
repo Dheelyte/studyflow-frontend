@@ -33,19 +33,21 @@ export function AuthProvider({ children }) {
         try {
             // Always try to fetch the user. The backend (via cookies) is the source of truth.
             // If valid cookies exist, this will succeed (possibly triggering a refresh).
-            const response = await auth.me(); 
+            const response = await auth.me();
             // Handle response structure depending on if apiFetch returns { data: user } or just user
             const userData = response.data || response;
-            
+
             setUser(userData);
             localStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
             localStorage.setItem(IS_LOGGED_IN_KEY, 'true');
+            return userData;
         } catch (error) {
             // Not logged in or session expired
             console.warn("Session check failed:", error);
             setUser(null);
             localStorage.removeItem(IS_LOGGED_IN_KEY);
             localStorage.removeItem(USER_DATA_KEY);
+            return null;
         } finally {
             setLoading(false);
         }

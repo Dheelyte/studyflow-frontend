@@ -27,11 +27,14 @@ export default function LoginPage() {
                 setVerifyingSocialLogin(true);
                 try {
                     // Force a session check because the backend set the cookie
-                    await checkUser(true);
+                    const verifiedUser = await checkUser(true);
+                    if (!verifiedUser) {
+                        throw new Error('Session verification failed');
+                    }
                     // The main auth effect below will handle the redirect when 'user' becomes available
                 } catch (err) {
                     console.error("Social login verification failed", err);
-                    addToast('Social login failed to verify session', 'error');
+                    addToast('Social login failed verify session. Please try again or use email login.', 'error');
                     setVerifyingSocialLogin(false);
                 }
             }
