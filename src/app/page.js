@@ -66,7 +66,7 @@ export default function LandingPage() {
 
             <header className={styles.header}>
                 <div className={styles.headerBrand}>
-                    <ZapIcon size={24} fill="var(--primary)" /> SkillPrima
+                    <ZapIcon size={24} fill="var(--primary)" /> Primerly
                 </div>
                 <div className={styles.headerActions}>
                     <Link href="/login" style={{ color: 'var(--foreground)', fontWeight: '600', textDecoration: 'none' }}>Log In</Link>
@@ -155,10 +155,10 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* 3. WHY SkillPrima (DYNAMIC STACK) SECTION */}
+            {/* 3. WHY Primerly (DYNAMIC STACK) SECTION */}
             <section className={styles.stackedSection} ref={container}>
                 <FadeIn>
-                    <h2 className={styles.sectionHeading} style={{ textAlign: 'center', marginBottom: '40px', marginTop: '40px' }}>Why SkillPrima?</h2>
+                    <h2 className={styles.sectionHeading} style={{ textAlign: 'center', marginBottom: '40px', marginTop: '40px' }}>Why Primerly?</h2>
                 </FadeIn>
                 <div className={styles.stackedContainer}>
                     {
@@ -268,7 +268,7 @@ export default function LandingPage() {
                         <div style={{ marginBottom: '24px', display: 'flex', gap: '4px', color: '#eab308' }}>
                             {[1, 2, 3, 4, 5].map(i => <StarIcon key={i} size={16} fill="currentColor" stroke="none" />)}
                         </div>
-                        <p className={styles.quote}>&quot;I was overwhelmed by the amount of React tutorials online. SkillPrima curated exactly what I needed.&quot;</p>
+                        <p className={styles.quote}>&quot;I was overwhelmed by the amount of React tutorials online. Primerly curated exactly what I needed.&quot;</p>
                         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                             <div className={styles.avatarRing}><div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'var(--card)' }}></div></div>
                             <div>
@@ -323,7 +323,7 @@ export default function LandingPage() {
                 <div className={styles.footerGrid}>
                     <div className={styles.footerBrand}>
                         <div style={{ display: 'flex', gap: '8px', fontWeight: '800', fontSize: '1.2rem', alignItems: 'center' }}>
-                            <ZapIcon size={24} fill="var(--primary)" /> SkillPrima
+                            <ZapIcon size={24} fill="var(--primary)" /> Primerly
                         </div>
                         <p>The AI-powered curriculum designer that helps you master any topic.</p>
                     </div>
@@ -351,7 +351,7 @@ export default function LandingPage() {
                     </div>
                 </div>
                 <div className={styles.footerBottom}>
-                    <div>&copy; {new Date().getFullYear()} SkillPrima Inc.</div>
+                    <div>&copy; {new Date().getFullYear()} Primerly.</div>
                     <div style={{ display: 'flex', gap: '16px' }}>
                         <a href="#" aria-label="Twitter">Twitter</a>
                         <a href="#" aria-label="GitHub">GitHub</a>
@@ -367,10 +367,10 @@ function FAQSection() {
     const [openIndex, setOpenIndex] = useState(0);
 
     const questions = [
-        { q: "Is SkillPrima really free?", a: "Yes! You can generate unlimited curriculums on the free plan. We may introduce premium features later." },
+        { q: "Is Primerly really free?", a: "Yes! You can generate unlimited curriculums on the free plan. We may introduce premium features later." },
         { q: "How accurate is the AI?", a: "We use Gemini 3 Pro to curate high-quality resources. The content is constantly vetted by our algorithm." },
         { q: "Can I customize the curriculum?", a: "Not yet. But in future versions, you should be able to edit, remove, or reorder modules as you see fit." },
-        { q: "Is there a mobile app?", a: "SkillPrima is fully responsive and works great on any device. A native app is coming soon!" }
+        { q: "Is there a mobile app?", a: "Primerly is fully responsive and works great on any device. A native app is coming soon!" }
     ];
 
     return (

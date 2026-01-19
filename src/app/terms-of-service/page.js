@@ -8,14 +8,14 @@ export default function TermsOfService() {
         <section>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '16px' }}>1. Agreement to Terms</h2>
           <p style={{ color: 'var(--secondary)' }}>
-            By accessing or using SkillPrima, you agree to be bound by these Terms of Service and our Privacy Policy. If you do not agree to these terms, you may not access or use the service.
+            By accessing or using Primerly, you agree to be bound by these Terms of Service and our Privacy Policy. If you do not agree to these terms, you may not access or use the service.
           </p>
         </section>
 
         <section>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '16px' }}>2. Use of Service</h2>
           <p style={{ color: 'var(--secondary)' }}>
-            SkillPrima provides an AI-powered curriculum generation tool. You are granted a limited, non-exclusive, non-transferable license to use the service for personal, non-commercial purposes.
+            Primerly provides an AI-powered curriculum generation tool. You are granted a limited, non-exclusive, non-transferable license to use the service for personal, non-commercial purposes.
           </p>
         </section>
 
@@ -36,14 +36,14 @@ export default function TermsOfService() {
         <section>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '16px' }}>5. Limitation of Liability</h2>
           <p style={{ color: 'var(--secondary)' }}>
-            SkillPrima shall not be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the service.
+            Primerly shall not be liable for any indirect, incidental, special, consequential or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the service.
           </p>
         </section>
 
         <section>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '16px' }}>6. Contact Us</h2>
           <p style={{ color: 'var(--secondary)' }}>
-            If you have any questions about these Terms, please contact us at: SkillPrima@gmail.com
+            If you have any questions about these Terms, please contact us at: primerlyapp@gmail.com
           </p>
         </section>
       </div>

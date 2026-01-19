@@ -94,7 +94,7 @@ export default function SignupPage() {
                             <div style={{ width: '32px', height: '32px', background: 'var(--primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
                             </div>
-                            <span style={{ fontWeight: '700', fontSize: '1.2rem', color: 'var(--foreground)' }}>SkillPrima</span>
+                            <span style={{ fontWeight: '700', fontSize: '1.2rem', color: 'var(--foreground)' }}>Primerly</span>
                         </Link>
                     </div>
                     <h1 className={styles.title}>Create Account</h1>

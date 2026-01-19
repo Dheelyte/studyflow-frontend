@@ -8,7 +8,7 @@ export default function PrivacyPolicy() {
         <section>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '16px' }}>1. Introduction</h2>
           <p style={{ color: 'var(--secondary)' }}>
-            Welcome to SkillPrima. We respect your privacy and are committed to protecting your personal data.
+            Welcome to Primerly. We respect your privacy and are committed to protecting your personal data.
             This privacy policy will inform you as to how we look after your personal data when you visit our website
             and tell you about your privacy rights and how the law protects you.
           </p>
@@ -49,7 +49,7 @@ export default function PrivacyPolicy() {
         <section>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '16px' }}>5. Contact Us</h2>
           <p style={{ color: 'var(--secondary)' }}>
-            If you have any questions about this privacy policy or our privacy practices, please contact us at: SkillPrima@gmail.com
+            If you have any questions about this privacy policy or our privacy practices, please contact us at: primerlyapp@gmail.com
           </p>
         </section>
       </div>

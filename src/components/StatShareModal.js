@@ -25,7 +25,7 @@ export default function StatShareModal({ isOpen, onClose, stats, user }) {
             });
 
             const link = document.createElement('a');
-            link.download = `SkillPrima-stats-${Date.now()}.png`;
+            link.download = `Primerly-stats-${Date.now()}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
         } catch (err) {
@@ -100,8 +100,8 @@ export default function StatShareModal({ isOpen, onClose, stats, user }) {
 
                         <div className={styles.footerDomain}>
                             <span>Join me on </span>
-                            <span className={styles.brandName}>SkillPrima</span>
-                            <span className={styles.brandUrl}>www.skillprima.com</span>
+                            <span className={styles.brandName}>Primerly</span>
+                            <span className={styles.brandUrl}>www.primerly.app</span>
                         </div>
                     </div>
                 </div>

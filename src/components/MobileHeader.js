@@ -8,7 +8,7 @@ export default function MobileHeader({ onMenuClick }) {
   return (
     <header className={styles.header}>
       <Link href="/" className={styles.logo} style={{ textDecoration: 'none' }}>
-        <ZapIcon size={24} fill="var(--primary)" /> SkillPrima
+        <ZapIcon size={24} fill="var(--primary)" /> Primerly
       </Link>
       <div style={{ display: 'flex', alignItems: 'center' }}>
 

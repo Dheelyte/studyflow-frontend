@@ -6,7 +6,7 @@ import { ToastProvider } from "@/context/ToastContext";
 import ToastContainer from "@/components/Toast";
 
 export const metadata = {
-  title: "SkillPrima",
+  title: "Primerly",
   description: "Your personalized learning curriculum, visualized.",
 };
 

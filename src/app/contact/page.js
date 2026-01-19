@@ -13,17 +13,17 @@ export default function ContactPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <div>
               <div style={{ fontWeight: '600', marginBottom: '4px' }}>Email Support</div>
-              <a href="mailto:skillprima@gmail.com" style={{ color: 'var(--primary)', fontSize: '1.1rem', textDecoration: 'none' }}>SkillPrima@gmail.com.com</a>
+              <a href="mailto:primerlyapp@gmail.com" style={{ color: 'var(--primary)', fontSize: '1.1rem', textDecoration: 'none' }}>primerlyapp@gmail.com.com</a>
             </div>
 
             <div>
               <div style={{ fontWeight: '600', marginBottom: '4px' }}>Twitter / X</div>
-              <a href="https://twitter.com/SkillPrima" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', fontSize: '1.1rem', textDecoration: 'none' }}>@SkillPrima</a>
+              <a href="https://twitter.com/Primerly" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', fontSize: '1.1rem', textDecoration: 'none' }}>@Primerly</a>
             </div>
 
             <div>
               <div style={{ fontWeight: '600', marginBottom: '4px' }}>Join our Discord</div>
-              <a href="#" style={{ color: 'var(--primary)', fontSize: '1.1rem', textDecoration: 'none' }}>SkillPrima Community</a>
+              <a href="#" style={{ color: 'var(--primary)', fontSize: '1.1rem', textDecoration: 'none' }}>Primerly Community</a>
             </div>
           </div>
         </div>

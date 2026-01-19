@@ -1,7 +1,7 @@
 export default function AboutPage() {
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '120px 24px 80px' }}>
-      <h1 style={{ fontSize: '3rem', fontWeight: '800', marginBottom: '24px' }}>About SkillPrima</h1>
+      <h1 style={{ fontSize: '3rem', fontWeight: '800', marginBottom: '24px' }}>About Primerly</h1>
       <p style={{ fontSize: '1.25rem', color: 'var(--secondary)', marginBottom: '60px', lineHeight: '1.6' }}>
         We're on a mission to make mastering any topic accessible, engaging, and efficient for everyone.
       </p>
@@ -33,10 +33,10 @@ export default function AboutPage() {
         <section>
           <h2 style={{ fontSize: '2rem', fontWeight: '700', marginBottom: '20px' }}>Our Story</h2>
           <p style={{ color: 'var(--secondary)', lineHeight: '1.6', marginBottom: '16px' }}>
-            SkillPrima began with a simple observation: there's too much information out there. Whether you want to learn React, Astrophysics, or Gardening, the problem isn't a lack of resources—it's knowing where to start and what path to follow.
+            Primerly began with a simple observation: there's too much information out there. Whether you want to learn React, Astrophysics, or Gardening, the problem isn't a lack of resources—it's knowing where to start and what path to follow.
           </p>
           <p style={{ color: 'var(--secondary)', lineHeight: '1.6' }}>
-            We started SkillPrima to bridge the gap between "I want to learn" and "I've mastered it." By leveraging advanced AI, we organize the world's knowledge into structured, interactive, and gamified curriculums.
+            We started Primerly to bridge the gap between "I want to learn" and "I've mastered it." By leveraging advanced AI, we organize the world's knowledge into structured, interactive, and gamified curriculums.
           </p>
         </section>
 

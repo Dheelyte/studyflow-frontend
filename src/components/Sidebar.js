@@ -65,7 +65,7 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
 
                 <nav className={styles.navContainer}>
                     <Link href="/" className={styles.logo} style={{ textDecoration: 'none' }}>
-                        <ZapIcon size={28} fill="var(--primary)" /> <span>SkillPrima</span>
+                        <ZapIcon size={28} fill="var(--primary)" /> <span>Primerly</span>
                     </Link>
 
                     <Link href="/dashboard" className={styles.navItem} onClick={handleProtectedNav}>
