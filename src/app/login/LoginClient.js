@@ -23,7 +23,9 @@ export default function LoginClient() {
     // Effect to handle social login success callback
     useEffect(() => {
         const handleSocialLogin = async () => {
-            if (loginSuccess === 'true' && !user) {
+            if (loginSuccess === 'false') {
+                addToast('Login with 3rd party app failed. Please try with your email instead.', 'error');
+            } else if (loginSuccess === 'true' && !user) {
                 setVerifyingSocialLogin(true);
                 try {
                     // Force a session check because the backend set the cookie
