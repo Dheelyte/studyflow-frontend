@@ -47,7 +47,7 @@ export default function TermsOfService() {
         <section>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '16px' }}>6. Contact Us</h2>
           <p style={{ color: 'var(--secondary)' }}>
-            If you have any questions about these Terms, please contact us at: primerlyapp@gmail.com
+            If you have any questions about these Terms, please contact us at: primerly.app@gmail.com
           </p>
         </section>
       </div>

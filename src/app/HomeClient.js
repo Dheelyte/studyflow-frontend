@@ -353,9 +353,9 @@ export default function HomeClient() {
                 <div className={styles.footerBottom}>
                     <div>&copy; {new Date().getFullYear()} Primerly.</div>
                     <div style={{ display: 'flex', gap: '16px' }}>
-                        <a href="#" aria-label="Twitter">Twitter</a>
-                        <a href="#" aria-label="GitHub">GitHub</a>
-                        <a href="#" aria-label="LinkedIn">LinkedIn</a>
+                        <a href="https://x.com/primerlyapp" aria-label="Twitter">Twitter</a>
+                        {/* <a href="#" aria-label="GitHub">GitHub</a> */}
+                        <a href="https://www.linkedin.com/company/primerly/" aria-label="LinkedIn">LinkedIn</a>
                     </div>
                 </div>
             </footer>
