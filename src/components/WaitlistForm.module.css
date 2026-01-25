@@ -1,0 +1,143 @@
+.container {
+    display: flex;
+    align-items: center;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 8px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    position: relative;
+    margin: 0 auto;
+}
+
+.container:focus-within {
+    box-shadow: 0 20px 50px -10px rgba(99, 102, 241, 0.3);
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.inputGroup {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+}
+
+.input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 16px 0;
+    font-size: 1.1rem;
+    color: var(--foreground);
+    outline: none;
+    font-weight: 500;
+}
+
+.input::placeholder {
+    color: var(--secondary);
+    opacity: 0.7;
+}
+
+.button {
+    background: var(--primary);
+    color: white;
+    border: none;
+    height: 48px;
+    padding: 0 32px;
+    border-radius: 99px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.button:hover:not(:disabled) {
+    background: var(--primary-hover);
+    transform: scale(1.05);
+}
+
+.button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.successMessage {
+    background: var(--card);
+    border: 1px solid var(--success, #10b981);
+    border-radius: 24px;
+    padding: 24px 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+    box-shadow: 0 20px 40px -10px rgba(16, 185, 129, 0.2);
+    animation: fadeIn 0.5s ease-out;
+}
+
+.successIcon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--success, #10b981);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.successMessage h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+.successMessage p {
+    margin: 0;
+    color: var(--secondary);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 640px) {
+    .container {
+        flex-direction: column;
+        border-radius: 24px;
+        padding: 16px;
+        gap: 12px;
+    }
+
+    .inputGroup {
+        padding-left: 0;
+        width: 100%;
+        text-align: center;
+    }
+
+    .input {
+        text-align: center;
+    }
+
+    .button {
+        width: 100%;
+    }
+}

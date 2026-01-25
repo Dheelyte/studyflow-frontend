@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from './page.module.css';
 import { ZapIcon, TrophyIconSimple, CheckIcon, UsersIcon, SearchIcon, PlayIcon, StarIcon, PlusIcon, ChevronRight } from '@/components/Icons';
-import IntegratedSearchBar from '@/components/IntegratedSearchBar';
+import WaitlistForm from '@/components/WaitlistForm';
 import TypingText from '@/components/TypingText';
 import FadeIn from '@/components/FadeIn';
 
@@ -69,8 +69,8 @@ export default function HomeClient() {
                     <ZapIcon size={24} fill="var(--primary)" /> Primerly
                 </div>
                 <div className={styles.headerActions}>
-                    <Link href="/login" style={{ color: 'var(--foreground)', fontWeight: '600', textDecoration: 'none' }}>Log In</Link>
-                    <Link href="/signup" className={styles.ctaSmall}>Sign Up</Link>
+                    {/* <Link href="/login" style={{ color: 'var(--foreground)', fontWeight: '600', textDecoration: 'none' }}>Log In</Link> */}
+                    {/* <Link href="/signup" className={styles.ctaSmall}>Sign Up</Link> */}
                 </div>
             </header>
 
@@ -97,8 +97,8 @@ export default function HomeClient() {
                     </div>
                 </FadeIn>
 
-                <FadeIn direction="up" delay={0.3} style={{ width: '100%', maxWidth: '900px', marginTop: '12px' }}>
-                    <IntegratedSearchBar onSearch={handleSearch} />
+                <FadeIn direction="up" delay={0.3} style={{ width: '100%', maxWidth: '600px', marginTop: '12px' }}>
+                    <WaitlistForm />
                 </FadeIn>
 
                 <FadeIn direction="up" delay={0.4} style={{ marginTop: '48px', width: '100%', display: 'flex', justifyContent: 'center' }}>
@@ -202,7 +202,7 @@ export default function HomeClient() {
                             <span className={styles.communityTag}>#Web3</span>
                             <span className={styles.communityTag}>#Design</span>
                         </div>
-                        <Link href="/community" className={styles.ctaButtonOutline}>Explore Communities</Link>
+                        {/* <Link href="/community" className={styles.ctaButtonOutline}>Explore Communities</Link> */}
                     </FadeIn>
                 </div>
                 <div className={styles.communityVisual}>
@@ -310,8 +310,10 @@ export default function HomeClient() {
             <section className={styles.ctaSection}>
                 <FadeIn direction="up" className={styles.flexColumnCentered}>
                     <h2>Ready to start your flow?</h2>
-                    <p>Join learners mastering new skills every day.</p>
-                    <Link href="/signup" className={styles.ctaButtonLarge}>Get Started for Free</Link>
+                    <p>Join learners mastering new skills every day. Join the Waitlist.</p>
+                    <div style={{ width: '100%', maxWidth: '600px' }}>
+                        <WaitlistForm />
+                    </div>
                 </FadeIn>
             </section>
 
@@ -330,8 +332,10 @@ export default function HomeClient() {
                     <div className={styles.footerColumn}>
                         <h4>Product</h4>
                         <div className={styles.footerLinks}>
-                            <Link href="/dashboard">Curriculum</Link>
-                            <Link href="/community">Community</Link>
+                            {/* <Link href="/dashboard">Curriculum</Link> */}
+                            {/* <Link href="/community">Community</Link> */}
+                            <span style={{ color: 'var(--secondary)' }}>Curriculum</span>
+                            <span style={{ color: 'var(--secondary)' }}>Community</span>
                         </div>
                     </div>
                     <div className={styles.footerColumn}>
