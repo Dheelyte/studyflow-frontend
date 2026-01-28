@@ -52,17 +52,17 @@ async function apiFetch(endpoint, options = {}) {
                 throw new Error(errorMessage);
             }
             const { _retry } = options;
-            
+
             // If this is already a retry, just fail to prevent infinite loops
             if (_retry) {
-                 console.warn("Unauthorized access (retry failed)");
-                 if (window.location.pathname !== '/login') { /* window.location.href = '/login'; */ }
-                 throw new Error('Session expired');
+                console.warn("Unauthorized access (retry failed)");
+                if (window.location.pathname !== '/login') { /* window.location.href = '/login'; */ }
+                throw new Error('Session expired');
             }
 
             if (isRefreshing) {
                 // If refresh is in progress, queue this request
-                return new Promise(function(resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     failedQueue.push({ resolve, reject });
                 }).then(() => {
                     // When resolved, retry the original request
@@ -79,12 +79,12 @@ async function apiFetch(endpoint, options = {}) {
                 console.log("Token expired, attempting refresh via /refresh...");
                 // Call refresh endpoint. We pass _retry=true so if THIS fails with 401, it goes to the immediate fail block above.
                 // User requested strictly /auth/refresh
-                await apiFetch('/auth/refresh', { 
-                    method: 'POST', 
+                await apiFetch('/auth/refresh', {
+                    method: 'POST',
                     // Ensure we don't infinitely retry the refresh call itself
-                    _retry: true 
+                    _retry: true
                 });
-                
+
                 // On success, process queue and retry current request
                 processQueue(null);
                 isRefreshing = false;
@@ -96,7 +96,9 @@ async function apiFetch(endpoint, options = {}) {
                 processQueue(refreshErr, null);
                 isRefreshing = false;
                 // Redirect because refresh failed, meaning user is not logged in / session invalid
-                if (window.location.pathname !== '/login') { /* window.location.href = '/login'; */ } 
+                if (window.location.pathname !== '/login') {
+                    window.location.href = '/login';
+                }
                 throw new Error('Session expired');
             }
         }
@@ -116,7 +118,7 @@ async function apiFetch(endpoint, options = {}) {
 
         // Attach validation errors specifically if present (usually 422)
         if (response.status === 422) {
-             error.validationErrors = errorData;
+            error.validationErrors = errorData;
         } else if (errorData?.errors) {
             error.validationErrors = errorData.errors;
         }
