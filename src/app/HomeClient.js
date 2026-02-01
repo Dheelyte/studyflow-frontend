@@ -77,11 +77,11 @@ export default function HomeClient() {
             {/* 1. HERO SECTION */}
             <section className={styles.hero}>
                 <FadeIn direction="up">
-                    <h1 className={styles.title}>Master any skill with an AI roadmap.</h1>
+                    <h1 className={styles.title}>Master any skill with a personalized course.</h1>
                 </FadeIn>
                 <FadeIn direction="up" delay={0.1}>
                     <p className={styles.subtitle}>
-                        Our AI builds your path, finds the best learning resources for every step, tracks your progress, and connects you with a learning community.
+                        Our AI creates your roadmap, finds the best learning resources for every step, tracks your progress, keeps you consistent, and connects you with a learning community.
                     </p>
                 </FadeIn>
 

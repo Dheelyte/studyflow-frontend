@@ -1,16 +1,16 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from 'react';
 
-const ThemeContext = createContext({ theme: 'system', setTheme: () => {} });
+const ThemeContext = createContext({ theme: 'system', setTheme: () => { } });
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState('system'); // Default to system
+  const [theme, setTheme] = useState('light'); // Default to light
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    const savedTheme = localStorage.getItem('theme') || 'system';
+    const savedTheme = localStorage.getItem('theme') || 'light';
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setTheme(savedTheme);
   }, []);
@@ -22,21 +22,21 @@ export function ThemeProvider({ children }) {
     localStorage.setItem('theme', theme);
 
     const applyTheme = () => {
-        if (theme === 'system') {
-            const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-            root.setAttribute('data-theme', systemTheme);
-        } else {
-            root.setAttribute('data-theme', theme);
-        }
+      if (theme === 'system') {
+        const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        root.setAttribute('data-theme', systemTheme);
+      } else {
+        root.setAttribute('data-theme', theme);
+      }
     };
 
     applyTheme();
 
     if (theme === 'system') {
-        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        const handleChange = () => applyTheme();
-        mediaQuery.addEventListener('change', handleChange);
-        return () => mediaQuery.removeEventListener('change', handleChange);
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const handleChange = () => applyTheme();
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
     }
   }, [theme, mounted]);
 
