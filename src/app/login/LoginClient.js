@@ -13,6 +13,15 @@ export default function LoginClient() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const redirect = searchParams.get('redirect');
+
+    const googleLoginUrl = redirect
+        ? `${API_URL}/auth/login/google?redirect=${encodeURIComponent(redirect)}`
+        : `${API_URL}/auth/login/google`;
+
+    const githubLoginUrl = redirect
+        ? `${API_URL}/auth/login/github?redirect=${encodeURIComponent(redirect)}`
+        : `${API_URL}/auth/login/github`;
+
     const loginSuccess = searchParams.get('login_success');
     const { login, checkUser, user, loading: authLoading } = useAuth();
     const { addToast } = useToast();
@@ -111,11 +120,11 @@ export default function LoginClient() {
                     <>
                         {!showEmailForm ? (
                             <div className={styles.socialButtons}>
-                                <a href={`${API_URL}/auth/login/google`} className={styles.socialButton} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                <a href={googleLoginUrl} className={styles.socialButton} style={{ textDecoration: 'none', color: 'inherit' }}>
                                     <GoogleIcon size={20} />
                                     Continue with Google
                                 </a>
-                                <a href={`${API_URL}/auth/login/github`} className={styles.socialButton} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                <a href={githubLoginUrl} className={styles.socialButton} style={{ textDecoration: 'none', color: 'inherit' }}>
                                     <GitHubIcon size={20} />
                                     Continue with GitHub
                                 </a>
