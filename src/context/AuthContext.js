@@ -17,7 +17,7 @@ export function AuthProvider({ children }) {
 
     useEffect(() => {
         checkUser();
-    }, []);
+    }, [checkUser]);
 
     const checkUser = useCallback(async (force = false) => {
         if (!force && typeof window !== 'undefined' && (pathname === '/' || pathname.startsWith('/playlist/') || pathname.startsWith('/library') || pathname.startsWith('/curriculum'))) {
