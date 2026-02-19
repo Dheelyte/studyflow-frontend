@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
-import PlaylistSkeleton from '@/components/PlaylistSkeleton';
+import CourseSkeleton from '@/components/CourseSkeleton';
 import { curriculum } from "@/services/api";
 import styles from "./page.module.css";
 import { PlayIcon, ClockIcon, ChevronDown, ChevronUp, ZapIcon, ShareIcon, MenuIcon, CheckCircleIcon, BookOpenIcon, VideoIcon, TrophyIconSimple } from "@/components/Icons";
@@ -9,7 +9,7 @@ import ShareModal from "@/components/ShareModal";
 import QuizModal from "@/components/QuizModal";
 
 // Helper to normalize API response to existing component state structure
-const normalizePlaylistData = (apiData) => {
+const normalizeCourseData = (apiData) => {
     if (!apiData) return null;
 
     let totalResources = 0;
@@ -124,10 +124,10 @@ const normalizePlaylistData = (apiData) => {
     };
 };
 
-export default function PlaylistClient({ params }) {
+export default function CourseClient({ params }) {
     // Unwrap params for Next.js 15+ where params is a Promise
     const resolvedParams = React.use(params);
-    const playlistId = resolvedParams?.id;
+    const courseId = resolvedParams?.id;
     const searchParams = useSearchParams();
 
     const [curriculumData, setCurriculumData] = useState(null);
@@ -153,7 +153,7 @@ export default function PlaylistClient({ params }) {
             const topic = searchParams.get("topic");
 
             // Key to identify if we are fetching the same thing
-            const fetchKey = playlistId ? `id-${playlistId}` : (topic ? `topic-${topic}` : null);
+            const fetchKey = courseId ? `id-${courseId}` : (topic ? `topic-${topic}` : null);
 
             if (!fetchKey) {
                 setLoading(false);
@@ -167,11 +167,11 @@ export default function PlaylistClient({ params }) {
                 setLoading(true);
                 let data = null;
 
-                if (playlistId) {
-                    // console.log("Fetching by ID:", playlistId);
-                    const response = await curriculum.get(playlistId);
+                if (courseId) {
+                    // console.log("Fetching by ID:", courseId);
+                    const response = await curriculum.getCourse(courseId);
                     // Normalize the response
-                    data = normalizePlaylistData(response);
+                    data = normalizeCourseData(response);
 
                     // Set derived state from normalized data
                     if (data) {
@@ -196,7 +196,7 @@ export default function PlaylistClient({ params }) {
                 }
 
                 if (!data || !data.modules) {
-                    throw new Error("Invalid playlist data received");
+                    throw new Error("Invalid course data received");
                 }
 
                 setCurriculumData(data);
@@ -234,7 +234,7 @@ export default function PlaylistClient({ params }) {
                             target.scrollIntoView({ behavior: "smooth", block: "center" });
 
                             // Only highlight if the user has already started (resuming)
-                            // This prevents the "glow" effect on a brand new playlist where the first item is naturally next
+                            // This prevents the "glow" effect on a brand new course where the first item is naturally next
                             if (data.isStarted) {
                                 setHighlightResource(true);
                                 setTimeout(() => setHighlightResource(false), 2000);
@@ -253,7 +253,7 @@ export default function PlaylistClient({ params }) {
         };
 
         fetchCurriculum();
-    }, [playlistId, searchParams]);
+    }, [courseId, searchParams]);
 
     const toggleModule = (id) => {
         setExpandedModules(prev => ({ ...prev, [id]: !prev[id] }));
@@ -322,7 +322,7 @@ export default function PlaylistClient({ params }) {
                     }
 
                     if (found) {
-                        return normalizePlaylistData(newRaw);
+                        return normalizeCourseData(newRaw);
                     }
                     return prev;
                 });
@@ -362,19 +362,19 @@ export default function PlaylistClient({ params }) {
         setCurriculumData(prev => {
             if (!prev) return prev;
 
-            // We need to simulate the raw data update so 'normalizePlaylistData' can re-run properly
-            // Because locking logic is inside normalizePlaylistData.
+            // We need to simulate the raw data update so 'normalizeCourseData' can re-run properly
+            // Because locking logic is inside normalizeCourseData.
             const newRaw = JSON.parse(JSON.stringify(prev._raw));
             const modIndex = newRaw.modules.findIndex(m => m.id === activeQuizModule.id);
             if (modIndex !== -1) {
                 newRaw.modules[modIndex].quiz_completed = true;
             }
-            return normalizePlaylistData(newRaw);
+            return normalizeCourseData(newRaw);
         });
     };
 
     if (loading) {
-        return <PlaylistSkeleton />;
+        return <CourseSkeleton />;
     }
 
     if (error) {
@@ -404,10 +404,10 @@ export default function PlaylistClient({ params }) {
         <div className={styles.container}>
             <div className={styles.headerBg}></div>
             <div className={styles.header}>
-                <div className={styles.playlistImage}>
+                <div className={styles.courseImage}>
                     <ZapIcon size={64} fill="white" />
                 </div>
-                <div className={styles.playlistInfo}>
+                <div className={styles.courseInfo}>
                     <span className={styles.type}>{(curriculumData.level || "Beginner").toUpperCase()}</span>
                     <h1 className={styles.title}>{curriculumData.curriculum_title}</h1>
                     <p className={styles.description}>
@@ -430,7 +430,7 @@ export default function PlaylistClient({ params }) {
                     {isStarted ? "Continue Learning" : "Start Learning"}
                 </button>
 
-                <button className={styles.iconButton} title="Share Playlist" onClick={() => setShowShareModal(true)}>
+                <button className={styles.iconButton} title="Share Course" onClick={() => setShowShareModal(true)}>
                     <ShareIcon />
                 </button>
             </div>
@@ -439,7 +439,7 @@ export default function PlaylistClient({ params }) {
                 <ShareModal
                     onClose={() => setShowShareModal(false)}
                     url={typeof window !== 'undefined' ? window.location.href : ''}
-                    title={curriculumData.curriculum_title || 'Check out this playlist!'}
+                    title={curriculumData.curriculum_title || 'Check out this course!'}
                 />
             )}
 
@@ -460,7 +460,7 @@ export default function PlaylistClient({ params }) {
                 <div className={styles.progressContainer}>
                     <div className={styles.progressLabel}>
                         {/* Display real completion percentage */}
-                        <span>Playlist Progress</span>
+                        <span>Course Progress</span>
                         <span>{completionPercentage}% completed</span>
                     </div>
                     <div className={styles.progressBarBg}>

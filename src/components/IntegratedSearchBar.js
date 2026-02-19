@@ -10,18 +10,18 @@ export default function IntegratedSearchBar({ redirect = false, onSearch, shadow
     const [themeQuery, setQuery] = useState('');
     const [experience, setExperience] = useState('');
     const [duration, setDuration] = useState('');
-    
+
     const experienceOptions = [
-      { value: 'Beginner', label: 'Beginner', description: 'Start from scratch. No prior knowledge.' },
-      { value: 'Intermediate', label: 'Intermediate', description: 'Deepen understanding and best practices.' },
-      { value: 'Advanced', label: 'Advanced', description: 'Expert topics and complex systems.' }
+        { value: 'Beginner', label: 'Beginner', description: 'Start from scratch. No prior knowledge.' },
+        { value: 'Intermediate', label: 'Intermediate', description: 'Deepen understanding and best practices.' },
+        { value: 'Advanced', label: 'Advanced', description: 'Expert topics and complex systems.' }
     ];
 
     const durationOptions = [
-      { value: 'No Fixed Duration', label: 'No Fixed Learning Duration', description: 'Complete zero-to-hero journey.' },
-      { value: '1 Day', label: '1 Day', description: 'Intensive crash course.' },
-      { value: '7 Days', label: '7 Days', description: 'Standard weekly sprint.' },
-      { value: '1 Month', label: '1 Month', description: 'In-depth mastery path.' }
+        { value: 'No Fixed Duration', label: 'No Fixed Learning Duration', description: 'Complete zero-to-hero journey.' },
+        { value: '1 Day', label: '1 Day', description: 'Intensive crash course.' },
+        { value: '7 Days', label: '7 Days', description: 'Standard weekly sprint.' },
+        { value: '1 Month', label: '1 Month', description: 'In-depth mastery path.' }
     ];
 
     const handleStart = () => {
@@ -39,10 +39,10 @@ export default function IntegratedSearchBar({ redirect = false, onSearch, shadow
             const queryString = new URLSearchParams(query).toString();
             // In a real app we might pass this to dashboard to auto-start, 
             // but for now let's just go to dashboard and prepopulate if we were clever,
-            // or directly to playlist generation if that was the flow.
+            // or directly to course generation if that was the flow.
             // Let's redirect to dashboard with search params so dashboard can pick it up if we wanted.
-            // For MVP simplicity, let's redirect to playlist generation directly!
-             router.push(`/curriculum?${queryString}`);
+            // For MVP simplicity, let's redirect to course generation directly!
+            router.push(`/curriculum?${queryString}`);
         } else if (onSearch) {
             onSearch({ topic: themeQuery, experience: finalExperience, duration: finalDuration });
         }
@@ -55,11 +55,11 @@ export default function IntegratedSearchBar({ redirect = false, onSearch, shadow
                 <div className={styles.searchIconWrapper}>
                     <SearchIcon size={24} />
                 </div>
-                
-                <input 
-                    type="text" 
-                    className={styles.searchInput} 
-                    placeholder="What do you want to learn?" 
+
+                <input
+                    type="text"
+                    className={styles.searchInput}
+                    placeholder="What do you want to learn?"
                     value={themeQuery}
                     onChange={(e) => setQuery(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleStart()}
@@ -68,7 +68,7 @@ export default function IntegratedSearchBar({ redirect = false, onSearch, shadow
 
             <div className={styles.divider}></div>
 
-            <CustomDropdown 
+            <CustomDropdown
                 options={experienceOptions}
                 value={experience}
                 onChange={setExperience}
@@ -77,7 +77,7 @@ export default function IntegratedSearchBar({ redirect = false, onSearch, shadow
 
             <div className={styles.divider}></div>
 
-            <CustomDropdown 
+            <CustomDropdown
                 options={durationOptions}
                 value={duration}
                 onChange={setDuration}

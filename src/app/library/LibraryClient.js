@@ -9,13 +9,13 @@ import SkeletonCard from '@/components/SkeletonCard';
 
 export default function LibraryClient() {
   const { user } = useAuth();
-  const [playlists, setPlaylists] = useState([]);
+  const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPlaylists = async () => {
+    const fetchCourses = async () => {
       try {
-        const response = await curriculum.getMyPlaylists();
+        const response = await curriculum.getMyCourses();
         if (Array.isArray(response)) {
 
           const colors = [
@@ -28,25 +28,25 @@ export default function LibraryClient() {
 
           const mapped = response.map((item, index) => ({
             id: item.id,
-            title: item.playlist?.title || "Untitled Playlist",
+            title: item.playlist?.title || "Untitled Course",
             description: "Your personalized curriculum",
             progress: item.progress?.percentage || 0,
             completedModules: item.progress?.completed_modules || 0,
             totalModules: item.progress?.total_modules || 0,
             level: item.playlist?.level,
             color: colors[index % colors.length],
-            link: `/playlist/${item.playlist?.id || 1}`
+            link: `/course/${item.playlist?.id || 1}`
           }));
-          setPlaylists(mapped);
+          setCourses(mapped);
         }
       } catch (error) {
-        console.error("Failed to fetch playlists:", error);
+        console.error("Failed to fetch courses:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPlaylists();
+    fetchCourses();
   }, [user]);
 
   return (
@@ -66,23 +66,23 @@ export default function LibraryClient() {
             <div style={{ minWidth: 0 }}><SkeletonCard /></div>
             <div style={{ minWidth: 0 }}><SkeletonCard /></div>
           </>
-        ) : playlists.length > 0 ? (
-          playlists.map(playlist => (
-            <Link key={playlist.id} href={playlist.link} style={{ display: 'block', textDecoration: 'none' }}>
+        ) : courses.length > 0 ? (
+          courses.map(course => (
+            <Link key={course.id} href={course.link} style={{ display: 'block', textDecoration: 'none' }}>
               <Card
-                title={playlist.title}
-                description={playlist.description}
-                color={playlist.color}
-                progress={playlist.progress}
-                completedModules={playlist.completedModules}
-                totalModules={playlist.totalModules}
-                level={playlist.level}
+                title={course.title}
+                description={course.description}
+                color={course.color}
+                progress={course.progress}
+                completedModules={course.completedModules}
+                totalModules={course.totalModules}
+                level={course.level}
               />
             </Link>
           ))
         ) : (
           <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: 'var(--secondary)' }}>
-            No playlists found. Start a new topic from the Dashboard!
+            No courses found. Start a new topic from the Dashboard!
           </div>
         )}
       </div>

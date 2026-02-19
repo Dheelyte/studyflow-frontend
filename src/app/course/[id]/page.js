@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
-import PlaylistClient from './PlaylistClient';
-import PlaylistSkeleton from '@/components/PlaylistSkeleton';
+import CourseClient from './CourseClient';
+import CourseSkeleton from '@/components/CourseSkeleton';
 import { curriculum } from "@/services/api";
 
 // Generate dynamic metadata
@@ -10,18 +10,18 @@ export async function generateMetadata({ params }) {
     const id = resolvedParams.id;
 
     try {
-        // We can optionally fetch the playlist title here if the API supports it efficiently.
-        // If not, we might fail back to a generic title or just "Playlist".
-        // Since 'curriculum.get(id)' is available, we can try it.
+        // We can optionally fetch the course title here if the API supports it efficiently.
+        // If not, we might fail back to a generic title or just "Course".
+        // Since 'curriculum.getCourse(id)' is available, we can try it.
         // However, we need to be careful about double fetching if not cached.
         // Next.js request duplication logic should handle it if using fetch, 
         // but our api.js uses a custom wrapper.
 
         // For now, let's just use a generic one or try to fetch if fast.
-        // To be safe and fast, let's just say "Playlist". 
+        // To be safe and fast, let's just say "Course". 
         // OR if we want to be fancy:
-        // const playlist = await curriculum.get(id);
-        // return { title: playlist.title };
+        // const course = await curriculum.getCourse(id);
+        // return { title: course.title };
 
         // Let's stick to "Curriculum" for now to avoid server-side auth/cookie issues 
         // if the fetch requires user context (which it might).
@@ -35,10 +35,10 @@ export async function generateMetadata({ params }) {
     }
 }
 
-export default function PlaylistPage({ params }) {
+export default function CoursePage({ params }) {
     return (
-        <Suspense fallback={<PlaylistSkeleton />}>
-            <PlaylistClient params={params} />
+        <Suspense fallback={<CourseSkeleton />}>
+            <CourseClient params={params} />
         </Suspense>
     );
 }

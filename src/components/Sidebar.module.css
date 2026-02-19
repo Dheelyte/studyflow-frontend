@@ -15,8 +15,8 @@
 }
 
 .sidebar.collapsed {
-    width: 80px;
-    padding: 16px 12px;
+  width: 80px;
+  padding: 16px 12px;
 }
 
 .navContainer {
@@ -34,20 +34,24 @@
 .navContainer::-webkit-scrollbar {
   width: 4px;
 }
+
 .navContainer::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .navContainer::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 4px;
 }
+
 .navContainer::-webkit-scrollbar-thumb:hover {
   background: var(--secondary);
 }
 
 
 .libraryContainer {
-  display: none; /* Hidden as content moved to navContainer */
+  display: none;
+  /* Hidden as content moved to navContainer */
 }
 
 .logo {
@@ -64,7 +68,7 @@
 }
 
 .sidebar.collapsed .logo span {
-    display: none;
+  display: none;
 }
 
 .navItem {
@@ -82,18 +86,19 @@
   flex-shrink: 0;
 }
 
-.navItem:hover, .navItem.active {
+.navItem:hover,
+.navItem.active {
   color: var(--foreground);
   background-color: var(--hover);
 }
 
 .sidebar.collapsed .navItem span {
-    display: none;
+  display: none;
 }
 
 .sidebar.collapsed .navItem {
-    justify-content: center;
-    padding: 12px 0;
+  justify-content: center;
+  padding: 12px 0;
 }
 
 .sectionTitle {
@@ -111,28 +116,28 @@
 }
 
 .sidebar.collapsed .sectionTitle span {
-    display: none;
+  display: none;
 }
 
 .sidebar.collapsed .sectionTitle {
-    justify-content: center;
+  justify-content: center;
 }
 
 .iconButton {
-    background: none;
-    border: none;
-    color: var(--secondary);
-    cursor: pointer;
-    padding: 4px;
-    borderRadius: 4px;
+  background: none;
+  border: none;
+  color: var(--secondary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
 }
 
 .iconButton:hover {
-    color: var(--foreground);
-    background-color: var(--hover);
+  color: var(--foreground);
+  background-color: var(--hover);
 }
 
-.playlistItem {
+.courseItem {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -143,16 +148,16 @@
   text-decoration: none;
 }
 
-.playlistItem:hover {
-    background-color: var(--hover);
+.courseItem:hover {
+  background-color: var(--hover);
 }
 
-.sidebar.collapsed .playlistItem {
-    justify-content: center;
-    padding: 8px 0;
+.sidebar.collapsed .courseItem {
+  justify-content: center;
+  padding: 8px 0;
 }
 
-.playlistImage {
+.courseImage {
   width: 40px;
   height: 40px;
   background-color: var(--card);
@@ -167,11 +172,11 @@
   overflow: hidden;
 }
 
-.sidebar.collapsed .playlistInfo {
-    display: none;
+.sidebar.collapsed .courseInfo {
+  display: none;
 }
 
-.playlistName {
+.courseName {
   color: var(--foreground);
   font-size: 0.9rem;
   font-weight: 500;
@@ -179,130 +184,135 @@
   overflow: hidden;
 }
 
-.playlistMeta {
+.courseMeta {
   color: var(--secondary);
   font-size: 0.75rem;
 }
 
 .footer {
-    padding-top: 16px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    flex-shrink: 0;
-    margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex-shrink: 0;
+  margin-top: auto;
 }
 
 .authButtons {
-    display: flex;
-    gap: 8px;
+  display: flex;
+  gap: 8px;
 }
 
-.loginBtn, .signupBtn {
-    flex: 1;
-    padding: 8px;
-    border-radius: 6px;
-    font-weight: 600;
-    cursor: pointer;
-    font-size: 0.9rem;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--foreground);
-    white-space: nowrap;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
+.loginBtn,
+.signupBtn {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--foreground);
+  white-space: nowrap;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
 }
 
 .signupBtn {
-    background: var(--primary);
-    border-color: var(--primary);
-    color: white;
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
 }
 
 .sidebar.collapsed .authButtons {
-    flex-direction: column;
-    gap: 8px;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.sidebar.collapsed .loginBtn, .sidebar.collapsed .signupBtn {
-    padding: 8px 4px;
-    font-size: 0.75rem;
+.sidebar.collapsed .loginBtn,
+.sidebar.collapsed .signupBtn {
+  padding: 8px 4px;
+  font-size: 0.75rem;
 }
 
 .themeToggle {
-    width: 100%;
-    padding: 10px;
-    background-color: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--foreground);
-    cursor: pointer;
-    font-weight: 600;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
+  width: 100%;
+  padding: 10px;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--foreground);
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
 }
 
 .toggleCollapseBtn {
-    position: absolute;
-    top: 20px;
-    right: -12px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: var(--foreground);
-    cursor: pointer;
-    z-index: 60;
+  position: absolute;
+  top: 20px;
+  right: -12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--foreground);
+  cursor: pointer;
+  z-index: 60;
 }
 
 /* Mobile specific overrides */
 @media (max-width: 768px) {
-    .sidebar {
-        width: 280px;
-        transform: translateX(-100%);
-        box-shadow: 10px 0 30px rgba(0,0,0,0.5);
-    }
-    
-    .sidebar.open {
-        transform: translateX(0);
-    }
+  .sidebar {
+    width: 280px;
+    transform: translateX(-100%);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+  }
 
-    .toggleCollapseBtn {
-        display: none;
-    }
-    
-    .closeMobileBtn {
-        position: absolute;
-        top: 16px;
-        right: 16px;
-        background: none;
-        border: none;
-        color: var(--secondary);
-        cursor: pointer;
-    }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .toggleCollapseBtn {
+    display: none;
+  }
+
+  .closeMobileBtn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    color: var(--secondary);
+    cursor: pointer;
+  }
 }
 
 /* Hide scrollbar functionality added via cat */
 .navContainer::-webkit-scrollbar {
   display: none;
 }
+
 .navContainer {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 /* Fix for mobile shadow persistence */
 @media (max-width: 768px) {
-    .sidebar:not(.open) {
-        box-shadow: none !important;
-    }
+  .sidebar:not(.open) {
+    box-shadow: none !important;
+  }
 }

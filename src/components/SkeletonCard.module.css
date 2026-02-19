@@ -10,7 +10,8 @@
     gap: 12px;
     position: relative;
     overflow: hidden;
-    min-width: 280px; /* Consistent with playlist cards */
+    min-width: 280px;
+    /* Consistent with course cards */
 }
 
 /* Shimmer animation */
@@ -26,13 +27,19 @@
 }
 
 @keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 /* Common skeleton block styles */
 .skeletonBlock {
-    background: rgba(255, 255, 255, 0.05); /* Very subtle fill */
+    background: rgba(255, 255, 255, 0.05);
+    /* Very subtle fill */
     border-radius: 4px;
 }
 
@@ -53,8 +60,9 @@
 }
 
 .footer {
-    height: 4px; 
-    width: 100%; /* Decorative bottom bar placeholder */
+    height: 4px;
+    width: 100%;
+    /* Decorative bottom bar placeholder */
     margin-top: auto;
     border-radius: 99px;
 }

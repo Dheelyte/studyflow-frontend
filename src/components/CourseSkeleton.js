@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 
-const PlaylistSkeleton = () => (
+const CourseSkeleton = () => (
     <div style={{ paddingBottom: '80px', minHeight: '100vh' }}>
         {/* Header Skeleton */}
         <div style={{ position: 'relative', width: '100%', height: '400px', background: 'radial-gradient(circle at 50% 0%, rgba(255,255,255,0.05) 0%, transparent 70%)' }}></div>
@@ -47,4 +47,4 @@ const PlaylistSkeleton = () => (
     </div>
 );
 
-export default PlaylistSkeleton;
+export default CourseSkeleton;

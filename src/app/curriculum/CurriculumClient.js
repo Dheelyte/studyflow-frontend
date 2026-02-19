@@ -7,6 +7,7 @@ import styles from "./page.module.css";
 import { useAuth } from "@/context/AuthContext";
 import { useRedirectState } from "@/hooks/useRedirectState";
 import ShareModal from "@/components/ShareModal";
+import Link from "next/link";
 import { PlayIcon, ClockIcon, ChevronDown, ChevronUp, ZapIcon, HeartIcon, ShareIcon, MenuIcon, CheckCircleIcon, BookOpenIcon, VideoIcon, TrophyIconSimple } from "@/components/Icons";
 
 export default function CurriculumClient() {
@@ -139,11 +140,11 @@ export default function CurriculumClient() {
             return;
         }
 
-        // If already started, just scroll (or if we want to support "Continue Learning" not creating new playlist every time? 
+        // If already started, just scroll (or if we want to support "Continue Learning" not creating new course every time? 
         // User request implies creating it. Let's assume correct behavior is to create if not already tracking?)
         // Actually, if we are purely "Starting", we create. If "Continuing" (isStarted=true) we might just scroll?
-        // But the user prompt says: "When a logged in clicks 'Continue Learning', send ... to create a playlist".
-        // This suggests we might even do it on Continue? But that would duplicate playlists.
+        // But the user prompt says: "When a logged in clicks 'Continue Learning', send ... to create a course".
+        // This suggests we might even do it on Continue? But that would duplicate courses.
         // Let's assume we do it once. But for now, let's implement the creation logic.
 
         try {
@@ -157,23 +158,23 @@ export default function CurriculumClient() {
                 content: curriculumData
             };
 
-            console.log("Creating playlist with payload", payload);
-            const response = await curriculum.createPlaylist(payload);
+            console.log("Creating course with payload", payload);
+            const response = await curriculum.createCourse(payload);
 
             if (response && response.id) {
-                // Redirect to the new playlist page
-                router.push(`/playlist/${response.id}`);
+                // Redirect to the new course page
+                router.push(`/course/${response.id}`);
             } else {
-                console.error("Created playlist but got no ID", response);
+                console.error("Created course but got no ID", response);
                 // Fallback behavior if API fails or returns unexpected?
                 // For now, let's just do the old behavior if it fails to redirect?
                 // Or maybe alert?
-                alert("Failed to create playlist. Checking console.");
+                alert("Failed to create course. Checking console.");
             }
 
         } catch (e) {
-            console.error("Failed to create playlist", e);
-            alert("Failed to save playlist. Please try again.");
+            console.error("Failed to create course", e);
+            alert("Failed to save course. Please try again.");
         } finally {
             setIsCreating(false);
         }
@@ -236,13 +237,27 @@ export default function CurriculumClient() {
     return (
         <div className={styles.container}>
             <div className={styles.headerBg}></div>
+
+            {/* Custom Header for Curriculum Page */}
+            <header className={styles.topNav}>
+                <div className={styles.navBrand}>
+                    <ZapIcon size={24} fill="var(--primary)" />
+                    <span>Primerly</span>
+                </div>
+                {!user && (
+                    <Link href="/login" className={styles.navLoginBtn}>
+                        Log In
+                    </Link>
+                )}
+            </header>
+
             <div className={styles.header}>
-                <div className={styles.playlistImage}>
+                <div className={styles.courseImage}>
                     <span style={{ fontSize: "1.5rem", fontWeight: "800", textAlign: "center", lineHeight: "1.2", padding: "16px" }}>
                         {curriculumData.curriculum_title}
                     </span>
                 </div>
-                <div className={styles.playlistInfo}>
+                <div className={styles.courseInfo}>
                     <span className={styles.type}>{(searchParams.get("experience_level") || "Beginner").toUpperCase()}</span>
                     <h1 className={styles.title}>{curriculumData.curriculum_title}</h1>
                     <p className={styles.description}>{curriculumData.overview}</p>
@@ -252,10 +267,10 @@ export default function CurriculumClient() {
             <div className={styles.controls}>
                 <button ref={startBtnRef} className={`${styles.playButton} ${isGlowing ? styles.glowing : ""}`} onClick={handlePlay} disabled={isCreating}>
                     <PlayIcon size={24} fill="white" />
-                    {isCreating ? "Creating Playlist..." : (isStarted ? "Continue Learning" : "Start Learning")}
+                    {isCreating ? "Creating Course..." : (isStarted ? "Continue Learning" : "Start Learning")}
                 </button>
 
-                <button className={styles.iconButton} title="Share Playlist" onClick={() => setIsShareModalOpen(true)}>
+                <button className={styles.iconButton} title="Share Course" onClick={() => setIsShareModalOpen(true)}>
                     <ShareIcon />
                 </button>
             </div>
@@ -265,7 +280,7 @@ export default function CurriculumClient() {
                 <div className={styles.progressContainer}>
                     <div className={styles.progressLabel}>
                         {/* ... existing progress UI kept simple for now */}
-                        <span>Playlist Progress</span>
+                        <span>Course Progress</span>
                         <span>{completionPercentage}% completed</span>
                     </div>
                     <div className={styles.progressBarBg}>
@@ -324,7 +339,7 @@ export default function CurriculumClient() {
                                                                 key={rIdx}
                                                                 className={`${styles.resourceCard} ${styles.resourceDisabled}`}
                                                                 onClick={(e) => handleResourceClick(e)}
-                                                                title="Click 'Start Learning' to create your playlist first"
+                                                                title="Click 'Start Learning' to create your course first"
                                                             >
                                                                 <div className={styles.resourceInfo}>
                                                                     <div className={styles.resourceHeaderRow}>

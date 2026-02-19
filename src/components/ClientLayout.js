@@ -25,93 +25,94 @@ export default function ClientLayout({ children }) {
   }, [pathname]);
 
   // Hide sidebar on auth pages AND Landing Page (root /) AND Info Pages
-  const isAuthPage = 
-    pathname?.startsWith('/login') || 
-    pathname?.startsWith('/signup') || 
-    pathname?.startsWith('/forgot-password') || 
-    pathname?.startsWith('/reset-password') || 
+  const isAuthPage =
+    pathname?.startsWith('/login') ||
+    pathname?.startsWith('/signup') ||
+    pathname?.startsWith('/forgot-password') ||
+    pathname?.startsWith('/reset-password') ||
     pathname === '/' ||
     pathname === '/about' ||
     pathname === '/contact' ||
     pathname === '/privacy-policy' ||
     pathname === '/terms-of-service' ||
-    pathname === '/cookie-policy';
+    pathname === '/cookie-policy' ||
+    pathname?.startsWith('/curriculum');
 
   // Check screen size for responsiveness
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768);
       if (window.innerWidth > 768) {
-          setIsMobileSidebarOpen(false);
+        setIsMobileSidebarOpen(false);
       }
     };
-    
+
     // Initial check
     checkMobile();
-    
+
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const toggleSidebar = () => {
     if (isMobile) {
-        setIsMobileSidebarOpen(!isMobileSidebarOpen);
+      setIsMobileSidebarOpen(!isMobileSidebarOpen);
     } else {
-        setIsSidebarCollapsed(!isSidebarCollapsed);
+      setIsSidebarCollapsed(!isSidebarCollapsed);
     }
   };
 
   const closeMobileSidebar = () => {
-      if (isMobile) setIsMobileSidebarOpen(false);
+    if (isMobile) setIsMobileSidebarOpen(false);
   };
 
   let containerClass = styles.container;
   if (!isAuthPage && !isMobile) {
-      containerClass = `${styles.container} ${isSidebarCollapsed ? styles.desktopSidebarCollapsed : styles.desktopSidebarOpen}`;
+    containerClass = `${styles.container} ${isSidebarCollapsed ? styles.desktopSidebarCollapsed : styles.desktopSidebarOpen}`;
   }
 
   return (
     <CommunityProvider>
-        <AuthGuard>
+      <AuthGuard>
         <div className={containerClass}>
-        {!isAuthPage && (
-            <Sidebar 
-                isCollapsed={!isMobile && isSidebarCollapsed} 
-                isOpen={isMobile && isMobileSidebarOpen}
-                onClose={closeMobileSidebar}
-                onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-                isMobile={isMobile}
+          {!isAuthPage && (
+            <Sidebar
+              isCollapsed={!isMobile && isSidebarCollapsed}
+              isOpen={isMobile && isMobileSidebarOpen}
+              onClose={closeMobileSidebar}
+              onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+              isMobile={isMobile}
             />
-        )}
-        
-        {isMobile && !isAuthPage && <BottomNav />}
-        <div className={styles.mainWrapper}>
+          )}
+
+          {isMobile && !isAuthPage && <BottomNav />}
+          <div className={styles.mainWrapper}>
             {!isAuthPage && <MobileHeader onMenuClick={toggleSidebar} />}
-             
+
             <main ref={mainRef} className={`${styles.contentScroll} ${!isAuthPage ? styles.withBottomNav : ''}`}>
-                {(pathname === '/about' || pathname === '/contact' || pathname === '/privacy-policy' || pathname === '/terms-of-service' || pathname === '/cookie-policy') && (
-                    <div 
-                        onClick={() => router.back()} 
-                        style={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            color: '#8A2BE2', 
-                            cursor: 'pointer', 
-                            padding: '20px 20px 0 20px', 
-                            fontSize: '17px', 
-                            fontWeight: '500',
-                            marginBottom: '0px',
-                            flexShrink: 0
-                        }}
-                    >
-                        <ChevronLeft size={24} /> Back
-                    </div>
-                )}
-                {children}
+              {(pathname === '/about' || pathname === '/contact' || pathname === '/privacy-policy' || pathname === '/terms-of-service' || pathname === '/cookie-policy') && (
+                <div
+                  onClick={() => router.back()}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    color: '#8A2BE2',
+                    cursor: 'pointer',
+                    padding: '20px 20px 0 20px',
+                    fontSize: '17px',
+                    fontWeight: '500',
+                    marginBottom: '0px',
+                    flexShrink: 0
+                  }}
+                >
+                  <ChevronLeft size={24} /> Back
+                </div>
+              )}
+              {children}
             </main>
+          </div>
         </div>
-        </div>
-    </AuthGuard>
+      </AuthGuard>
     </CommunityProvider>
   );
 }

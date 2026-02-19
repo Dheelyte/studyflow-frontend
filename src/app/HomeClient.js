@@ -150,7 +150,7 @@ export default function HomeClient() {
                             <PlayIcon size={32} />
                         </div>
                         <h3>Start Learning</h3>
-                        <p className={styles.featureText}>Follow the playlist, track progress, and chat with the community.</p>
+                        <p className={styles.featureText}>Follow the course, track progress, and chat with the community.</p>
                     </FadeIn>
                 </div>
             </section>

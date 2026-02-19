@@ -13,8 +13,8 @@ import StatShareModal from '@/components/StatShareModal';
 
 export default function DashboardClient() {
     const [greeting, setGreeting] = useState('');
-    const [playlists, setPlaylists] = useState([]);
-    const [loadingPlaylists, setLoadingPlaylists] = useState(true);
+    const [courses, setCourses] = useState([]);
+    const [loadingCourses, setLoadingCourses] = useState(true);
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
     const [exploreCommunities, setExploreCommunities] = useState([]);
     const [loadingCommunities, setLoadingCommunities] = useState(true);
@@ -48,14 +48,14 @@ export default function DashboardClient() {
         const fetchDashboardData = async () => {
             try {
                 // Parallel fetch
-                const [playlistsRes, myCommunitiesRes, exploreCommunitiesRes] = await Promise.all([
-                    curriculum.getMyPlaylists().catch(e => []),
+                const [coursesRes, myCommunitiesRes, exploreCommunitiesRes] = await Promise.all([
+                    curriculum.getMyCourses().catch(e => []),
                     communities.getMyCommunities().catch(e => []),
                     communities.getExplore().catch(e => [])
                 ]);
 
-                // Process Playlists
-                if (Array.isArray(playlistsRes)) {
+                // Process Courses
+                if (Array.isArray(coursesRes)) {
                     const colors = [
                         'linear-gradient(135deg, #6366f1, #8b5cf6)',
                         'linear-gradient(135deg, #ec4899, #f43f5e)',
@@ -63,18 +63,18 @@ export default function DashboardClient() {
                         'linear-gradient(135deg, #f59e0b, #fbbf24)',
                         'linear-gradient(135deg, #3b82f6, #0ea5e9)'
                     ];
-                    const mapped = playlistsRes.map((item, index) => ({
+                    const mapped = coursesRes.map((item, index) => ({
                         id: item.id,
                         title: item.playlist?.title || "Untitled",
                         description: "Your personalized curriculum",
                         color: colors[index % colors.length],
-                        link: `/playlist/${item.playlist?.id || 1}`,
+                        link: `/course/${item.playlist?.id || 1}`,
                         progress: item.progress?.percentage || 0,
                         completedModules: item.progress?.completed_modules || 0,
                         totalModules: item.progress?.total_modules || 0,
                         level: item.playlist?.level
                     }));
-                    setPlaylists(mapped);
+                    setCourses(mapped);
                 }
 
                 // Process My Communities
@@ -91,7 +91,7 @@ export default function DashboardClient() {
                 console.error("Failed to fetch dashboard data", error);
             } finally {
                 setLoadingCommunities(false);
-                setLoadingPlaylists(false);
+                setLoadingCourses(false);
                 setLoadingMyCommunities(false);
             }
         };
@@ -176,16 +176,16 @@ export default function DashboardClient() {
                     <Link href="/library" className={styles.showAll}>View Library</Link>
                 </div>
                 <div className={styles.scrollContainer}>
-                    {loadingPlaylists ? (
+                    {loadingCourses ? (
                         <>
                             <div style={{ minWidth: '280px', height: '100%' }}><SkeletonCard /></div>
                             <div style={{ minWidth: '280px', height: '100%' }}><SkeletonCard /></div>
                             <div style={{ minWidth: '280px', height: '100%' }}><SkeletonCard /></div>
                         </>
-                    ) : playlists.length > 0 ? (
-                        playlists.slice(0, 5).map(playlist => (
-                            <Link key={playlist.id} href={playlist.link} style={{ minWidth: '280px', display: 'block', textDecoration: 'none' }}>
-                                <Card title={playlist.title} description={playlist.description} color={playlist.color} progress={playlist.progress} completedModules={playlist.completedModules} totalModules={playlist.totalModules} level={playlist.level} />
+                    ) : courses.length > 0 ? (
+                        courses.slice(0, 5).map(course => (
+                            <Link key={course.id} href={course.link} style={{ minWidth: '280px', display: 'block', textDecoration: 'none' }}>
+                                <Card title={course.title} description={course.description} color={course.color} progress={course.progress} completedModules={course.completedModules} totalModules={course.totalModules} level={course.level} />
                             </Link>
                         ))
                     ) : (

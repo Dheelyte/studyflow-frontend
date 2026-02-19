@@ -250,12 +250,12 @@ export const curriculum = {
         const searchParams = new URLSearchParams(params);
         return apiFetch("/generate-curriculum?" + searchParams.toString());
     },
-    get: (id) => apiFetch(`/playlists/${id}`),
-    getMyPlaylists: () => apiFetch('/playlists'),
+    getCourse: (id) => apiFetch(`/playlists/${id}`),
+    getMyCourses: () => apiFetch('/playlists'),
     completeResource: (resourceId) => apiFetch(`/resource/${resourceId}/complete`, {
         method: 'POST'
     }),
-    createPlaylist: (data) => apiFetch('/playlists', {
+    createCourse: (data) => apiFetch('/playlists', {
         method: 'POST',
         body: JSON.stringify(data)
     }),

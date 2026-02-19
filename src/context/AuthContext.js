@@ -16,7 +16,7 @@ export function AuthProvider({ children }) {
     const pathname = usePathname();
 
     const checkUser = useCallback(async (force = false) => {
-        if (!force && typeof window !== 'undefined' && (pathname === '/' || pathname.startsWith('/playlist/') || pathname.startsWith('/library') || pathname.startsWith('/curriculum'))) {
+        if (!force && typeof window !== 'undefined' && (pathname === '/' || pathname.startsWith('/course/') || pathname.startsWith('/library') || pathname.startsWith('/curriculum'))) {
             setLoading(false);
             return;
         }

@@ -24,7 +24,7 @@
     z-index: 1;
 }
 
-.playlistImage {
+.courseImage {
     width: 160px;
     height: 160px;
     background: linear-gradient(135deg, #6366f1, #a855f7);
@@ -52,7 +52,7 @@
     }
 }
 
-.playlistInfo {
+.courseInfo {
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -535,7 +535,7 @@
         align-items: flex-start;
     }
 
-    .playlistImage {
+    .courseImage {
         width: 180px;
         height: 180px;
         margin: 0 auto;
