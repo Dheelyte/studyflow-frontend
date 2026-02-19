@@ -4,7 +4,7 @@ import { useScroll, useTransform, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import styles from './page.module.css';
-import { ZapIcon, TrophyIconSimple, CheckIcon, UsersIcon, SearchIcon, PlayIcon, StarIcon, PlusIcon, ChevronRight } from '@/components/Icons';
+import { ZapIcon, SearchIcon, PlayIcon, StarIcon, ChevronRight } from '@/components/Icons';
 import IntegratedSearchBar from '@/components/IntegratedSearchBar';
 import TypingText from '@/components/TypingText';
 import FadeIn from '@/components/FadeIn';
@@ -60,6 +60,46 @@ export default function HomeClient() {
         "Cybersecurity Fundamentals", "Interior Design", "Music Theory"
     ];
     const marqueeExamples = [...examples, ...examples];
+
+    const testimonials = [
+        {
+            quote: "I was overwhelmed by the amount of React tutorials online. Primerly curated exactly what I needed.",
+            name: "Chinedu O.",
+            role: "Frontend Dev",
+            color: "#eab308",
+            gradient: "linear-gradient(135deg, #eab308, #f59e0b)"
+        },
+        {
+            quote: "The gamification keeps me coming back. I finally finished a course without dropping out halfway!",
+            name: "Amara N.",
+            role: "Student",
+            color: "#10b981",
+            gradient: "linear-gradient(135deg, #10b981, #3b82f6)"
+        },
+        {
+            quote: "Community support is unmatched. I got help with my Python bug in minutes.",
+            name: "Yusuf I.",
+            role: "Data Analyst",
+            color: "#ec4899",
+            gradient: "linear-gradient(135deg, #f59e0b, #ec4899)"
+        },
+        {
+            quote: "I landed my first job after completing the Full Stack path. Best investment ever.",
+            name: "Sarah J.",
+            role: "Junior Dev",
+            color: "#6366f1",
+            gradient: "linear-gradient(135deg, #6366f1, #8b5cf6)"
+        },
+        {
+            quote: "The personalized roadmap saved me months of aimless searching.",
+            name: "David K.",
+            role: "Product Designer",
+            color: "#f43f5e",
+            gradient: "linear-gradient(135deg, #f43f5e, #fb7185)"
+        }
+    ];
+
+    const marqueeTestimonials = [...testimonials, ...testimonials];
 
     return (
         <div className={styles.container}>
@@ -263,46 +303,26 @@ export default function HomeClient() {
                 <FadeIn>
                     <h2 className={styles.sectionHeading}>Loved by learners everywhere</h2>
                 </FadeIn>
-                <div className={styles.testimonialsGrid}>
-                    <FadeIn delay={0.1} direction="up" className={styles.testimonialCard}>
-                        <div style={{ marginBottom: '24px', display: 'flex', gap: '4px', color: '#eab308' }}>
-                            {[1, 2, 3, 4, 5].map(i => <StarIcon key={i} size={16} fill="currentColor" stroke="none" />)}
-                        </div>
-                        <p className={styles.quote}>&quot;I was overwhelmed by the amount of React tutorials online. Primerly curated exactly what I needed.&quot;</p>
-                        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                            <div className={styles.avatarRing}><div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'var(--card)' }}></div></div>
-                            <div>
-                                <div style={{ fontWeight: '700' }}>Chinedu O.</div>
-                                <div style={{ fontSize: '0.8rem', color: 'var(--secondary)' }}>Frontend Dev</div>
+                <div className={styles.marqueeContainer} style={{ marginTop: '60px', maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}>
+                    <div className={styles.testimonialMarqueeTrack}>
+                        {marqueeTestimonials.map((item, i) => (
+                            <div key={i} className={styles.testimonialCard}>
+                                <div style={{ marginBottom: '24px', display: 'flex', gap: '4px', color: '#eab308' }}>
+                                    {[1, 2, 3, 4, 5].map(star => <StarIcon key={star} size={16} fill="currentColor" stroke="none" />)}
+                                </div>
+                                <p className={styles.quote}>&quot;{item.quote}&quot;</p>
+                                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                                    <div className={styles.avatarRing} style={{ background: item.gradient || 'var(--primary)' }}>
+                                        <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'var(--card)' }}></div>
+                                    </div>
+                                    <div>
+                                        <div style={{ fontWeight: '700' }}>{item.name}</div>
+                                        <div style={{ fontSize: '0.8rem', color: 'var(--secondary)' }}>{item.role}</div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </FadeIn>
-                    <FadeIn delay={0.2} direction="up" className={styles.testimonialCard}>
-                        <div style={{ marginBottom: '24px', display: 'flex', gap: '4px', color: '#eab308' }}>
-                            {[1, 2, 3, 4, 5].map(i => <StarIcon key={i} size={16} fill="currentColor" stroke="none" />)}
-                        </div>
-                        <p className={styles.quote}>&quot;The gamification keeps me coming back. I finally finished a course without dropping out halfway!&quot;</p>
-                        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                            <div className={styles.avatarRing} style={{ background: 'linear-gradient(135deg, #10b981, #3b82f6)' }}><div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'var(--card)' }}></div></div>
-                            <div>
-                                <div style={{ fontWeight: '700' }}>Amara N.</div>
-                                <div style={{ fontSize: '0.8rem', color: 'var(--secondary)' }}>Student</div>
-                            </div>
-                        </div>
-                    </FadeIn>
-                    <FadeIn delay={0.3} direction="up" className={styles.testimonialCard}>
-                        <div style={{ marginBottom: '24px', display: 'flex', gap: '4px', color: '#eab308' }}>
-                            {[1, 2, 3, 4, 5].map(i => <StarIcon key={i} size={16} fill="currentColor" stroke="none" />)}
-                        </div>
-                        <p className={styles.quote}>&quot;Community support is unmatched. I got help with my Python bug in minutes.&quot;</p>
-                        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                            <div className={styles.avatarRing} style={{ background: 'linear-gradient(135deg, #f59e0b, #ec4899)' }}><div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'var(--card)' }}></div></div>
-                            <div>
-                                <div style={{ fontWeight: '700' }}>Yusuf I.</div>
-                                <div style={{ fontSize: '0.8rem', color: 'var(--secondary)' }}>Data Analyst</div>
-                            </div>
-                        </div>
-                    </FadeIn>
+                        ))}
+                    </div>
                 </div>
             </section>
 
@@ -370,6 +390,10 @@ function FAQSection() {
         { q: "Is Primerly really free?", a: "Yes! You can generate unlimited curriculums on the free plan. We may introduce premium features later." },
         { q: "How accurate is the AI?", a: "We use Gemini 3 Pro to curate high-quality resources. The content is constantly vetted by our algorithm." },
         { q: "Can I customize the curriculum?", a: "Not yet. But in future versions, you should be able to edit, remove, or reorder modules as you see fit." },
+        { q: "How does the streak system work?", a: "You build a streak by completing at least one lesson or quiz every day. Streaks unlock special badges and community flair!" },
+        { q: "Can I share my progress?", a: "Absolutely. You can share your daily streaks to social media or directly with your friends." },
+        { q: "What topics can I learn?", a: "Anything! From 'Quantum Physics' to 'Cake Baking'. If it has online resources, Primerly can build a path for it." },
+        { q: "How do I join a community?", a: "Once you start a course, you're automatically invited to the relevant topic channel where you can chat with fellow learners." },
         { q: "Is there a mobile app?", a: "Primerly is fully responsive and works great on any device. A native app is coming soon!" }
     ];
 
