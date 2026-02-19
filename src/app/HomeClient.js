@@ -183,7 +183,7 @@ export default function HomeClient() {
                             <ZapIcon size={32} />
                         </div>
                         <h3>AI Generation</h3>
-                        <p className={styles.featureText}>Our engine scrapes the best videos, articles, and quizzes to build your path.</p>
+                        <p className={styles.featureText}>Primerly curates the best videos, articles, and quizzes to build your path.</p>
                     </FadeIn>
                     <FadeIn direction="up" delay={0.3} className={styles.stepCard}>
                         <div className={styles.stepIconBg}>
@@ -205,19 +205,16 @@ export default function HomeClient() {
                         [
                             {
                                 title: "AI-Curated Paths", subtitle: "Personalized curriculum tailored to you",
-                                desc: "We don't just serve you random videos. Our Gemini-powered engine analyzes thousands of resources to create a cohesive, step-by-step curriculum.",
                                 color: "linear-gradient(135deg, #6366f1, #8b5cf6)",
                                 visual: (<div className={styles.visualMockup}><div className={styles.pathContainer}><div className={styles.pathLine}></div><div className={styles.pathNode}><div className={styles.pathIcon}><PlayIcon size={12} fill="var(--primary)" /></div><span style={{ fontSize: "0.9rem", fontWeight: "600" }}>React Basics</span></div><div className={styles.pathNode}><div className={styles.pathIcon}><ZapIcon size={12} fill="var(--primary)" /></div><span style={{ fontSize: "0.9rem", fontWeight: "600" }}>Advanced Hooks</span></div><div className={styles.pathNode}><div className={styles.pathIcon}><StarIcon size={12} fill="var(--primary)" /></div><span style={{ fontSize: "0.9rem", fontWeight: "600" }}>Capstone Project</span></div></div></div>)
                             },
                             {
                                 title: "Gamified Motivation", subtitle: "Track progress with streaks and XP",
-                                desc: "Stay consistent with streaks, XP, and daily goals. We turn learning into a game you actually want to play.",
                                 color: "linear-gradient(135deg, #eab308, #f59e0b)",
                                 visual: (<div className={styles.streakCard}><div className={styles.streakFlame}>🔥</div><div className={styles.streakText}>12 Day Streak</div></div>)
                             },
                             {
                                 title: "Community Powered", subtitle: "Join communities for every topic",
-                                desc: "Never learn alone. Join niche communities for every topic. Share your notes and ask questions.",
                                 color: "linear-gradient(135deg, #ec4899, #f43f5e)",
                                 visual: (<div className={styles.chatContainer}><div className={`${styles.chatBubble} ${styles.chatLeft}`}>Has anyone finished module 4? 🙋‍♀️</div><div className={`${styles.chatBubble} ${styles.chatRight}`}>Yes! The visualizer helps properly.</div></div>)
                             }
