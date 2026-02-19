@@ -15,10 +15,6 @@ export function AuthProvider({ children }) {
     const router = useRouter();
     const pathname = usePathname();
 
-    useEffect(() => {
-        checkUser();
-    }, [checkUser]);
-
     const checkUser = useCallback(async (force = false) => {
         if (!force && typeof window !== 'undefined' && (pathname === '/' || pathname.startsWith('/playlist/') || pathname.startsWith('/library') || pathname.startsWith('/curriculum'))) {
             setLoading(false);
@@ -52,6 +48,10 @@ export function AuthProvider({ children }) {
             setLoading(false);
         }
     }, [setUser, setLoading, pathname]);
+
+    useEffect(() => {
+        checkUser();
+    }, [checkUser]);
 
     const login = useCallback(async (credentials) => {
         const { email, password } = credentials;
