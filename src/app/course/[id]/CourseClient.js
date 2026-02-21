@@ -339,10 +339,11 @@ export default function CourseClient({ params }) {
 
     };
 
-    // Sync completion percentage when data changes
+    // Sync completion percentage and page title when data changes
     useEffect(() => {
         if (curriculumData) {
             setCompletionPercentage(curriculumData.completionPercentage);
+            document.title = `${curriculumData.curriculum_title} | Primerly`;
         }
     }, [curriculumData]);
 

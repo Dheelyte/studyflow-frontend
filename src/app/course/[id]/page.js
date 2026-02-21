@@ -23,14 +23,14 @@ export async function generateMetadata({ params }) {
         // const course = await curriculum.getCourse(id);
         // return { title: course.title };
 
-        // Let's stick to "Curriculum" for now to avoid server-side auth/cookie issues 
+        // Let's stick to a generic "Course" for now to avoid server-side auth/cookie issues 
         // if the fetch requires user context (which it might).
         return {
-            title: 'Curriculum',
+            title: 'Course',
         };
     } catch (e) {
         return {
-            title: 'Curriculum',
+            title: 'Course',
         };
     }
 }
