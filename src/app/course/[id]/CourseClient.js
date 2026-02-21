@@ -343,6 +343,9 @@ export default function CourseClient({ params }) {
     useEffect(() => {
         if (curriculumData) {
             setCompletionPercentage(curriculumData.completionPercentage);
+            if (curriculumData.isStarted) {
+                setIsStarted(true);
+            }
             document.title = `${curriculumData.curriculum_title} | Primerly`;
         }
     }, [curriculumData]);
