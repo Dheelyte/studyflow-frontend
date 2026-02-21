@@ -201,6 +201,8 @@ export default function CourseClient({ params }) {
 
                 setCurriculumData(data);
 
+                document.title = `${data.curriculum_title} | Primerly`;
+
                 // Auto-expand module containing "Next Up" or first module
                 if (data.modules && data.modules.length > 0) {
                     let moduleToExpand = data.modules[0].module_id !== undefined ? data.modules[0].module_id : 0;
@@ -339,14 +341,13 @@ export default function CourseClient({ params }) {
 
     };
 
-    // Sync completion percentage and page title when data changes
+    // Sync completion percentage when data changes
     useEffect(() => {
         if (curriculumData) {
             setCompletionPercentage(curriculumData.completionPercentage);
             if (curriculumData.isStarted) {
                 setIsStarted(true);
             }
-            document.title = `${curriculumData.curriculum_title} | Primerly`;
         }
     }, [curriculumData]);
 

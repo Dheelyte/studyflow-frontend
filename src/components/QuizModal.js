@@ -13,8 +13,10 @@ export default function QuizModal({ isOpen, onClose, moduleTitle, moduleId, onCo
     const [answers, setAnswers] = useState({}); // { questionId: optionId }
     const [score, setScore] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [loadingProgress, setLoadingProgress] = useState(0);
+    const progressInterval = useRef(null);
     const [showCorrection, setShowCorrection] = useState(false); // To show correct/incorrect after selection
-    
+
     // Ref for scrolling content to top
     const contentRef = useRef(null);
 
@@ -25,9 +27,13 @@ export default function QuizModal({ isOpen, onClose, moduleTitle, moduleId, onCo
             resetQuizState();
         } else {
             // Reset questions when opening a new module so we don't show old ones while waiting to start
-            setQuestions([]); 
-            resetQuizState(); 
+            setQuestions([]);
+            resetQuizState();
         }
+
+        return () => {
+            if (progressInterval.current) clearInterval(progressInterval.current);
+        };
     }, [isOpen, moduleId]);
 
     const resetQuizState = () => {
@@ -36,6 +42,8 @@ export default function QuizModal({ isOpen, onClose, moduleTitle, moduleId, onCo
         setScore(0);
         setCurrentQuestionIdx(0);
         setShowCorrection(false);
+        setLoadingProgress(0);
+        if (progressInterval.current) clearInterval(progressInterval.current);
     };
 
     const loadQuiz = async () => {
@@ -61,15 +69,24 @@ export default function QuizModal({ isOpen, onClose, moduleTitle, moduleId, onCo
 
     const handleStart = async () => {
         if (loading) return; // Prevent start if still loading
-        
+
         if (questions.length === 0) {
             try {
                 setLoading(true);
+                setLoadingProgress(0);
+
+                progressInterval.current = setInterval(() => {
+                    setLoadingProgress(prev => {
+                        const next = prev + (100 / 300); // 100% / 300 ticks (30s at 100ms/tick)
+                        return next >= 99 ? 99 : next;
+                    });
+                }, 100);
+
                 const data = await curriculum.getQuiz(moduleId, {
                     curriculum_title: curriculumTitle,
                     experience_level: experienceLevel
                 });
-                
+
                 if (data && data.questions && data.questions.length > 0) {
                     setQuestions(data.questions);
                     setStep('QUESTION');
@@ -78,7 +95,9 @@ export default function QuizModal({ isOpen, onClose, moduleTitle, moduleId, onCo
             } catch (err) {
                 console.error("Failed to load quiz", err);
             } finally {
+                clearInterval(progressInterval.current);
                 setLoading(false);
+                setLoadingProgress(100);
             }
             return;
         }
@@ -88,18 +107,18 @@ export default function QuizModal({ isOpen, onClose, moduleTitle, moduleId, onCo
     };
 
     const handleRetry = () => {
-         setAnswers({});
-         setScore(0);
-         setCurrentQuestionIdx(0);
-         setShowCorrection(false);
-         setStep('QUESTION');
-         // Scroll to top when retrying
-         setTimeout(scrollToTop, 0);
+        setAnswers({});
+        setScore(0);
+        setCurrentQuestionIdx(0);
+        setShowCorrection(false);
+        setStep('QUESTION');
+        // Scroll to top when retrying
+        setTimeout(scrollToTop, 0);
     };
 
     const handleOptionSelect = (optionId) => {
         if (showCorrection) return; // Prevent changing after selection
-        
+
         const currentQ = questions[currentQuestionIdx];
         setAnswers(prev => ({ ...prev, [currentQ.id]: optionId }));
         setShowCorrection(true);
@@ -126,9 +145,9 @@ export default function QuizModal({ isOpen, onClose, moduleTitle, moduleId, onCo
 
         const finalScore = Math.round((correctCount / questions.length) * 100);
         setScore(finalScore);
-        
+
         setStep('RESULTS');
-        
+
         // Only submit and celebrate if passed
         if (finalScore >= PASS_MARK) {
             try {
@@ -177,7 +196,7 @@ export default function QuizModal({ isOpen, onClose, moduleTitle, moduleId, onCo
     return (
         <div className={styles.overlay} onClick={onClose}>
             <div className={styles.modal} onClick={e => e.stopPropagation()}>
-                
+
                 {/* Header */}
                 <div className={styles.header}>
                     <div className={styles.headerTitle}>
@@ -191,14 +210,14 @@ export default function QuizModal({ isOpen, onClose, moduleTitle, moduleId, onCo
 
                 {/* Progress Bar - Persistent */}
                 {questions.length > 0 && step !== 'INTRO' && (
-                     <div style={{ width: '100%', padding: '0 2rem', marginTop: '1.5rem' }}>
+                    <div style={{ width: '100%', padding: '0 2rem', marginTop: '1.5rem' }}>
                         <div className={styles.progressContainer} style={{ marginBottom: 0 }}>
-                            <div 
-                                className={styles.progressBar} 
+                            <div
+                                className={styles.progressBar}
                                 style={{ width: `${progressPercentage}%`, background: isPassed || step !== 'RESULTS' ? 'linear-gradient(90deg, #10b981, #34d399)' : '#ef4444' }}
                             ></div>
                         </div>
-                     </div>
+                    </div>
                 )}
 
                 {/* Content */}
@@ -210,29 +229,43 @@ export default function QuizModal({ isOpen, onClose, moduleTitle, moduleId, onCo
                             <h2 className={styles.introTitle}>Ready to test your skills?</h2>
                             <p className={styles.introDesc}>
                                 You'll face 10 questions to verify your understanding of <strong>{moduleTitle}</strong>.
-                                <br/><br/>
+                                <br /><br />
                                 <span style={{ color: '#fbbf24', fontWeight: 'bold' }}>Pass Mark: {PASS_MARK}%</span>
                             </p>
-                            <div className={styles.footer} style={{ width: '100%', justifyContent: 'center', border: 'none' }}>
-                                <button 
-                                    className={styles.primaryBtn} 
-                                    onClick={handleStart}
-                                    disabled={loading}
-                                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: '140px', justifyContent: 'center' }}
-                                >
-                                    {loading ? <Spinner size={20} color="white" /> : 'Start Quiz'}
-                                </button>
-                            </div>
+                            {loading ? (
+                                <div style={{ width: '100%', maxWidth: '300px', margin: '2rem auto 0 auto', textAlign: 'center' }}>
+                                    <div style={{ marginBottom: '8px', fontSize: '0.9rem', color: 'var(--secondary)' }}>
+                                        Generating quiz... {Math.round(loadingProgress)}%
+                                    </div>
+                                    <div className={styles.progressContainer} style={{ marginBottom: 0, height: '8px', background: 'var(--border)' }}>
+                                        <div
+                                            className={styles.progressBar}
+                                            style={{ width: `${loadingProgress}%`, background: 'var(--primary)', transition: 'width 0.1s linear' }}
+                                        ></div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className={styles.footer} style={{ width: '100%', justifyContent: 'center', border: 'none' }}>
+                                    <button
+                                        className={styles.primaryBtn}
+                                        onClick={handleStart}
+                                        disabled={loading}
+                                        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: '140px', justifyContent: 'center' }}
+                                    >
+                                        Start Quiz
+                                    </button>
+                                </div>
+                            )}
                         </>
                     )}
 
                     {/* Question State - Renders only if questions exist */}
                     {step === 'QUESTION' && (
                         loading ? (
-                             <div style={{ color: '#a1a1aa' }}>Loading fallback...</div> // Should typically be caught by Intro
+                            <div style={{ color: '#a1a1aa' }}>Loading fallback...</div> // Should typically be caught by Intro
                         ) : questions.length > 0 ? (
                             <div className={styles.questionContainer}>
-                                
+
                                 <div style={{ marginBottom: '1rem', color: '#a1a1aa', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
                                     Question {currentQuestionIdx + 1} of {questions.length}
                                 </div>
@@ -245,7 +278,7 @@ export default function QuizModal({ isOpen, onClose, moduleTitle, moduleId, onCo
                                     {questions[currentQuestionIdx].options.map(opt => {
                                         const isSelected = answers[questions[currentQuestionIdx].id] === opt.id;
                                         const isCorrect = opt.id === questions[currentQuestionIdx].correctOptionId;
-                                        
+
                                         let className = styles.optionBtn;
                                         if (showCorrection) {
                                             if (isCorrect) className += ` ${styles.correct}`;
@@ -255,7 +288,7 @@ export default function QuizModal({ isOpen, onClose, moduleTitle, moduleId, onCo
                                         }
 
                                         return (
-                                            <button 
+                                            <button
                                                 key={opt.id}
                                                 className={className}
                                                 onClick={() => handleOptionSelect(opt.id)}
@@ -269,7 +302,7 @@ export default function QuizModal({ isOpen, onClose, moduleTitle, moduleId, onCo
                                 </div>
 
                                 <div className={styles.footer} style={{ marginTop: '2rem', padding: '1.5rem 0 0 0', border: 'none' }}>
-                                    <button 
+                                    <button
                                         className={styles.primaryBtn}
                                         onClick={handleNext}
                                         disabled={!showCorrection} // Force answer before next
@@ -287,7 +320,7 @@ export default function QuizModal({ isOpen, onClose, moduleTitle, moduleId, onCo
 
                     {step === 'RESULTS' && (
                         <>
-                            <div className={styles.scoreCircle} style={{ 
+                            <div className={styles.scoreCircle} style={{
                                 borderColor: isPassed ? '#10b981' : '#ef4444',
                                 color: isPassed ? '#10b981' : '#ef4444',
                                 background: isPassed ? 'rgba(16, 185, 129, 0.05)' : 'rgba(239, 68, 68, 0.05)',
@@ -299,8 +332,8 @@ export default function QuizModal({ isOpen, onClose, moduleTitle, moduleId, onCo
                                 {isPassed ? "Excellent Work!" : "Keep Learning!"}
                             </h2>
                             <p className={styles.resultSubtext}>
-                                {isPassed 
-                                    ? `You passed the ${moduleTitle} quiz!` 
+                                {isPassed
+                                    ? `You passed the ${moduleTitle} quiz!`
                                     : `You need ${PASS_MARK}% to pass. Review the material and try again—you've got this!`}
                             </p>
                             <div className={styles.footer} style={{ width: '100%', justifyContent: 'center', gap: '1rem', border: 'none' }}>

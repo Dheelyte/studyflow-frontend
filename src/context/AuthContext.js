@@ -6,8 +6,7 @@ import { useRouter, usePathname } from 'next/navigation';
 
 const AuthContext = createContext();
 
-const IS_LOGGED_IN_KEY = 'studyspotify_is_logged_in';
-const USER_DATA_KEY = 'studyspotify_user_data';
+const USER_DATA_KEY = 'primerly_user_data';
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
@@ -21,7 +20,7 @@ export function AuthProvider({ children }) {
             return;
         }
         // Optimization: Don't check session if we know user isn't logged in locally
-        if (!force && typeof window !== 'undefined' && !localStorage.getItem(IS_LOGGED_IN_KEY)) {
+        if (!force && typeof window !== 'undefined' && !localStorage.getItem(USER_DATA_KEY)) {
             setLoading(false);
             return;
         }
@@ -35,13 +34,11 @@ export function AuthProvider({ children }) {
 
             setUser(userData);
             localStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
-            localStorage.setItem(IS_LOGGED_IN_KEY, 'true');
             return userData;
         } catch (error) {
             // Not logged in or session expired
             console.warn("Session check failed:", error);
             setUser(null);
-            localStorage.removeItem(IS_LOGGED_IN_KEY);
             localStorage.removeItem(USER_DATA_KEY);
             return null;
         } finally {
@@ -56,7 +53,6 @@ export function AuthProvider({ children }) {
     const login = useCallback(async (credentials) => {
         const { email, password } = credentials;
         await auth.login(email, password);
-        localStorage.setItem(IS_LOGGED_IN_KEY, 'true');
         return checkUser(true);
     }, [checkUser]);
 
@@ -72,7 +68,6 @@ export function AuthProvider({ children }) {
             console.error('Logout failed', e);
         }
         setUser(null);
-        localStorage.removeItem(IS_LOGGED_IN_KEY);
         localStorage.removeItem(USER_DATA_KEY);
         router.push('/login');
     }, [router, setUser]);
