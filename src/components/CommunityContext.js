@@ -70,8 +70,8 @@ export function CommunityProvider({ children }) {
             // Helper to safely format user logic if missing
             const processed = (res || []).map(p => ({
                 ...p,
-                author: "User",
-                initials: "U",
+                author: p.user_name || "User",
+                initials: p.user_name ? p.user_name.substring(0, 2).toUpperCase() : "U",
                 time: formatTimeAgo(p.created_at),
                 tag: "General",
                 likes: 0,
@@ -317,8 +317,8 @@ export function CommunityProvider({ children }) {
 
             const newPost = {
                 ...res,
-                author: "You",
-                initials: "ME",
+                author: res.user_name || "You",
+                initials: res.user_name ? res.user_name.substring(0, 2).toUpperCase() : "ME",
                 time: "Just now",
                 tag: "General",
                 likes: 0,
