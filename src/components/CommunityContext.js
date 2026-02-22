@@ -258,29 +258,37 @@ export function CommunityProvider({ children }) {
         }
     }, [user]);
 
-    const joinCommunity = async (id) => {
-        requireAuth(async () => {
-            try {
-                await communityApi.join(id);
-                setCommunities(prev => prev.map(c =>
-                    c.id === id ? { ...c, isJoined: true, memberCount: (c.memberCount || 0) + 1 } : c
-                ));
-            } catch (e) {
-                console.error("Failed to join community", e);
-            }
+    const joinCommunity = (id) => {
+        return new Promise((resolve, reject) => {
+            requireAuth(async () => {
+                try {
+                    await communityApi.join(id);
+                    setCommunities(prev => prev.map(c =>
+                        c.id === id ? { ...c, isJoined: true, memberCount: (c.memberCount || 0) + 1 } : c
+                    ));
+                    resolve();
+                } catch (e) {
+                    console.error("Failed to join community", e);
+                    reject(e);
+                }
+            });
         });
     };
 
-    const leaveCommunity = async (id) => {
-        requireAuth(async () => {
-            try {
-                await communityApi.leave(id);
-                setCommunities(prev => prev.map(c =>
-                    c.id === id ? { ...c, isJoined: false, memberCount: Math.max(0, (c.memberCount || 0) - 1) } : c
-                ));
-            } catch (e) {
-                console.error("Failed to leave community", e);
-            }
+    const leaveCommunity = (id) => {
+        return new Promise((resolve, reject) => {
+            requireAuth(async () => {
+                try {
+                    await communityApi.leave(id);
+                    setCommunities(prev => prev.map(c =>
+                        c.id === id ? { ...c, isJoined: false, memberCount: Math.max(0, (c.memberCount || 0) - 1) } : c
+                    ));
+                    resolve();
+                } catch (e) {
+                    console.error("Failed to leave community", e);
+                    reject(e);
+                }
+            });
         });
     };
 
