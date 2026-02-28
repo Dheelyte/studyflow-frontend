@@ -35,7 +35,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--hover); /* Using hover for slight tint, or transparent */
+  background: var(--hover);
+  /* Using hover for slight tint, or transparent */
 }
 
 .headerTitle {
@@ -70,12 +71,18 @@
   padding: 2rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
   min-height: 300px;
   flex: 1;
   overflow-y: auto;
-  justify-content: center;
+}
+
+.contentInner {
+  margin: auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 /* Intro State */
@@ -91,6 +98,7 @@
   margin-bottom: 0.75rem;
   background: linear-gradient(135deg, var(--foreground), var(--secondary));
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -238,9 +246,17 @@
 }
 
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
 }
 
 /* Inline Code Styling */
@@ -250,5 +266,6 @@
   border-radius: 4px;
   font-family: 'Courier New', Courier, monospace;
   font-size: 0.9em;
-  color: #fbbf24; /* Amber-400 for visibility, keep as accent */
+  color: #fbbf24;
+  /* Amber-400 for visibility, keep as accent */
 }
