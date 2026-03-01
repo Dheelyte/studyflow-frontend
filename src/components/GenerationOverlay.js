@@ -14,7 +14,7 @@ const FACTS = [
 ];
 
 const RELATED_TERMS = [
-    "Concepts", "History", "Syntax", "Patterns", "Tools", 
+    "Concepts", "History", "Syntax", "Patterns", "Tools",
     "Best Practices", "Case Studies", "Frameworks", "Security",
     "Optimization", "Architecture", "Debugging", "Community",
     "Resources", "Algorithms", "Data Structures"
@@ -37,9 +37,9 @@ export default function GenerationOverlay({ topic, experience, onComplete, isFin
     const [progress, setProgress] = useState(0);
     const [logs, setLogs] = useState([]);
     const [typedText, setTypedText] = useState('');
-    
+
     const containerRef = useRef(null);
-    const boxRef = useRef(null); 
+    const boxRef = useRef(null);
 
     // Initial fact rotation
     useEffect(() => {
@@ -52,12 +52,12 @@ export default function GenerationOverlay({ topic, experience, onComplete, isFin
     // Progress and Logs timer with stall logic
     useEffect(() => {
         // Base duration to reach 99% (40 seconds)
-        const simulatedDuration = 40000; 
+        const simulatedDuration = 40000;
         const startTime = Date.now();
-        
+
         const interval = setInterval(() => {
             const elapsed = Date.now() - startTime;
-            
+
             // If finished, we want to complete quickly
             if (isFinished) {
                 setProgress(prev => {
@@ -72,10 +72,10 @@ export default function GenerationOverlay({ topic, experience, onComplete, isFin
                 // Not finished yet: calculate steady progress
                 // Linear interpolation from 0 to 99 over 40000ms
                 let p = (elapsed / simulatedDuration) * 99;
-                
+
                 // Cap at 99% if not finished
                 if (p > 99) p = 99;
-                
+
                 setProgress(p);
             }
 
@@ -83,15 +83,15 @@ export default function GenerationOverlay({ topic, experience, onComplete, isFin
             // Map 0-99% to the available log messages
             const currentP = isFinished ? 100 : (Math.min((elapsed / simulatedDuration) * 99, 99));
             const logIndex = Math.floor((currentP / 100) * LOG_MESSAGES.length);
-            
+
             if (logIndex < LOG_MESSAGES.length && LOG_MESSAGES[logIndex]) {
-                 setLogs(prev => {
-                     const msg = LOG_MESSAGES[logIndex];
-                     if (prev[0] !== msg) {
-                         return [msg];
-                     }
-                     return prev;
-                 });
+                setLogs(prev => {
+                    const msg = LOG_MESSAGES[logIndex];
+                    if (prev[0] !== msg) {
+                        return [msg];
+                    }
+                    return prev;
+                });
             }
 
         }, 100);
@@ -103,7 +103,7 @@ export default function GenerationOverlay({ topic, experience, onComplete, isFin
     useEffect(() => {
         if (progress >= 100 && onComplete) {
             const timer = setTimeout(() => {
-                 onComplete();
+                onComplete();
             }, 500);
             return () => clearTimeout(timer);
         }
@@ -114,7 +114,7 @@ export default function GenerationOverlay({ topic, experience, onComplete, isFin
         if (logs.length === 0) return;
         const targetText = logs[0];
         setTypedText('');
-        
+
         const startTime = Date.now();
         const charDuration = 25; // ms per char
 
@@ -122,7 +122,7 @@ export default function GenerationOverlay({ topic, experience, onComplete, isFin
             const now = Date.now();
             const elapsed = now - startTime;
             const charCount = Math.floor(elapsed / charDuration);
-            
+
             if (charCount >= targetText.length) {
                 setTypedText(targetText);
                 clearInterval(interval);
@@ -138,7 +138,7 @@ export default function GenerationOverlay({ topic, experience, onComplete, isFin
     useEffect(() => {
         let count = 0;
         const maxNodes = 8;
-        
+
         const spawnInterval = setInterval(() => {
             if (count >= maxNodes) {
                 clearInterval(spawnInterval);
@@ -146,7 +146,7 @@ export default function GenerationOverlay({ topic, experience, onComplete, isFin
             }
 
             const angle = Math.random() * Math.PI * 2;
-            const distance = 160 + Math.random() * 100; 
+            const distance = 160 + Math.random() * 100;
             const x = Math.cos(angle) * distance;
             const y = Math.sin(angle) * distance;
 
@@ -172,12 +172,12 @@ export default function GenerationOverlay({ topic, experience, onComplete, isFin
 
     return (
         <div className={styles.overlay}>
-             <div className={styles.graphContainer} ref={containerRef}>
+            <div className={styles.graphContainer} ref={containerRef}>
                 {/* Lines Layer */}
                 <svg className={styles.connections}>
                     <g transform="translate(50%, 50%)" style={{ overflow: 'visible' }}>
                         {lines.map(line => (
-                            <line 
+                            <line
                                 key={line.id}
                                 x1={0} y1={0}
                                 x2={line.x2} y2={line.y2}
@@ -190,14 +190,14 @@ export default function GenerationOverlay({ topic, experience, onComplete, isFin
                 {/* Center Node + Progress Ring */}
                 <div className={styles.centerWrapper}>
                     <svg className={styles.progressSvg}>
-                         {/* Background Circle */}
-                        <circle 
-                            cx="100" cy="100" r={radius} 
+                        {/* Background Circle */}
+                        <circle
+                            cx="100" cy="100" r={radius}
                             className={styles.progressBg}
                         />
                         {/* Progress Circle */}
-                        <circle 
-                            cx="100" cy="100" r={radius} 
+                        <circle
+                            cx="100" cy="100" r={radius}
                             className={styles.progressCircle}
                             strokeDasharray={circumference}
                             strokeDashoffset={strokeDashoffset}
@@ -205,42 +205,42 @@ export default function GenerationOverlay({ topic, experience, onComplete, isFin
                     </svg>
 
                     <div className={styles.centerNode} ref={boxRef}>
-                        <div>{topic}</div>
+                        <div className={styles.topicText}>{topic}</div>
                         <div className={styles.percentage}>{Math.round(progress)}%</div>
                     </div>
                 </div>
 
                 {/* Floating Nodes */}
                 {nodes.map(node => (
-                    <div 
-                        key={node.id} 
+                    <div
+                        key={node.id}
                         className={styles.node}
                         style={{
-                            transform: `translate(${node.x}px, ${node.y}px)`   
+                            transform: `translate(${node.x}px, ${node.y}px)`
                         }}
                     >
                         {node.label}
                     </div>
                 ))}
-             </div>
+            </div>
 
-             <div className={styles.statusBar}>
+            <div className={styles.statusBar}>
                 <div className={styles.logContainer}>
                     {/* Render only the typed text */}
                     {logs.length > 0 && (
                         <div className={styles.logItem}>
-                           &gt;_ {typedText}<span className={styles.cursor}>|</span>
+                            &gt;_ {typedText}<span className={styles.cursor}>|</span>
                         </div>
                     )}
                 </div>
 
                 <div className={styles.factBox}>
                     <div className={styles.factLabel}>Did You Know?</div>
-                    <div className={styles.factText} key={factIndex} style={{animation: 'fadeIn 0.5s'}}>
+                    <div className={styles.factText} key={factIndex} style={{ animation: 'fadeIn 0.5s' }}>
                         {FACTS[factIndex]}
                     </div>
                 </div>
-             </div>
+            </div>
         </div>
     );
 }

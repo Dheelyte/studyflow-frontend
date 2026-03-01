@@ -1,4 +1,3 @@
-
 .overlay {
     position: fixed;
     top: 0;
@@ -55,17 +54,41 @@
     letter-spacing: 1px;
 }
 
+.topicText {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    word-break: break-word;
+    font-size: 0.9rem;
+    line-height: 1.2;
+}
+
 .percentage {
     font-size: 0.8rem;
-    color: rgba(255,255,255,0.9);
+    color: rgba(255, 255, 255, 0.9);
     margin-top: 4px;
     font-family: monospace;
 }
 
 @keyframes pulse {
-    0% { transform: scale(1); box-shadow: 0 0 40px rgba(168, 85, 247, 0.4); }
-    50% { transform: scale(1.05); box-shadow: 0 0 80px rgba(168, 85, 247, 0.6); }
-    100% { transform: scale(1); box-shadow: 0 0 40px rgba(168, 85, 247, 0.4); }
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 40px rgba(168, 85, 247, 0.4);
+    }
+
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 80px rgba(168, 85, 247, 0.6);
+    }
+
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 40px rgba(168, 85, 247, 0.4);
+    }
 }
 
 /* Progress Ring */
@@ -117,8 +140,15 @@
 }
 
 @keyframes popIn {
-    from { transform: scale(0); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 /* SVG Connections */
@@ -142,7 +172,9 @@
 }
 
 @keyframes drawLine {
-    to { stroke-dashoffset: 0; }
+    to {
+        stroke-dashoffset: 0;
+    }
 }
 
 /* Status Bar @ Bottom */
@@ -189,8 +221,15 @@
 }
 
 @keyframes slideUp {
-    from { transform: translateY(10px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+    from {
+        transform: translateY(10px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 /* Fact Box */
@@ -230,26 +269,34 @@
 }
 
 @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
 }
 
 
 /* Responsiveness for small height screens */
 @media (max-height: 800px) {
+
     /* Scale the entire wrapper down without changing internal dimensions to avoid clipping SVG */
     .centerWrapper {
         transform: scale(0.75);
     }
-    
+
     .statusBar {
         bottom: 20px;
     }
-    
+
     .factBox {
         padding: 10px;
     }
-    
+
     .logContainer {
         height: 60px;
     }
