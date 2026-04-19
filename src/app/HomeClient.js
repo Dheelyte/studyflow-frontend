@@ -1,49 +1,20 @@
 "use client";
-import { useState, useRef, useEffect } from 'react';
-import { useScroll, useTransform, motion } from 'framer-motion';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import styles from './page.module.css';
-import { ZapIcon, SearchIcon, PlayIcon, StarIcon, ChevronRight } from '@/components/Icons';
+import { ZapIcon, SearchIcon, StarIcon, ChevronRight, CheckCircleIcon, VideoIcon, MessageSquareIcon } from '@/components/Icons';
 import IntegratedSearchBar from '@/components/IntegratedSearchBar';
-import TypingText from '@/components/TypingText';
 import FadeIn from '@/components/FadeIn';
+
+const HowItWorksAnimation = dynamic(() => import('@/components/HowItWorksAnimation'), { ssr: false });
 
 export default function HomeClient() {
     const router = useRouter();
-    const videoRef = useRef(null);
-    const container = useRef(null);
-    const { scrollYProgress } = useScroll({ target: container, offset: ['start start', 'end end'] });
-
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        videoRef.current?.play().catch(e => console.log('Autoplay prevented', e));
-                    } else {
-                        videoRef.current?.pause();
-                    }
-                });
-            },
-            { threshold: 0.9 }
-        );
-
-        if (videoRef.current) {
-            observer.observe(videoRef.current);
-        }
-
-        return () => {
-            observer.disconnect();
-        };
-    }, []);
 
     const handleSearch = (params) => {
-        const query = {
-            topic: params.topic,
-            experience: params.experience,
-            duration: params.duration
-        };
+        const query = { topic: params.topic };
         const queryString = new URLSearchParams(query).toString();
         router.push(`/curriculum?${queryString}`);
     };
@@ -116,12 +87,16 @@ export default function HomeClient() {
 
             {/* 1. HERO SECTION */}
             <section className={styles.hero}>
+                <div className={styles.heroBgExtra} aria-hidden />
+                <div className={styles.heroGrain} aria-hidden />
                 <FadeIn direction="up">
-                    <h1 className={styles.title}>Master any skill with a personalized course.</h1>
+                    <h1 className={styles.title}>
+                        Master <span className={styles.titleAccent}>any skill</span> with your personal <span className={styles.titleAccent}>AI tutor</span>.
+                    </h1>
                 </FadeIn>
                 <FadeIn direction="up" delay={0.1}>
                     <p className={styles.subtitle}>
-                        Our AI creates your personalized learning roadmap, finds the best learning resources for every step, tracks your progress, and connects you with a learning community.
+                        AI builds your personalized roadmap, an on-demand video tutor explains every concept, smart quizzes lock in what you learn, and a community keeps you moving.
                     </p>
                 </FadeIn>
 
@@ -140,27 +115,6 @@ export default function HomeClient() {
                 <FadeIn direction="up" delay={0.3} style={{ width: '100%', maxWidth: '900px', marginTop: '12px' }}>
                     <IntegratedSearchBar onSearch={handleSearch} />
                 </FadeIn>
-
-                <FadeIn direction="up" delay={0.4} style={{ marginTop: '48px', width: '100%', display: 'flex', justifyContent: 'center' }}>
-                    <div style={{
-                        borderRadius: '16px',
-                        overflow: 'hidden',
-                        boxShadow: '0 20px 50px -10px rgba(0,0,0,0.3)',
-                        border: '1px solid var(--border)',
-                        maxWidth: '1000px',
-                        width: '100%'
-                    }}>
-                        <video
-                            ref={videoRef}
-                            loop
-                            muted
-                            playsInline
-                            style={{ width: '100%', display: 'block' }}
-                        >
-                            <source src="/recording.mp4" type="video/mp4" />
-                        </video>
-                    </div>
-                </FadeIn>
             </section>
 
             {/* 2. HOW IT WORKS SECTION */}
@@ -168,61 +122,55 @@ export default function HomeClient() {
                 <FadeIn>
                     <h2 className={styles.sectionHeading}>How it works</h2>
                 </FadeIn>
-                <div className={styles.stepsGrid}>
-                    <FadeIn direction="up" delay={0.1} className={styles.stepCard}>
-                        <div className={styles.stepIconBg}>
-                            <SearchIcon size={32} />
-                        </div>
-                        <h3>Set your Goal</h3>
-                        <p className={styles.featureText}>
-                            I want to learn <TypingText words={["React Hooks", "Astrophysics", "Python", "Data Science", "Piano", "Spanish"]} />
-                        </p>
-                    </FadeIn>
-                    <FadeIn direction="up" delay={0.2} className={styles.stepCard}>
-                        <div className={styles.stepIconBg}>
-                            <ZapIcon size={32} />
-                        </div>
-                        <h3>AI Generation</h3>
-                        <p className={styles.featureText}>Primerly curates the best videos, articles, and quizzes to build your path.</p>
-                    </FadeIn>
-                    <FadeIn direction="up" delay={0.3} className={styles.stepCard}>
-                        <div className={styles.stepIconBg}>
-                            <PlayIcon size={32} />
-                        </div>
-                        <h3>Start Learning</h3>
-                        <p className={styles.featureText}>Follow the course, track progress, and chat with the community.</p>
-                    </FadeIn>
-                </div>
-            </section>
-
-            {/* 3. WHY Primerly (DYNAMIC STACK) SECTION */}
-            <section className={styles.stackedSection} ref={container}>
-                <FadeIn>
-                    <h2 className={styles.sectionHeading} style={{ textAlign: 'center', marginBottom: '40px', marginTop: '40px' }}>Why Primerly?</h2>
-                </FadeIn>
-                <div className={styles.stackedContainer}>
-                    {
-                        [
-                            {
-                                title: "AI-Curated Paths", subtitle: "Personalized curriculum tailored to you",
-                                color: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-                                visual: (<div className={styles.visualMockup}><div className={styles.pathContainer}><div className={styles.pathLine}></div><div className={styles.pathNode}><div className={styles.pathIcon}><PlayIcon size={12} fill="var(--primary)" /></div><span style={{ fontSize: "0.9rem", fontWeight: "600" }}>React Basics</span></div><div className={styles.pathNode}><div className={styles.pathIcon}><ZapIcon size={12} fill="var(--primary)" /></div><span style={{ fontSize: "0.9rem", fontWeight: "600" }}>Advanced Hooks</span></div><div className={styles.pathNode}><div className={styles.pathIcon}><StarIcon size={12} fill="var(--primary)" /></div><span style={{ fontSize: "0.9rem", fontWeight: "600" }}>Capstone Project</span></div></div></div>)
-                            },
-                            {
-                                title: "Gamified Motivation", subtitle: "Track progress with streaks and XP",
-                                color: "linear-gradient(135deg, #eab308, #f59e0b)",
-                                visual: (<div className={styles.streakCard}><div className={styles.streakFlame}>🔥</div><div className={styles.streakText}>12 Day Streak</div></div>)
-                            },
-                            {
-                                title: "Community Powered", subtitle: "Join communities for every topic",
-                                color: "linear-gradient(135deg, #ec4899, #f43f5e)",
-                                visual: (<div className={styles.chatContainer}><div className={`${styles.chatBubble} ${styles.chatLeft}`}>Has anyone finished module 4? 🙋‍♀️</div><div className={`${styles.chatBubble} ${styles.chatRight}`}>Yes! The visualizer helps properly.</div></div>)
-                            }
-                        ].map((card, i) => {
-                            const targetScale = 1 - ((3 - i) * 0.05);
-                            return <Card key={i} i={i} {...card} progress={scrollYProgress} range={[i * 0.25, 1]} targetScale={targetScale}>{card.visual}</Card>
-                        })
-                    }
+                <div className={styles.featureStack}>
+                    {[
+                        {
+                            icon: <SearchIcon size={28} />,
+                            title: "Set your goal",
+                            description: "Tell Primerly the topic you want to master. A single sentence turns into a full, personalized learning path — hand-picked videos, notes, and quizzes.",
+                            scene: "setYourGoal",
+                        },
+                        {
+                            icon: <VideoIcon size={28} />,
+                            title: "Learn with your AI Tutor",
+                            description: "Watch curated videos organized into a clear curriculum. Tap Explain this ✨ on any lesson and your tutor breaks it down — no judgement, no context-switching.",
+                            scene: "learnWithAITutor",
+                        },
+                        {
+                            icon: <CheckCircleIcon size={28} />,
+                            title: "Master with quizzes",
+                            description: "Every module ends with an AI-generated quiz. Get instant feedback, celebrate the wins, and move on only when you've actually got it.",
+                            scene: "quiz",
+                        },
+                        {
+                            icon: <ZapIcon size={28} />,
+                            title: "Stay motivated",
+                            description: "Streaks, XP, and a heatmap of your grind turn every study session into visible progress you'll want to protect.",
+                            scene: "gamifiedMotivation",
+                        },
+                        {
+                            icon: <MessageSquareIcon size={28} />,
+                            title: "Grow with community",
+                            description: "Ask questions in topic communities and learn from people on the same path. Likes, comments, and friendly nudges make the journey feel less solo.",
+                            scene: "communityQuestion",
+                        },
+                    ].map((card, i) => (
+                        <FadeIn
+                            key={card.scene}
+                            direction="up"
+                            delay={0.05}
+                            className={`${styles.featureCard} ${i % 2 === 1 ? styles.featureCardReverse : ""}`}
+                        >
+                            <div className={styles.featureCardText}>
+                                <div className={styles.featureCardIcon}>{card.icon}</div>
+                                <h3 className={styles.featureCardTitle}>{card.title}</h3>
+                                <p className={styles.featureCardDescription}>{card.description}</p>
+                            </div>
+                            <div className={styles.featureCardMedia}>
+                                <HowItWorksAnimation scene={card.scene} />
+                            </div>
+                        </FadeIn>
+                    ))}
                 </div>
             </section>
 
@@ -231,7 +179,7 @@ export default function HomeClient() {
                 <div className={styles.communityContent}>
                     <FadeIn direction="right">
                         <h2 className={styles.communityTitle}>Learn better, together.</h2>
-                        <p className={styles.communityText}>Join thousands of learners in topic-specific communities. Share your progress, get help, and stay motivated.</p>
+                        <p className={styles.communityText}>Join thousands of learners in topic-specific channels. Share progress, drop reactions, spin up threaded replies, and stay motivated together.</p>
                         <div className={styles.communityTags}>
                             <span className={styles.communityTag}>#ReactJs</span>
                             <span className={styles.communityTag}>#Python</span>
@@ -243,20 +191,35 @@ export default function HomeClient() {
                     </FadeIn>
                 </div>
                 <div className={styles.communityVisual}>
-                    <FadeIn direction="left" delay={0.2} className={`${styles.mockPostCard} ${styles.mockPostCard1}`}>
-                        <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
-                            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #6366f1, #a855f7)' }}></div>
-                            <div>
-                                <div style={{ fontWeight: '700', fontSize: '0.9rem' }}>Sarah J.</div>
-                                <div style={{ fontSize: '0.75rem', color: 'var(--secondary)' }}>Just now • #ReactMastery</div>
+                    <FadeIn direction="left" delay={0.2} className={styles.mockPostStack}>
+                        <div className={styles.mockPostCard}>
+                            <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
+                                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #6366f1, #a855f7)' }}></div>
+                                <div>
+                                    <div style={{ fontWeight: '700', fontSize: '0.9rem' }}>Sarah J.</div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--secondary)' }}>Just now • #ReactMastery</div>
+                                </div>
+                            </div>
+                            <div style={{ fontSize: '0.9rem', lineHeight: '1.5', marginBottom: '12px' }}>
+                                Finally understood <strong>useEffect</strong> thanks to the module 3 visualizer! 🚀
+                            </div>
+                            <div style={{ display: 'flex', gap: '16px', color: 'var(--secondary)', fontSize: '0.85rem' }}>
+                                <span>❤️ 142</span>
+                                <span>💬 18</span>
+                                <span>🔁 6</span>
                             </div>
                         </div>
-                        <div style={{ fontSize: '0.9rem', lineHeight: '1.5', marginBottom: '12px' }}>
-                            Finally understood <strong>useEffect</strong> thanks to the module 3 visualizer! 🚀
-                        </div>
-                        <div style={{ display: 'flex', gap: '16px', color: 'var(--secondary)', fontSize: '0.85rem' }}>
-                            <span>❤️ 24</span>
-                            <span>💬 5</span>
+                        <div className={styles.mockReplyCard}>
+                            <div style={{ display: 'flex', gap: '10px', marginBottom: '8px' }}>
+                                <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: 'linear-gradient(135deg, #10b981, #14b8a6)' }}></div>
+                                <div>
+                                    <div style={{ fontWeight: '700', fontSize: '0.82rem' }}>David K.</div>
+                                    <div style={{ fontSize: '0.7rem', color: 'var(--secondary)' }}>replying to Sarah</div>
+                                </div>
+                            </div>
+                            <div style={{ fontSize: '0.85rem', lineHeight: '1.5' }}>
+                                Same! The quiz on module 3 cemented it for me 🧠✨
+                            </div>
                         </div>
                     </FadeIn>
                 </div>
@@ -347,7 +310,9 @@ export default function HomeClient() {
                     <div className={styles.footerColumn}>
                         <h4>Product</h4>
                         <div className={styles.footerLinks}>
-                            <Link href="/dashboard">Curriculum</Link>
+                            <Link href="/curriculum">Curriculum</Link>
+                            <Link href="/library">Library</Link>
+                            <Link href="/dashboard">Dashboard</Link>
                             <Link href="/community">Community</Link>
                         </div>
                     </div>
@@ -385,12 +350,14 @@ function FAQSection() {
 
     const questions = [
         { q: "Is Primerly really free?", a: "Yes! You can generate unlimited curriculums on the free plan. We may introduce premium features later." },
-        { q: "How accurate is the AI?", a: "We use Gemini 3 Pro to curate high-quality resources. The content is constantly vetted by our algorithm." },
-        { q: "Can I customize the curriculum?", a: "Not yet. But in future versions, you should be able to edit, remove, or reorder modules as you see fit." },
+        { q: "How accurate is the AI?", a: "We use Claude to curate high-quality resources. The content is constantly vetted by our algorithm." },
         { q: "How does the streak system work?", a: "You build a streak by completing at least one lesson or quiz every day. Streaks unlock special badges and community flair!" },
         { q: "Can I share my progress?", a: "Absolutely. You can share your daily streaks to social media or directly with your friends." },
         { q: "What topics can I learn?", a: "Anything! From 'Quantum Physics' to 'Cake Baking'. If it has online resources, Primerly can build a path for it." },
         { q: "How do I join a community?", a: "Once you start a course, you're automatically invited to the relevant topic channel where you can chat with fellow learners." },
+        { q: "What is the AI Tutor?", a: "Every lesson opens in an interactive video player. Hit 'Explain this ✨' whenever something feels fuzzy and the AI tutor breaks it down in plain language, in context." },
+        { q: "How do quizzes work?", a: "Each module ships with an AI-generated quiz tuned to the lessons you just finished. Passing it earns XP, fuels your streak, and confirms you've actually mastered the material." },
+        { q: "Can I sign in with Google, GitHub, or Apple?", a: "Yes. One-click social sign-in is supported for Google, GitHub, and Apple — no password required." },
         { q: "Is there a mobile app?", a: "Primerly is fully responsive and works great on any device. A native app is coming soon!" }
     ];
 
@@ -423,49 +390,3 @@ function FAQSection() {
 }
 
 
-function Card({ i, title, subtitle, description, color, children, progress, range, targetScale }) {
-    const container = useRef(null);
-    const { scrollYProgress } = useScroll({
-        target: container,
-        offset: ['start end', 'start start']
-    });
-
-    const imageScale = useTransform(scrollYProgress, [0, 1], [1.1, 1]);
-    const scale = useTransform(progress, range, [1, targetScale]);
-
-    return (
-        <div ref={container} className={styles.cardContainer} style={{ top: `${i * 25}px` }}>
-            <motion.div
-                className={styles.dynamicCard}
-                style={{ scale, top: `calc(-5% + ${i * 25}px)` }}
-            >
-                {/* Floating Background Particles */}
-                {[...Array(15)].map((_, idx) => (
-                    <div
-                        key={idx}
-                        className={styles.particle}
-                        style={{
-                            top: `${Math.random() * 100}%`,
-                            left: `${Math.random() * 100}%`,
-                            width: `${Math.random() * 200 + 50}px`,
-                            height: `${Math.random() * 200 + 50}px`,
-                            opacity: Math.random() * 0.09 + 0.03,
-                            animationDuration: `${Math.random() * 10 + 20}s`,
-                            animationDelay: `${Math.random() * 5}s`,
-                            background: color,
-                        }}
-                    />
-                ))}
-                <div className={styles.dynamicCardContent}>
-                    <h3 style={{ fontSize: '2rem', marginBottom: '8px', fontWeight: '800' }}>{title}</h3><div style={{ fontSize: '1rem', fontWeight: '700', color: 'var(--primary)', marginBottom: '24px', letterSpacing: '0px', textTransform: 'none' }}>{subtitle}</div>
-                    <p style={{ fontSize: '1.2rem', color: 'var(--secondary)', lineHeight: '1.6' }}>{description}</p>
-                </div>
-                <div className={styles.dynamicCardVisual} style={{ background: color }}>
-                    <motion.div style={{ scale: imageScale, width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        {children}
-                    </motion.div>
-                </div>
-            </motion.div>
-        </div>
-    )
-}

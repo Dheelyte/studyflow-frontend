@@ -1,0 +1,24 @@
+.wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.player {
+    width: 100%;
+    max-width: 720px;
+    aspect-ratio: 16 / 9;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 24px 60px -24px rgba(99, 102, 241, 0.4),
+                0 8px 24px -8px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.15);
+    background: linear-gradient(135deg, #f5f7ff, #faf5ff);
+    text-align: left;
+}
+
+@media (max-width: 768px) {
+    .player {
+        border-radius: 16px;
+    }
+}

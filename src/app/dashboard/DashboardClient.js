@@ -102,11 +102,7 @@ export default function DashboardClient() {
     }, [user?.id]);
 
     const handleSearch = (params) => {
-        const query = {
-            topic: params.topic,
-            experience: params.experience,
-            duration: params.duration
-        };
+        const query = { topic: params.topic };
         const queryString = new URLSearchParams(query).toString();
         router.push(`/curriculum?${queryString}`);
     };

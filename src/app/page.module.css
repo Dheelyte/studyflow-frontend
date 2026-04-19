@@ -11,23 +11,138 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 140px 12px 80px;
-    background: radial-gradient(circle at 50% 30%, rgba(99, 102, 241, 0.15) 0%, transparent 60%);
+    padding: 170px 12px 110px;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    background: var(--background);
     gap: 32px;
+}
+
+.hero::before,
+.hero::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.55;
+    pointer-events: none;
+}
+
+.hero::before {
+    width: 520px;
+    height: 520px;
+    top: -120px;
+    left: -60px;
+    background: radial-gradient(circle, #6366f1 0%, #8b5cf6 45%, transparent 70%);
+    animation: heroOrbDrift1 18s ease-in-out infinite;
+}
+
+.hero::after {
+    width: 460px;
+    height: 460px;
+    top: 80px;
+    right: -80px;
+    background: radial-gradient(circle, #ec4899 0%, #f97316 50%, transparent 70%);
+    animation: heroOrbDrift2 22s ease-in-out infinite;
+}
+
+.heroBgExtra {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        radial-gradient(circle 320px at 25% 85%, rgba(16, 185, 129, 0.35), transparent 65%),
+        radial-gradient(circle 380px at 82% 72%, rgba(59, 130, 246, 0.4), transparent 65%),
+        radial-gradient(circle 260px at 55% 15%, rgba(234, 179, 8, 0.28), transparent 65%);
+    filter: blur(40px);
+    animation: heroOrbDrift3 26s ease-in-out infinite;
+}
+
+.heroGrain {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.4;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+}
+
+@keyframes heroOrbDrift1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(60px, 40px) scale(1.12); }
+}
+
+@keyframes heroOrbDrift2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-70px, 50px) scale(1.08); }
+}
+
+@keyframes heroOrbDrift3 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-20px, -30px); }
+}
+
+@media (max-width: 768px) {
+    .hero::before,
+    .hero::after {
+        filter: blur(55px);
+        opacity: 0.7;
+    }
+    .hero::before {
+        width: 300px;
+        height: 300px;
+        top: 60px;
+        left: -60px;
+        background: radial-gradient(circle, #6366f1 0%, #8b5cf6 50%, transparent 72%);
+    }
+    .hero::after {
+        width: 280px;
+        height: 280px;
+        top: auto;
+        bottom: 160px;
+        right: -50px;
+        background: radial-gradient(circle, #ec4899 0%, #f97316 55%, transparent 72%);
+    }
+    .heroBgExtra {
+        background:
+            radial-gradient(circle 180px at 15% 25%, rgba(16, 185, 129, 0.5), transparent 65%),
+            radial-gradient(circle 200px at 92% 45%, rgba(59, 130, 246, 0.5), transparent 65%),
+            radial-gradient(circle 170px at 50% 92%, rgba(234, 179, 8, 0.45), transparent 65%);
+        filter: blur(30px);
+    }
 }
 
 .title {
     font-size: 4rem;
     font-weight: 700;
     line-height: 1.1;
-    background: linear-gradient(135deg, var(--foreground) 0%, var(--primary) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--foreground);
     max-width: 800px;
     font-optical-sizing: auto;
     font-style: normal;
-    font-variation-settings:
-        "GRAD" 0;
+    font-variation-settings: "GRAD" 0;
+}
+
+.titleAccent {
+    background: linear-gradient(120deg, #6366f1 0%, #ec4899 50%, #f59e0b 100%);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: heroTitleShift 8s ease-in-out infinite;
+}
+
+@keyframes heroTitleShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
 }
 
 .subtitle {
@@ -172,10 +287,12 @@
 }
 
 /* Light Mode Override for Title Gradient */
-:global([data-theme='light']) .title {
-    background: linear-gradient(135deg, #1e293b 0%, #4f46e5 100%);
+:global([data-theme='light']) .titleAccent {
+    background: linear-gradient(120deg, #4f46e5 0%, #db2777 50%, #d97706 100%);
+    background-size: 200% 200%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .communitySection {
@@ -278,10 +395,61 @@
 /* Redesigned How It Works */
 .stepsGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 32px;
-    max-width: 1000px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 24px;
+    max-width: 1200px;
     margin: 0 auto;
+}
+
+.inlineChip {
+    display: inline-block;
+    background: rgba(99, 102, 241, 0.15);
+    color: var(--primary);
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-size: 0.85em;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Hero video — browser-chrome bezel */
+.heroVideoBezel {
+    max-width: 1000px;
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--card);
+    box-shadow:
+        0 30px 80px -20px rgba(99, 102, 241, 0.35),
+        0 20px 50px -10px rgba(0, 0, 0, 0.3);
+}
+
+.heroVideoChrome {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    background: var(--background);
+}
+
+.heroVideoDot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.heroVideoUrl {
+    margin-left: 16px;
+    font-size: 0.78rem;
+    color: var(--secondary);
+    font-family: monospace;
+}
+
+.heroVideo {
+    width: 100%;
+    display: block;
 }
 
 .stepCard {
@@ -299,6 +467,110 @@
     transform: translateY(-8px);
     box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
     border-color: var(--primary);
+}
+
+/* Stacked Feature Cards (NotebookLM-style icon + text + video) */
+.featureStack {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.featureCard {
+    display: grid;
+    grid-template-columns: minmax(260px, 1fr) minmax(0, 1.6fr);
+    gap: 48px;
+    align-items: center;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    padding: 40px 44px;
+    text-align: left;
+    transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+}
+
+.featureCard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 24px 60px -24px rgba(99, 102, 241, 0.3);
+    border-color: rgba(99, 102, 241, 0.35);
+}
+
+.featureCardReverse {
+    grid-template-columns: minmax(0, 1.6fr) minmax(260px, 1fr);
+}
+
+.featureCardReverse .featureCardText {
+    order: 2;
+}
+
+.featureCardReverse .featureCardMedia {
+    order: 1;
+}
+
+.featureCardText {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    text-align: left;
+}
+
+.featureCardIcon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    background: rgba(99, 102, 241, 0.1);
+    margin-bottom: 4px;
+}
+
+.featureCardTitle {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--foreground);
+    line-height: 1.3;
+    margin: 0;
+    text-align: left;
+}
+
+.featureCardDescription {
+    font-size: 1rem;
+    color: var(--secondary);
+    line-height: 1.65;
+    margin: 0;
+    text-align: left;
+}
+
+.featureCardMedia {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+@media (max-width: 900px) {
+    .featureCard,
+    .featureCardReverse {
+        grid-template-columns: 1fr;
+        gap: 24px;
+        padding: 28px;
+    }
+
+    .featureCardReverse .featureCardText {
+        order: 1;
+    }
+
+    .featureCardReverse .featureCardMedia {
+        order: 2;
+    }
+
+    .featureCardTitle {
+        font-size: 1.35rem;
+    }
 }
 
 .stepIconBg {
@@ -995,4 +1267,389 @@
     color: var(--secondary);
     line-height: 1.6;
     font-size: 1.05rem;
+}
+
+/* ==========================================================
+   AI Tutor mock (stacked card)
+   ========================================================== */
+.tutorMock {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 280px;
+}
+
+.tutorFrame {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #0f172a;
+    border-radius: 14px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+}
+
+.tutorPlayBtn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #ef4444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.5);
+}
+
+.tutorProgress {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.tutorProgressFill {
+    width: 42%;
+    height: 100%;
+    background: #ef4444;
+    border-radius: 2px;
+}
+
+.tutorExplainChip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #0f172a;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 10px 18px;
+    border-radius: 99px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+}
+
+/* ==========================================================
+   Quiz mock (stacked card)
+   ========================================================== */
+.quizMock {
+    width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    padding: 20px;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.quizQuestion {
+    color: white;
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+}
+
+.quizQuestion code {
+    background: rgba(0, 0, 0, 0.25);
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 0.85em;
+}
+
+.quizOption {
+    background: rgba(255, 255, 255, 0.9);
+    color: #0f172a;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.quizOptionCorrect {
+    background: #10b981;
+    color: white;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+}
+
+/* ==========================================================
+   Gamified composite (streak + mini heatmap)
+   ========================================================== */
+.gamifiedVisual {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.miniHeatmap {
+    display: grid;
+    grid-template-columns: repeat(7, 14px);
+    grid-auto-rows: 14px;
+    gap: 4px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.miniHeatmapCell {
+    width: 14px;
+    height: 14px;
+    background: #ffffff;
+    border-radius: 3px;
+}
+
+/* ==========================================================
+   Community — threaded reply mock
+   ========================================================== */
+.mockPostStack {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+    max-width: 360px;
+}
+
+.mockReplyCard {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin-left: 28px;
+    box-shadow: 0 12px 28px -10px rgba(0, 0, 0, 0.18);
+    text-align: left;
+    position: relative;
+}
+
+.mockReplyCard::before {
+    content: '';
+    position: absolute;
+    left: -16px;
+    top: -6px;
+    width: 2px;
+    height: calc(100% + 12px);
+    background: var(--border);
+    border-radius: 2px;
+}
+
+/* ==========================================================
+   Bento Grid Section (Everything you need)
+   ========================================================== */
+.bentoBoard {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.bentoTile {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    grid-column: span 4;
+    transition: transform 0.25s ease, border-color 0.25s ease;
+    min-height: 180px;
+}
+
+.bentoTile:hover {
+    transform: translateY(-4px);
+    border-color: var(--primary);
+}
+
+.bentoWide {
+    grid-column: span 6;
+}
+
+.bentoFull {
+    grid-column: span 12;
+}
+
+.bentoSlim {
+    min-height: 0;
+}
+
+.bentoHeader {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 8px;
+}
+
+.bentoIconWrap {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.18), rgba(168, 85, 247, 0.18));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    flex-shrink: 0;
+}
+
+.bentoLabel {
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--foreground);
+}
+
+.bentoBlurb {
+    color: var(--secondary);
+    font-size: 0.92rem;
+    line-height: 1.5;
+}
+
+/* Library mock inside bento */
+.libraryMock {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.libraryRow {
+    display: grid;
+    grid-template-columns: 10px 1fr 100px 40px;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.85rem;
+}
+
+.libraryDot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.libraryName {
+    font-weight: 600;
+    color: var(--foreground);
+}
+
+.libraryBar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.libraryBarFill {
+    height: 100%;
+    border-radius: 99px;
+}
+
+.libraryPct {
+    color: var(--secondary);
+    font-size: 0.8rem;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Heatmap inside bento */
+.bentoHeatmap {
+    display: grid;
+    grid-template-columns: repeat(21, 1fr);
+    gap: 3px;
+    margin-top: 8px;
+}
+
+.bentoHeatmapCell {
+    aspect-ratio: 1 / 1;
+    background: var(--primary);
+    border-radius: 3px;
+    min-height: 10px;
+}
+
+/* Social pills */
+.socialPills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: auto;
+}
+
+.socialPill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--background);
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: 99px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--foreground);
+}
+
+/* Profile badges */
+.profileBadgeRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: auto;
+}
+
+.profileBadge {
+    background: var(--background);
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: 99px;
+    font-weight: 700;
+    font-size: 0.82rem;
+    color: var(--foreground);
+}
+
+/* Thread mock */
+.threadMock {
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.threadLine {
+    font-size: 0.82rem;
+    color: var(--foreground);
+    line-height: 1.4;
+}
+
+@media (max-width: 900px) {
+    .bentoBoard {
+        grid-template-columns: repeat(6, 1fr);
+    }
+    .bentoTile,
+    .bentoWide {
+        grid-column: span 6;
+    }
+}
+
+@media (max-width: 600px) {
+    .bentoHeatmap {
+        grid-template-columns: repeat(14, 1fr);
+    }
 }

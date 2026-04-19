@@ -252,10 +252,15 @@ export const curriculum = {
     },
     getCourse: (id) => apiFetch(`/playlists/${id}`),
     getMyCourses: () => apiFetch('/playlists'),
-    completeResource: (resourceId) => apiFetch(`/resource/${resourceId}/complete`, {
+    completeTopic: (topicId) => apiFetch(`/topics/${topicId}/complete`, {
         method: 'POST'
     }),
     createCourse: (data) => apiFetch('/playlists', {
+        method: 'POST',
+        body: JSON.stringify(data)
+    }),
+    getTopicVideo: (topicId) => apiFetch(`/topics/${topicId}/video`),
+    explainTopic: (topicId, data) => apiFetch(`/topics/${topicId}/explain`, {
         method: 'POST',
         body: JSON.stringify(data)
     }),
@@ -264,7 +269,6 @@ export const curriculum = {
         return apiFetch(`/modules/${moduleId}/quiz?${searchParams.toString()}`);
     },
     submitQuiz: (moduleId, payload) => {
-        console.log('Submitting Quiz Payload:', JSON.stringify(payload));
         return apiFetch(`/modules/${moduleId}/quiz/submit`, {
             method: 'POST',
             body: JSON.stringify(payload)

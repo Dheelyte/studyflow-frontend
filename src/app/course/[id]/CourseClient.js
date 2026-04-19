@@ -1,46 +1,41 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import CourseSkeleton from '@/components/CourseSkeleton';
 import { curriculum } from "@/services/api";
 import styles from "./page.module.css";
-import { PlayIcon, ClockIcon, ChevronDown, ChevronUp, ZapIcon, ShareIcon, MenuIcon, CheckCircleIcon, BookOpenIcon, VideoIcon, TrophyIconSimple } from "@/components/Icons";
+import { PlayIcon, ClockIcon, ChevronDown, ChevronUp, ZapIcon, ShareIcon, CheckCircleIcon, VideoIcon, TrophyIconSimple } from "@/components/Icons";
 import ShareModal from "@/components/ShareModal";
 import QuizModal from "@/components/QuizModal";
 
-// Helper to normalize API response to existing component state structure
+// Helper to normalize API response to component state structure
 const normalizeCourseData = (apiData) => {
     if (!apiData) return null;
 
-    let totalResources = 0;
-    let completedResources = 0;
-
-    // Global flag to track if we have found the first incomplete item (Next Up)
+    let totalTopics = 0;
+    let completedTopics = 0;
     let foundNextUp = false;
 
-    // Track if global sequence is broken (used to lock future items)
-    // Actually `foundNextUp` serves this purpose: if foundNextUp is true, everything subsequent is locked.
-
     const modules = (apiData.modules || []).map(m => {
-        let moduleResourcesTotal = 0;
-        let moduleResourcesCompleted = 0;
+        let moduleTopicsTotal = 0;
+        let moduleTopicsCompleted = 0;
 
         const lessons = (m.lessons || []).map(l => ({
             lesson_title: l.title,
             estimated_time: l.estimated_time || "1 hour",
-            resources: (l.resources || []).map(r => {
-                totalResources++;
-                moduleResourcesTotal++;
+            topics: (l.topics || []).map(t => {
+                totalTopics++;
+                moduleTopicsTotal++;
 
-                if (r.is_completed) {
-                    completedResources++;
-                    moduleResourcesCompleted++;
+                if (t.is_completed) {
+                    completedTopics++;
+                    moduleTopicsCompleted++;
                 }
 
                 let isNextUp = false;
                 let isLocked = false;
 
-                if (!r.is_completed) {
+                if (!t.is_completed) {
                     if (!foundNextUp) {
                         isNextUp = true;
                         foundNextUp = true;
@@ -50,51 +45,37 @@ const normalizeCourseData = (apiData) => {
                 }
 
                 return {
-                    resource_id: r.id,
-                    label: r.title,
-                    type: r.type,
-                    description: r.description,
-                    resource_url: r.url,
-                    is_completed: r.is_completed,
+                    topic_id: t.id,
+                    title: t.title,
+                    description: t.description,
+                    youtube_video_id: t.youtube_video_id,
+                    is_completed: t.is_completed,
                     isNextUp: isNextUp,
                     isLocked: isLocked
                 };
             })
         }));
 
-        const isResourcesComplete = moduleResourcesTotal > 0 && moduleResourcesTotal === moduleResourcesCompleted;
+        const isTopicsComplete = moduleTopicsTotal > 0 && moduleTopicsTotal === moduleTopicsCompleted;
         const isQuizCompleted = m.quiz_completed === true;
 
         let isQuizNextUp = false;
         let isQuizLocked = false;
 
-        // Quiz Logic
-        // 1. If resources NOT complete, Quiz is locked.
-        // 2. If resources complete, check if Quiz is complete.
-        // 3. If Quiz NOT complete:
-        //    - If !foundNextUp (meaning this is the first incomplete thing after resources), THIS IS NEXT UP.
-        //    - Else (foundNextUp implies a resource earlier in this module was incomplete), Quiz is locked.
-
-        if (!isResourcesComplete) {
+        if (!isTopicsComplete) {
             isQuizLocked = true;
-            // The foundNextUp would have been triggered by a resource inside this module already.
         } else {
-            // Resources are done. Check Quiz status.
             if (!isQuizCompleted) {
                 if (!foundNextUp) {
                     isQuizNextUp = true;
                     foundNextUp = true;
                 } else {
-                    // This creates a lock if some previous module had an incomplete item
                     isQuizLocked = true;
                 }
             }
         }
 
-        // Note: completionPercentage calculation counts resources only. 
-        // We might want to include quizzes in "Module Completion" logic but maybe not the global % yet unless requested.
-        // For 'is_module_completed' flag, usually it means everything in it is done.
-        const isModuleComplete = isResourcesComplete && isQuizCompleted;
+        const isModuleComplete = isTopicsComplete && isQuizCompleted;
 
         return {
             module_id: m.id,
@@ -107,8 +88,8 @@ const normalizeCourseData = (apiData) => {
         };
     });
 
-    const completionPercentage = totalResources > 0
-        ? Math.round((completedResources / totalResources) * 100)
+    const completionPercentage = totalTopics > 0
+        ? Math.round((completedTopics / totalTopics) * 100)
         : 0;
 
     return {
@@ -118,42 +99,32 @@ const normalizeCourseData = (apiData) => {
         modules: modules,
         learning_objectives: apiData.objectives || [],
         completionPercentage,
-        isStarted: completedResources > 0,
-        nextUpId: foundNextUp ? "next-up-resource" : null, // This ID might conflict if multiple "next ups", but logic ensures only 1 true
-        level: apiData.level || "Beginner"
+        isStarted: completedTopics > 0,
     };
 };
 
 export default function CourseClient({ params }) {
-    // Unwrap params for Next.js 15+ where params is a Promise
     const resolvedParams = React.use(params);
     const courseId = resolvedParams?.id;
-    const searchParams = useSearchParams();
+    const router = useRouter();
 
     const [curriculumData, setCurriculumData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [expandedModules, setExpandedModules] = useState({});
-
-    // Derived state for UI, usually would be in the data object or separate
     const [completionPercentage, setCompletionPercentage] = useState(0);
     const [isStarted, setIsStarted] = useState(false);
-
     const [showShareModal, setShowShareModal] = useState(false);
     const [highlightResource, setHighlightResource] = useState(false);
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     const [showQuizModal, setShowQuizModal] = useState(false);
     const [activeQuizModule, setActiveQuizModule] = useState(null);
 
-    // Ref to track if we have already fetched
     const fetchedRef = useRef(null);
 
     useEffect(() => {
-        const fetchCurriculum = async () => {
-            const topic = searchParams.get("topic");
-
-            // Key to identify if we are fetching the same thing
-            const fetchKey = courseId ? `id-${courseId}` : (topic ? `topic-${topic}` : null);
+        const fetchCourse = async () => {
+            const fetchKey = courseId ? `id-${courseId}` : null;
 
             if (!fetchKey) {
                 setLoading(false);
@@ -165,54 +136,30 @@ export default function CourseClient({ params }) {
 
             try {
                 setLoading(true);
-                let data = null;
-
-                if (courseId) {
-                    // console.log("Fetching by ID:", courseId);
-                    const response = await curriculum.getCourse(courseId);
-                    // Normalize the response
-                    data = normalizeCourseData(response);
-
-                    // Set derived state from normalized data
-                    if (data) {
-                        setCompletionPercentage(data.completionPercentage);
-                        if (data.isStarted) setIsStarted(true);
-                    }
-
-                } else if (topic) {
-                    // Existing topic-based generation...
-                    const genParams = {
-                        topic,
-                        experience_level: searchParams.get("experience_level") || "Beginner",
-                        duration: searchParams.get("duration") || "4 weeks"
-                    };
-                    // console.log("Generating curriculum:", genParams);
-                    const response = await curriculum.generate(genParams);
-                    // The generator API returns a structure closer to our internal state, usually.
-                    // But if we want consistency, we might assume generate returns the OLD format 
-                    // which is what 'data' was assigned to directly before.
-                    // Let's assume generate returns the structure we were already using.
-                    data = response;
-                }
+                const response = await curriculum.getCourse(courseId);
+                const data = normalizeCourseData(response);
 
                 if (!data || !data.modules) {
                     throw new Error("Invalid course data received");
                 }
 
                 setCurriculumData(data);
-
                 document.title = `${data.curriculum_title} | Primerly`;
+
+                if (data.completionPercentage !== undefined) {
+                    setCompletionPercentage(data.completionPercentage);
+                }
+                if (data.isStarted) setIsStarted(true);
 
                 // Auto-expand module containing "Next Up" or first module
                 if (data.modules && data.modules.length > 0) {
                     let moduleToExpand = data.modules[0].module_id !== undefined ? data.modules[0].module_id : 0;
 
-                    // Find module with Next Up resource or Quiz
                     for (const m of data.modules) {
                         let innerFound = false;
                         if (m.lessons) {
                             for (const l of m.lessons) {
-                                if (l.resources && l.resources.some(r => r.isNextUp)) {
+                                if (l.topics && l.topics.some(t => t.isNextUp)) {
                                     moduleToExpand = m.module_id;
                                     innerFound = true;
                                     break;
@@ -227,16 +174,10 @@ export default function CourseClient({ params }) {
 
                     setExpandedModules({ [moduleToExpand]: true });
 
-                    // Scroll to Next Up resource after a brief delay to allow rendering
                     setTimeout(() => {
-                        const nextUp = document.getElementById("next-up-resource");
-                        const target = nextUp;
-
-                        if (target) {
-                            target.scrollIntoView({ behavior: "smooth", block: "center" });
-
-                            // Only highlight if the user has already started (resuming)
-                            // This prevents the "glow" effect on a brand new course where the first item is naturally next
+                        const nextUp = document.getElementById("next-up-topic");
+                        if (nextUp) {
+                            nextUp.scrollIntoView({ behavior: "smooth", block: "center" });
                             if (data.isStarted) {
                                 setHighlightResource(true);
                                 setTimeout(() => setHighlightResource(false), 2000);
@@ -244,18 +185,17 @@ export default function CourseClient({ params }) {
                         }
                     }, 600);
                 }
-
             } catch (err) {
-                console.error("Failed to fetch curriculum:", err);
-                setError(err.message || "Failed to load curriculum");
+                console.error("Failed to fetch course:", err);
+                setError(err.message || "Failed to load course");
                 fetchedRef.current = null;
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchCurriculum();
-    }, [courseId, searchParams]);
+        fetchCourse();
+    }, [courseId]);
 
     const toggleModule = (id) => {
         setExpandedModules(prev => ({ ...prev, [id]: !prev[id] }));
@@ -266,11 +206,10 @@ export default function CourseClient({ params }) {
             setIsStarted(true);
         }
 
-        // Scroll to Next Up or First Resource
         setTimeout(() => {
-            const nextUpResource = document.getElementById("next-up-resource");
-            const firstResource = document.getElementById("first-resource");
-            const target = nextUpResource || firstResource;
+            const nextUpTopic = document.getElementById("next-up-topic");
+            const firstTopic = document.getElementById("first-topic");
+            const target = nextUpTopic || firstTopic;
 
             if (target) {
                 target.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -280,40 +219,23 @@ export default function CourseClient({ params }) {
         }, 100);
     };
 
-    // Updated handler with redundancy check
-    const handleResourceClick = async (resourceId, url, isCompleted, isLocked, e) => {
-        // e.preventDefault(); // Optional: decide if we want to block navigation until complete. Usually unsafe for UX.
+    const handleTopicClick = async (topicId, isCompleted, isLocked) => {
+        if (isLocked) return;
 
-        if (isLocked) {
-            // Allow navigation but do not track progress
-            return;
-        }
-
-        // Check if already completed to avoid redundant calls
-        if (isCompleted) {
-            // console.log("Resource already completed, skipping API call:", resourceId);
-            return;
-        }
-
-        try {
-            // console.log("Marking resource complete:", resourceId);
-            const response = await curriculum.completeResource(resourceId);
-
-            if (response && response.is_completed) {
-                // Update local state without full refetch
+        // Mark as completed if not already
+        if (!isCompleted) {
+            try {
+                await curriculum.completeTopic(topicId);
+                // Update local state
                 setCurriculumData(prev => {
                     if (!prev || !prev._raw) return prev;
-
-                    // Create deep clone of raw data to mutate
                     const newRaw = JSON.parse(JSON.stringify(prev._raw));
-
-                    // Find the resource in raw data
                     let found = false;
                     for (const m of newRaw.modules || []) {
                         for (const l of m.lessons || []) {
-                            for (const r of l.resources || []) {
-                                if (r.id === resourceId) {
-                                    r.is_completed = true;
+                            for (const t of l.topics || []) {
+                                if (t.id === topicId) {
+                                    t.is_completed = true;
                                     found = true;
                                     break;
                                 }
@@ -322,26 +244,18 @@ export default function CourseClient({ params }) {
                         }
                         if (found) break;
                     }
-
-                    if (found) {
-                        return normalizeCourseData(newRaw);
-                    }
+                    if (found) return normalizeCourseData(newRaw);
                     return prev;
                 });
+            } catch (err) {
+                console.error("Failed to mark topic complete:", err);
             }
-
-        } catch (err) {
-            console.error("Failed to mark resource complete:", err);
-            // Non-blocking error
         }
 
-        // Ensure first module is expanded
-        setExpandedModules(prev => ({ ...prev, 1: true }));
-
-
+        // Navigate to tutor page
+        router.push(`/tutor/${topicId}`);
     };
 
-    // Sync completion percentage when data changes
     useEffect(() => {
         if (curriculumData) {
             setCompletionPercentage(curriculumData.completionPercentage);
@@ -351,7 +265,6 @@ export default function CourseClient({ params }) {
         }
     }, [curriculumData]);
 
-
     const handleOpenQuiz = (moduleId, moduleTitle) => {
         setActiveQuizModule({ id: moduleId, title: moduleTitle });
         setShowQuizModal(true);
@@ -360,15 +273,8 @@ export default function CourseClient({ params }) {
     const handleQuizComplete = (score) => {
         setShowQuizModal(false);
         setActiveQuizModule(null);
-        // Force re-fetch logic or local update. 
-        // Since quiz_completed is server-side, it's safest to trigger a refresh 
-        // OR update local state optimistically.
-        // Let's update local state optimistically to unblock the next module immediately.
         setCurriculumData(prev => {
             if (!prev) return prev;
-
-            // We need to simulate the raw data update so 'normalizeCourseData' can re-run properly
-            // Because locking logic is inside normalizeCourseData.
             const newRaw = JSON.parse(JSON.stringify(prev._raw));
             const modIndex = newRaw.modules.findIndex(m => m.id === activeQuizModule.id);
             if (modIndex !== -1) {
@@ -413,7 +319,6 @@ export default function CourseClient({ params }) {
                     <ZapIcon size={64} fill="white" />
                 </div>
                 <div className={styles.courseInfo}>
-                    <span className={styles.type}>{(curriculumData.level || "Beginner").toUpperCase()}</span>
                     <h1 className={styles.title}>{curriculumData.curriculum_title}</h1>
                     <p className={styles.description}>
                         {isDescriptionExpanded ? curriculumData.overview : (curriculumData.overview?.slice(0, 200) + (curriculumData.overview?.length > 200 ? "..." : ""))}
@@ -456,15 +361,12 @@ export default function CourseClient({ params }) {
                     moduleId={activeQuizModule.id}
                     onComplete={handleQuizComplete}
                     curriculumTitle={curriculumData.curriculum_title}
-                    experienceLevel={curriculumData.level}
                 />
             )}
 
-            {/* Progress Bar only shown if started */}
             {isStarted && (
                 <div className={styles.progressContainer}>
                     <div className={styles.progressLabel}>
-                        {/* Display real completion percentage */}
                         <span>Course Progress</span>
                         <span>{completionPercentage}% completed</span>
                     </div>
@@ -476,7 +378,6 @@ export default function CourseClient({ params }) {
 
             <div className={styles.content}>
 
-                {/* Learning Objectives Section - Filter out nulls/empty */}
                 {curriculumData.learning_objectives && curriculumData.learning_objectives.length > 0 && (
                     <div className={styles.objectivesSection}>
                         <h2 className={styles.sectionTitle}>What You'll Learn</h2>
@@ -498,7 +399,6 @@ export default function CourseClient({ params }) {
 
                         return (
                             <div key={uniqueId} className={styles.module}>
-                                {/* Apply conditional class for completed module header */}
                                 <div
                                     className={`${styles.moduleHeader} ${module.is_module_completed ? styles.completedModuleHeader : ''}`}
                                     onClick={() => toggleModule(uniqueId)}
@@ -522,57 +422,52 @@ export default function CourseClient({ params }) {
                                                 </div>
 
                                                 <div className={styles.resourcesList}>
-                                                    {lesson.resources && lesson.resources.map((resource, rIdx) => {
+                                                    {lesson.topics && lesson.topics.map((topic, tIdx) => {
                                                         const firstId = curriculumData.modules[0]?.module_id !== undefined ? curriculumData.modules[0].module_id : 0;
-                                                        const isFirstResource = uniqueId === firstId && lessonIdx === 0 && rIdx === 0;
+                                                        const isFirstTopic = uniqueId === firstId && lessonIdx === 0 && tIdx === 0;
 
-                                                        // ID for scrolling
                                                         let elementId = null;
-                                                        if (resource.isNextUp) elementId = "next-up-resource";
-                                                        else if (isFirstResource) elementId = "first-resource";
+                                                        if (topic.isNextUp) elementId = "next-up-topic";
+                                                        else if (isFirstTopic) elementId = "first-topic";
 
                                                         return (
-                                                            <a
-                                                                href={resource.resource_url}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                key={rIdx}
+                                                            <div
+                                                                key={tIdx}
                                                                 id={elementId}
-                                                                // Apply conditional class for completed resources
                                                                 className={`
-                                                                    ${styles.resourceCard} 
-                                                                    ${resource.is_completed ? styles.completedResource : ''}
-                                                                    ${isFirstResource && highlightResource ? styles.highlight : ""} 
-                                                                    ${resource.isNextUp ? styles.nextUpResource : ""} 
-                                                                    ${resource.isNextUp && highlightResource ? styles.highlight : ""}
+                                                                    ${styles.resourceCard}
+                                                                    ${topic.is_completed ? styles.completedResource : ''}
+                                                                    ${isFirstTopic && highlightResource ? styles.highlight : ""}
+                                                                    ${topic.isNextUp ? styles.nextUpResource : ""}
+                                                                    ${topic.isNextUp && highlightResource ? styles.highlight : ""}
                                                                 `}
-                                                                // UPDATED: Pass is_completed to handler
-                                                                onClick={(e) => handleResourceClick(resource.resource_id, resource.resource_url, resource.is_completed, resource.isLocked, e)}
+                                                                onClick={() => handleTopicClick(topic.topic_id, topic.is_completed, topic.isLocked)}
                                                                 style={{
-                                                                    opacity: resource.isLocked ? 0.6 : 1,
+                                                                    opacity: topic.isLocked ? 0.6 : 1,
+                                                                    cursor: topic.isLocked ? 'not-allowed' : 'pointer',
                                                                 }}
                                                             >
-                                                                {resource.isNextUp && <div className={styles.nextUpBadge}>Next Up</div>}
+                                                                {topic.isNextUp && <div className={styles.nextUpBadge}>Next Up</div>}
 
                                                                 <div className={`${styles.resourceIcon} ${styles.mediaIcon}`}>
-                                                                    {resource.type === "Video" ? <VideoIcon size={20} /> : <BookOpenIcon size={20} />}
+                                                                    <VideoIcon size={20} />
                                                                 </div>
                                                                 <div className={styles.resourceInfo}>
                                                                     <div className={styles.resourceHeaderRow}>
                                                                         <div className={styles.resourceTitleGroup}>
-                                                                            <span className={styles.resourceLabel}>{resource.label}</span>
+                                                                            <span className={styles.resourceLabel}>{topic.title}</span>
                                                                         </div>
                                                                     </div>
-                                                                    <p className={styles.resourceDescription}>{resource.description}</p>
+                                                                    <p className={styles.resourceDescription}>{topic.description}</p>
                                                                 </div>
                                                                 <div className={styles.badgeContainer}>
                                                                     <span className={styles.xpBadge}>+11 XP</span>
                                                                     <span className={styles.resourceTypeBadge}>
-                                                                        {resource.type === "Video" ? <VideoIcon size={12} /> : <BookOpenIcon size={12} />}
-                                                                        {resource.type}
+                                                                        <VideoIcon size={12} />
+                                                                        Video
                                                                     </span>
                                                                 </div>
-                                                            </a>
+                                                            </div>
                                                         );
                                                     })}
                                                 </div>
@@ -581,13 +476,13 @@ export default function CourseClient({ params }) {
 
                                         <div style={{ marginTop: '1.5rem' }}>
                                             <button
-                                                id={module.isQuizNextUp ? "next-up-resource" : null}
+                                                id={module.isQuizNextUp ? "next-up-topic" : null}
                                                 className={`${styles.resourceCard} ${module.isQuizNextUp ? styles.highlight : ''}`}
                                                 disabled={module.isQuizLocked}
                                                 style={{
                                                     width: '100%',
                                                     background: module.quiz_completed
-                                                        ? 'rgba(16, 185, 129, 0.1)' // Greenish tint if done
+                                                        ? 'rgba(16, 185, 129, 0.1)'
                                                         : 'linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,165,0,0.05))',
                                                     border: module.quiz_completed
                                                         ? '1px solid rgba(16, 185, 129, 0.2)'
@@ -629,7 +524,6 @@ export default function CourseClient({ params }) {
                     })}
                 </div>
             </div>
-
         </div>
     );
 }
