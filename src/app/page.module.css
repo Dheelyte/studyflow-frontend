@@ -179,16 +179,6 @@
     margin: 0 auto;
 }
 
-.featureCard {
-    background: var(--card);
-    border: 1px solid var(--border);
-    padding: 32px;
-    border-radius: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
 .featureTitle {
     font-size: 1.25rem;
     font-weight: 700;
@@ -469,32 +459,26 @@
     border-color: var(--primary);
 }
 
-/* Stacked Feature Cards (NotebookLM-style icon + text + video) */
 .featureStack {
     display: flex;
     flex-direction: column;
-    gap: 28px;
+    gap: 120px;
     max-width: 1200px;
     margin: 0 auto;
 }
 
 .featureCard {
     display: grid;
-    grid-template-columns: minmax(260px, 1fr) minmax(0, 1.6fr);
+    grid-template-columns: minmax(260px, 1fr) minmax(0, 3fr);
     gap: 48px;
+    padding: 10px;
     align-items: center;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 28px;
-    padding: 40px 44px;
     text-align: left;
     transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
 }
 
 .featureCard:hover {
     transform: translateY(-4px);
-    box-shadow: 0 24px 60px -24px rgba(99, 102, 241, 0.3);
-    border-color: rgba(99, 102, 241, 0.35);
 }
 
 .featureCardReverse {
