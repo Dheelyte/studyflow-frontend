@@ -1,7 +1,7 @@
 import HomeClient from './HomeClient';
 
 export const metadata = {
-    title: 'Primerly | Learn Anything With An AI Roadmap',
+    title: 'Primerly | Master any skill with your personal AI tutor.',
 };
 
 export default function HomePage() {

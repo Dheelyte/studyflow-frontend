@@ -25,10 +25,11 @@ export default function HomeClient() {
     const marqueeTopicsReverse = [...topics.reverse(), ...topics];
 
     const examples = [
-        "Python for Beginners", "History of Jazz", "Calculus II", "Digital Photography",
-        "React Hooks", "Machine Learning Basics", "Creative Writing", "SEO Strategies",
-        "Public Speaking", "Watercolor Painting", "Financial Literacy", "Yoga for Beginners",
-        "Cybersecurity Fundamentals", "Interior Design", "Music Theory"
+        "Graphic Design", "Software Development", "Forex & Crypto Trading", "Data Analysis",
+        "Content Creation", "Cybersecurity", "Virtual Assistance", "UI/UX Design",
+        "Copywriting", "Cloud Computing (AWS)", "Social Media Management", "AI & Machine Learning",
+        "Video Editing", "Product Management", "SEO", "Mobile App Development",
+        "Project Management", "Digital Marketing", "Fintech Development", "DevOps Engineering"
     ];
     const marqueeExamples = [...examples, ...examples];
 
@@ -76,18 +77,26 @@ export default function HomeClient() {
         <div className={styles.container}>
 
             <header className={styles.header}>
-                <div className={styles.headerBrand}>
-                    <ZapIcon size={24} fill="var(--primary)" /> Primerly
-                </div>
-                <div className={styles.headerActions}>
-                    <Link href="/login" style={{ color: 'var(--foreground)', fontWeight: '600', textDecoration: 'none' }}>Log In</Link>
-                    <Link href="/signup" className={styles.ctaSmall}>Sign Up</Link>
+                <div className={styles.headerInner}>
+                    <div className={styles.headerBrand}>
+                        <ZapIcon size={24} fill="var(--primary)" /> Primerly
+                    </div>
+                    <nav className={styles.headerNav} aria-label="Primary">
+                        <a href="#how-it-works" className={styles.headerNavLink}>How it works</a>
+                        <a href="#reviews" className={styles.headerNavLink}>Reviews</a>
+                        <a href="#community" className={styles.headerNavLink}>Community</a>
+                        <a href="#topics" className={styles.headerNavLink}>Topics</a>
+                        <a href="#faq" className={styles.headerNavLink}>FAQ</a>
+                    </nav>
+                    <div className={styles.headerActions}>
+                        <Link href="/login" className={styles.headerLogin}>Log In</Link>
+                        <Link href="/signup" className={styles.ctaSmall}>Sign Up</Link>
+                    </div>
                 </div>
             </header>
 
             {/* 1. HERO SECTION */}
             <section className={styles.hero}>
-                <div className={styles.heroBgExtra} aria-hidden />
                 <div className={styles.heroGrain} aria-hidden />
                 <FadeIn direction="up">
                     <h1 className={styles.title}>
@@ -118,7 +127,7 @@ export default function HomeClient() {
             </section>
 
             {/* 2. HOW IT WORKS SECTION */}
-            <section className={styles.howItWorks}>
+            <section id="how-it-works" className={styles.howItWorks}>
                 <FadeIn>
                     <h2 className={styles.sectionHeading}>How it works</h2>
                 </FadeIn>
@@ -174,8 +183,36 @@ export default function HomeClient() {
                 </div>
             </section>
 
+            {/* 3. REVIEWS (TESTIMONIALS) SECTION */}
+            <section id="reviews" className={styles.testimonialsSection}>
+                <FadeIn>
+                    <h2 className={styles.sectionHeading}>Loved by learners everywhere</h2>
+                </FadeIn>
+                <div className={styles.marqueeContainer} style={{ marginTop: '60px', maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}>
+                    <div className={styles.testimonialMarqueeTrack}>
+                        {marqueeTestimonials.map((item, i) => (
+                            <div key={i} className={styles.testimonialCard}>
+                                <div style={{ marginBottom: '24px', display: 'flex', gap: '4px', color: '#eab308' }}>
+                                    {[1, 2, 3, 4, 5].map(star => <StarIcon key={star} size={16} fill="currentColor" stroke="none" />)}
+                                </div>
+                                <p className={styles.quote}>&quot;{item.quote}&quot;</p>
+                                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                                    <div className={styles.avatarRing} style={{ background: item.gradient || 'var(--primary)' }}>
+                                        <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'var(--card)' }}></div>
+                                    </div>
+                                    <div>
+                                        <div style={{ fontWeight: '700' }}>{item.name}</div>
+                                        <div style={{ fontSize: '0.8rem', color: 'var(--secondary)' }}>{item.role}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
             {/* 4. LEARN BETTER TOGETHER (COMMUNITY) SECTION */}
-            <section className={styles.communitySection}>
+            <section id="community" className={styles.communitySection}>
                 <div className={styles.communityContent}>
                     <FadeIn direction="right">
                         <h2 className={styles.communityTitle}>Learn better, together.</h2>
@@ -226,7 +263,7 @@ export default function HomeClient() {
             </section>
 
             {/* 5. POPULAR TOPICS SECTION */}
-            <section className={styles.topicsSection}>
+            <section id="topics" className={styles.topicsSection}>
                 <FadeIn>
                     <h2 className={styles.sectionHeading}>Endless Learning Possibilities</h2>
                 </FadeIn>
@@ -258,34 +295,6 @@ export default function HomeClient() {
                 </div>
             </section>
 
-            {/* 6. REVIEWS (TESTIMONIALS) SECTION */}
-            <section className={styles.testimonialsSection}>
-                <FadeIn>
-                    <h2 className={styles.sectionHeading}>Loved by learners everywhere</h2>
-                </FadeIn>
-                <div className={styles.marqueeContainer} style={{ marginTop: '60px', maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}>
-                    <div className={styles.testimonialMarqueeTrack}>
-                        {marqueeTestimonials.map((item, i) => (
-                            <div key={i} className={styles.testimonialCard}>
-                                <div style={{ marginBottom: '24px', display: 'flex', gap: '4px', color: '#eab308' }}>
-                                    {[1, 2, 3, 4, 5].map(star => <StarIcon key={star} size={16} fill="currentColor" stroke="none" />)}
-                                </div>
-                                <p className={styles.quote}>&quot;{item.quote}&quot;</p>
-                                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                                    <div className={styles.avatarRing} style={{ background: item.gradient || 'var(--primary)' }}>
-                                        <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'var(--card)' }}></div>
-                                    </div>
-                                    <div>
-                                        <div style={{ fontWeight: '700' }}>{item.name}</div>
-                                        <div style={{ fontSize: '0.8rem', color: 'var(--secondary)' }}>{item.role}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
             {/* 7. CTA SECTION */}
             <section className={styles.ctaSection}>
                 <FadeIn direction="up" className={styles.flexColumnCentered}>
@@ -296,7 +305,7 @@ export default function HomeClient() {
             </section>
 
             {/* 8. FAQ SECTION */}
-            <FAQSection />
+            <div id="faq"><FAQSection /></div>
 
             {/* 9. FOOTER */}
             <footer className={styles.mainFooter}>
@@ -305,7 +314,7 @@ export default function HomeClient() {
                         <div style={{ display: 'flex', gap: '8px', fontWeight: '800', fontSize: '1.2rem', alignItems: 'center' }}>
                             <ZapIcon size={24} fill="var(--primary)" /> Primerly
                         </div>
-                        <p>The AI-powered curriculum designer that helps you master any topic.</p>
+                        <p>Master any skill with your personal AI tutor.</p>
                     </div>
                     <div className={styles.footerColumn}>
                         <h4>Product</h4>

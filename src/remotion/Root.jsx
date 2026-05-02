@@ -4,9 +4,18 @@ import { LearnWithAITutor } from "./LearnWithAITutor";
 import { QuizScene } from "./QuizScene";
 import { GamifiedMotivation } from "./GamifiedMotivation";
 import { CommunityQuestion } from "./CommunityQuestion";
+import { Combined, COMBINED_DURATION } from "./Combined";
 
 export const RemotionRoot = () => (
   <>
+    <Composition
+      id="Combined"
+      component={Combined}
+      durationInFrames={COMBINED_DURATION}
+      fps={30}
+      width={1280}
+      height={720}
+    />
     <Composition
       id="SetYourGoal"
       component={SetYourGoal}

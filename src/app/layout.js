@@ -11,7 +11,7 @@ export const metadata = {
     template: '%s | Primerly',
     default: 'Primerly',
   },
-  description: "Learn Anything With An AI Roadmap",
+  description: "Master any skill with your personal AI tutor.",
 };
 
 export default function RootLayout({ children }) {
