@@ -51,7 +51,7 @@ export const CommunityHeader = ({ opacity = 1, memberBump = 0 }) => {
             gap: 10,
           }}
         >
-          <span style={{ fontSize: 20, fontWeight: 700, color: "#111827" }}>
+          <span style={{ fontSize: 20, fontWeight: 700, color: "#ffffff" }}>
             Data Analysis
           </span>
           <span

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
@@ -12,6 +12,17 @@ const HowItWorksAnimation = dynamic(() => import('@/components/HowItWorksAnimati
 
 export default function HomeClient() {
     const router = useRouter();
+    const [scrolled, setScrolled] = useState(false);
+
+    useEffect(() => {
+        const scroller = document.querySelector('main');
+        const target = scroller || window;
+        const getY = () => (target === window ? window.scrollY : target.scrollTop);
+        const onScroll = () => setScrolled(getY() > 0);
+        onScroll();
+        target.addEventListener('scroll', onScroll, { passive: true });
+        return () => target.removeEventListener('scroll', onScroll);
+    }, []);
 
     const handleSearch = (params) => {
         const query = { topic: params.topic };
@@ -76,7 +87,7 @@ export default function HomeClient() {
     return (
         <div className={styles.container}>
 
-            <header className={styles.header}>
+            <header className={`${styles.header} ${scrolled ? styles.headerScrolled : ''}`}>
                 <div className={styles.headerInner}>
                     <div className={styles.headerBrand}>
                         <ZapIcon size={24} fill="var(--primary)" /> Primerly

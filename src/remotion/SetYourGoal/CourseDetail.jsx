@@ -65,10 +65,7 @@ export const CourseDetail = ({
           fontSize: 64,
           fontWeight: 900,
           lineHeight: 1.1,
-          background: "linear-gradient(135deg, #111827 0%, #4b5563 100%)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          backgroundClip: "text",
+          color: "#ffffff",
           whiteSpace: "nowrap",
         }}
       >
