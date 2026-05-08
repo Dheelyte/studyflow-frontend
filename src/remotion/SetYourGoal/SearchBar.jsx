@@ -74,7 +74,7 @@ export const SearchBar = ({
           )}
           {hasTyped && (
             <>
-              <span style={{ color: "#6b7280" }}>{prefix}</span>
+              <span style={{ color: "#6b7280", marginRight: 6 }}>{prefix.trimEnd()}</span>
               <span style={{ color: "#111827", fontWeight: 600 }}>
                 {typed.slice(prefix.length)}
               </span>
