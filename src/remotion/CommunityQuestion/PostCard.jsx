@@ -1,6 +1,6 @@
 import { HeartIcon, MessageSquareIcon } from "../icons";
 
-export const POST_WIDTH = 820;
+export const POST_WIDTH = 440;
 
 const POST_AUTHOR = "John Musa";
 const POST_INITIALS = "AR";

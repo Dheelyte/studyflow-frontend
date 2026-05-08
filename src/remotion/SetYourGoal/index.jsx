@@ -258,12 +258,7 @@ export const SetYourGoal = () => {
       { frame: 148, x: buttonTarget.x, y: BAR_CENTER_Y, scale: 1.55 },
       { frame: 165, x: buttonTarget.x, y: BAR_CENTER_Y, scale: 1.45 },
       { frame: 180, x: 640, y: BAR_CENTER_Y, scale: 1.1 },
-      { frame: PHASE_SWITCH + 10, x: 640, y: 360, scale: 1.0 },
-      { frame: PHASE_SWITCH + 40, x: 640, y: DETAIL_TITLE_CENTER_Y - 40, scale: 1.0 },
-      { frame: PHASE_SWITCH + 70, x: 640, y: DETAIL_TITLE_CENTER_Y, scale: 1.0 },
-      { frame: DETAIL_CURSOR_END, x: DETAIL_BUTTON_CENTER_X, y: DETAIL_BUTTON_CENTER_Y, scale: 1.25 },
-      { frame: DETAIL_BUTTON_PRESS_START + 6, x: DETAIL_BUTTON_CENTER_X, y: DETAIL_BUTTON_CENTER_Y, scale: 1.35 },
-      { frame: 315, x: 640, y: 360, scale: 1.05 },
+      { frame: PHASE_SWITCH, x: 640, y: 360, scale: 1.0 },
       { frame: 330, x: 640, y: 360, scale: 1.0 },
     ],
     { x: 640, y: 360, scale: 1 }
@@ -317,10 +312,10 @@ export const SetYourGoal = () => {
           {detailAppear > 0 && (
             <CourseDetail
               appear={detailAppear}
-              imageEnter={detailImageEnter}
-              titleEnter={detailTitleEnter}
-              descEnter={detailDescEnter}
-              ctaEnter={detailCtaEnter}
+              imageEnter={1}
+              titleEnter={1}
+              descEnter={1}
+              ctaEnter={1}
               buttonScale={detailButtonScale}
               buttonFlash={detailButtonFlash}
             />

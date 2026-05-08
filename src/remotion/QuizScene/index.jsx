@@ -31,7 +31,7 @@ const arcPath = (from, to, t, lift = 80) => {
 
 const QUIZ_CARD_TARGET = { x: 640, y: 495 };
 const OPTION_B_TARGET = { x: 640, y: 395 };
-const FINISH_BUTTON_TARGET = { x: 820, y: 572 };
+const FINISH_BUTTON_TARGET = { x: 851, y: 605 };
 
 const T = {
   contextIn: [0, 24],
@@ -44,7 +44,7 @@ const T = {
   cursorToOptionB: [205, 245],
   optionBClick: [240, 252],
   correctionReveal: [250, 275],
-  cursorToFinish: [275, 305],
+  cursorToFinish: [275, 302],
   finishClick: [302, 315],
   resultsEnter: [315, 345],
   confettiStart: 325,

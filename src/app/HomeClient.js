@@ -7,6 +7,7 @@ import styles from './page.module.css';
 import { ZapIcon, SearchIcon, StarIcon, ChevronRight, CheckCircleIcon, VideoIcon, MessageSquareIcon } from '@/components/Icons';
 import IntegratedSearchBar from '@/components/IntegratedSearchBar';
 import FadeIn from '@/components/FadeIn';
+import ScrambleText from '@/components/ScrambleText';
 
 const HowItWorksAnimation = dynamic(() => import('@/components/HowItWorksAnimation'), { ssr: false });
 
@@ -111,7 +112,7 @@ export default function HomeClient() {
                 <div className={styles.heroGrain} aria-hidden />
                 <FadeIn direction="up">
                     <h1 className={styles.title}>
-                        Master <span className={styles.titleAccent}>any skill</span> with your personal <span className={styles.titleAccent}>AI tutor</span>.
+                        Master <span className={styles.titleAccent}>any skill</span> with your personal <ScrambleText text="AI tutor" className={styles.titleAccent} />.
                     </h1>
                 </FadeIn>
                 <FadeIn direction="up" delay={0.1}>
@@ -179,7 +180,7 @@ export default function HomeClient() {
                             key={card.scene}
                             direction="up"
                             delay={0.05}
-                            className={`${styles.featureCard} ${i % 2 === 1 ? styles.featureCardReverse : ""}`}
+                            className={styles.featureCard}
                         >
                             <div className={styles.featureCardText}>
                                 <div className={styles.featureCardIcon}>{card.icon}</div>

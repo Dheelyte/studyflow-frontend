@@ -4,13 +4,29 @@ import {
   useVideoConfig,
   interpolate,
   spring,
+  Easing,
 } from "remotion";
 import { Backdrop } from "../SetYourGoal/Backdrop";
-import { CommunityHeader, HEADER_HEIGHT } from "./CommunityHeader";
+import { Cursor } from "../SetYourGoal/Cursor";
+import {
+  CommunityHeader,
+  HEADER_HEIGHT,
+  HEADER_WIDTH,
+  JOIN_BUTTON_OFFSET_X,
+  JOIN_BUTTON_OFFSET_Y,
+} from "./CommunityHeader";
 import { PostCard, POST_WIDTH } from "./PostCard";
 import { Comment } from "./Comment";
 import { FloatingHearts } from "./FloatingHeart";
 import { Camera, useCameraPath } from "../Camera";
+
+const easeInOut = Easing.bezier(0.65, 0, 0.35, 1);
+const arcPath = (from, to, t, lift = 60) => {
+  const x = from.x + (to.x - from.x) * t;
+  const yLinear = from.y + (to.y - from.y) * t;
+  const arc = -Math.sin(Math.PI * t) * lift;
+  return { x, y: yLinear + arc };
+};
 
 const QUESTION =
   "How do you handle missing values in a large DataFrame? Torn between dropna() and smart imputation — what's your go-to?";
@@ -41,18 +57,22 @@ const COMMENTS = [
 
 const T = {
   headerIn: [12, 36],
-  cardIn: [25, 55],
-  typeStart: 55,
-  typeEnd: 140,
-  likePulse: [142, 158],
-  likeCount: [142, 215],
-  heartsStart: 148,
-  comment1: [175, 200],
-  comment2: [220, 245],
-  comment3: [265, 290],
-  hold: [290, 330],
-  fadeOut: [330, 360],
+  joinCursorIn: [60, 90],
+  joinClick: [88, 102],
+  cardIn: [92, 122],
+  typeStart: 122,
+  typeEnd: 207,
+  likePulse: [209, 225],
+  likeCount: [209, 282],
+  heartsStart: 215,
+  comment1: [242, 267],
+  comment2: [287, 312],
+  comment3: [332, 357],
+  hold: [357, 397],
+  fadeOut: [397, 427],
 };
+
+const JOIN_PRESS_FRAME = 94;
 
 const clamped = (frame, [a, b]) =>
   interpolate(frame, [a, b], [0, 1], {
@@ -132,11 +152,72 @@ export const CommunityQuestion = () => {
   const headerTop = 64;
   const cardTop = headerTop + HEADER_HEIGHT + 20;
 
+  const joined = frame >= JOIN_PRESS_FRAME;
+
+  let joinScale = 1;
+  let joinFlash = 0;
+  if (frame >= T.joinClick[0] && frame <= T.joinClick[1]) {
+    const t = (frame - T.joinClick[0]) / (T.joinClick[1] - T.joinClick[0]);
+    if (t < 0.35) {
+      joinScale = interpolate(t, [0, 0.35], [1, 0.9]);
+    } else if (t < 0.7) {
+      joinScale = interpolate(t, [0.35, 0.7], [0.9, 1.08]);
+    } else {
+      joinScale = interpolate(t, [0.7, 1], [1.08, 1]);
+    }
+    joinFlash = Math.sin(t * Math.PI);
+  }
+
+  const joinButtonX = headerLeft + JOIN_BUTTON_OFFSET_X;
+  const joinButtonY = headerTop + JOIN_BUTTON_OFFSET_Y;
+
+  const cursorStart = { x: width + 60, y: height + 60 };
+  let cursorX = cursorStart.x;
+  let cursorY = cursorStart.y;
+  let cursorScale = 1;
+  let rippleScale = 0;
+  let rippleOpacity = 0;
+  let cursorOpacity = 0;
+
+  if (frame >= T.joinCursorIn[0]) {
+    cursorOpacity = 1;
+  }
+  if (frame < T.joinCursorIn[0]) {
+    cursorX = cursorStart.x;
+    cursorY = cursorStart.y;
+  } else if (frame < T.joinCursorIn[1]) {
+    const t = easeInOut(
+      (frame - T.joinCursorIn[0]) /
+        (T.joinCursorIn[1] - T.joinCursorIn[0])
+    );
+    const p = arcPath(cursorStart, { x: joinButtonX, y: joinButtonY }, t, 80);
+    cursorX = p.x;
+    cursorY = p.y;
+  } else if (frame < T.cardIn[1]) {
+    cursorX = joinButtonX;
+    cursorY = joinButtonY;
+  } else {
+    const t = Math.min(
+      1,
+      (frame - T.cardIn[1]) / 24
+    );
+    cursorX = interpolate(t, [0, 1], [joinButtonX, width + 80]);
+    cursorY = interpolate(t, [0, 1], [joinButtonY, height + 120]);
+    cursorOpacity = 1 - t;
+  }
+
+  if (frame >= T.joinClick[0] && frame <= T.joinClick[1]) {
+    const t = (frame - T.joinClick[0]) / (T.joinClick[1] - T.joinClick[0]);
+    cursorScale = 1 - 0.2 * Math.sin(Math.PI * t);
+    rippleScale = interpolate(t, [0, 1], [0.4, 1.3]);
+    rippleOpacity = interpolate(t, [0, 1], [0.6, 0]);
+  }
+
   const heartsOriginX = headerLeft + 34;
   const heartsOriginY = cardTop + 190;
 
   const postCenterX = headerLeft + POST_WIDTH / 2;
-  const nameMembersFocusX = headerLeft + 210;
+  const headerFocusX = headerLeft + HEADER_WIDTH / 2;
   const nameMembersFocusY = headerTop + HEADER_HEIGHT / 2 - 2;
   const questionY = cardTop + 120;
   const commentsY = cardTop + 320;
@@ -144,13 +225,15 @@ export const CommunityQuestion = () => {
   const cam = useCameraPath(
     frame,
     [
-      { frame: 0, x: nameMembersFocusX, y: nameMembersFocusY, scale: 3.3 },
-      { frame: T.typeStart, x: nameMembersFocusX, y: nameMembersFocusY, scale: 3.3 },
-      { frame: T.typeStart + 50, x: postCenterX, y: questionY, scale: 1.55 },
-      { frame: T.typeEnd, x: postCenterX, y: questionY + 10, scale: 1.55 },
-      { frame: T.comment1[0] + 30, x: postCenterX, y: commentsY, scale: 1.45 },
-      { frame: T.comment3[0], x: postCenterX, y: commentsY + 40, scale: 1.4 },
-      { frame: T.fadeOut[1], x: postCenterX, y: commentsY + 40, scale: 1.4 },
+      { frame: 0, x: headerFocusX, y: nameMembersFocusY, scale: 2.4 },
+      { frame: T.headerIn[1], x: headerFocusX, y: nameMembersFocusY, scale: 2.4 },
+      { frame: T.joinClick[1], x: headerFocusX, y: nameMembersFocusY, scale: 2.4 },
+      { frame: T.typeStart, x: headerFocusX, y: nameMembersFocusY, scale: 2.2 },
+      { frame: T.typeStart + 50, x: postCenterX, y: questionY, scale: 2.1 },
+      { frame: T.typeEnd, x: postCenterX, y: questionY + 10, scale: 2.1 },
+      { frame: T.comment1[0] + 30, x: postCenterX, y: commentsY, scale: 1.95 },
+      { frame: T.comment3[0], x: postCenterX, y: commentsY + 40, scale: 1.9 },
+      { frame: T.fadeOut[1], x: postCenterX, y: commentsY + 40, scale: 1.9 },
     ],
     { x: 640, y: 360, scale: 1 }
   );
@@ -167,7 +250,12 @@ export const CommunityQuestion = () => {
           top: headerTop,
         }}
       >
-        <CommunityHeader opacity={headerOpacity} />
+        <CommunityHeader
+          opacity={headerOpacity}
+          joined={joined}
+          joinScale={joinScale}
+          joinFlash={joinFlash}
+        />
       </div>
 
       <div
@@ -218,6 +306,18 @@ export const CommunityQuestion = () => {
         originY={heartsOriginY}
         active={frame >= T.heartsStart && frame < T.heartsStart + 80}
       />
+
+      {cursorOpacity > 0 && (
+        <div style={{ opacity: cursorOpacity }}>
+          <Cursor
+            x={cursorX}
+            y={cursorY}
+            scale={cursorScale}
+            rippleScale={rippleScale}
+            rippleOpacity={rippleOpacity}
+          />
+        </div>
+      )}
       </Camera>
     </AbsoluteFill>
   );

@@ -10,7 +10,7 @@ export const SCENE_DURATIONS = {
   LearnWithAITutor: 390,
   QuizScene: 450,
   GamifiedMotivation: 390,
-  CommunityQuestion: 360,
+  CommunityQuestion: 430,
 };
 
 export const COMBINED_DURATION =

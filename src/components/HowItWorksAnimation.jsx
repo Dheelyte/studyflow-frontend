@@ -27,7 +27,7 @@ const SCENES = {
     },
     communityQuestion: {
         component: CommunityQuestion,
-        durationInFrames: 360,
+        durationInFrames: 430,
     },
 };
 

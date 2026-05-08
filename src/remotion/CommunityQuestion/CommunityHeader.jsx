@@ -1,10 +1,18 @@
 import { UsersIcon } from "../icons";
 
-export const HEADER_WIDTH = 820;
+export const HEADER_WIDTH = 440;
 export const HEADER_HEIGHT = 88;
+export const JOIN_BUTTON_OFFSET_X = 385;
+export const JOIN_BUTTON_OFFSET_Y = HEADER_HEIGHT / 2;
 
-export const CommunityHeader = ({ opacity = 1, memberBump = 0 }) => {
-  const members = 2847 + Math.round(memberBump * 3);
+export const CommunityHeader = ({
+  opacity = 1,
+  memberBump = 0,
+  joined = false,
+  joinScale = 1,
+  joinFlash = 0,
+}) => {
+  const members = 2847 + (joined ? 1 : 0) + Math.round(memberBump * 3);
   return (
     <div
       style={{
@@ -43,15 +51,16 @@ export const CommunityHeader = ({ opacity = 1, memberBump = 0 }) => {
         DA
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 3, flex: 1 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
         <div
           style={{
             display: "flex",
             alignItems: "center",
             gap: 10,
+            whiteSpace: "nowrap",
           }}
         >
-          <span style={{ fontSize: 20, fontWeight: 700, color: "#ffffff" }}>
+          <span style={{ fontSize: 20, fontWeight: 700, color: "#ffffff", whiteSpace: "nowrap" }}>
             Data Analysis
           </span>
           <span
@@ -107,15 +116,17 @@ export const CommunityHeader = ({ opacity = 1, memberBump = 0 }) => {
       <div
         style={{
           padding: "8px 16px",
-          background: "#6366f1",
+          background: joined ? "#4f46e5" : "#6366f1",
           color: "white",
           borderRadius: 10,
           fontSize: 13,
           fontWeight: 700,
-          boxShadow: "0 10px 24px -8px rgba(99, 102, 241, 0.5)",
+          boxShadow: `0 ${10 + joinFlash * 14}px ${24 + joinFlash * 18}px -8px rgba(99, 102, 241, ${0.5 + joinFlash * 0.3})`,
+          transform: `scale(${joinScale})`,
+          filter: `brightness(${1 + joinFlash * 0.15})`,
         }}
       >
-        Joined
+        {joined ? "Joined" : "Join"}
       </div>
     </div>
   );
