@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 export default function ScrambleText({
     text,
     stagger = 70,
-    duration = 600,
+    duration = 2000,
     maxAngle = 55,
     className,
     style,

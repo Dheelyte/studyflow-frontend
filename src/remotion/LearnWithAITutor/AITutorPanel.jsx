@@ -58,7 +58,7 @@ export const AITutorPanel = ({
             AI Tutor
           </div>
           <div style={{ fontSize: 13, color: "#6b7280", marginTop: 2 }}>
-            Paused at 0:42 — explaining this section
+            Paused at 0:42 - explaining this section
           </div>
         </div>
       </div>

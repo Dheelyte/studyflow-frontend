@@ -1,0 +1,238 @@
+.pageWrap {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%);
+    padding: 40px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.statusBox {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px 28px;
+    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.12);
+    max-width: 480px;
+    text-align: center;
+    color: var(--foreground, #111827);
+}
+
+.statusBox h2 {
+    margin: 0 0 8px;
+    font-size: 1.2rem;
+}
+
+.statusBox p {
+    margin: 0;
+    color: var(--secondary, #6b7280);
+    font-size: 0.95rem;
+}
+
+.actions {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.printButton {
+    background: #6366f1;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 18px;
+    font-weight: 600;
+    font-size: 0.92rem;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(99, 102, 241, 0.3);
+}
+
+.printButton:hover {
+    background: #4f46e5;
+}
+
+.certificate {
+    width: 100%;
+    max-width: 900px;
+    aspect-ratio: 1.414 / 1; /* A4 landscape */
+    background: #fff;
+    border-radius: 18px;
+    padding: 48px;
+    position: relative;
+    border: 6px solid transparent;
+    background-image:
+        linear-gradient(#fff, #fff),
+        linear-gradient(135deg, #6366f1, #a855f7);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    box-shadow: 0 30px 80px rgba(99, 102, 241, 0.18);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-family: "Georgia", "Times New Roman", serif;
+}
+
+.certHeader {
+    text-align: center;
+}
+
+.brand {
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: #6366f1;
+    font-family: "Inter", "Helvetica", sans-serif;
+}
+
+.divider {
+    height: 2px;
+    width: 80px;
+    background: linear-gradient(90deg, transparent, #a855f7, transparent);
+    margin: 12px auto 14px;
+}
+
+.eyebrow {
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: #6b7280;
+    font-family: "Inter", "Helvetica", sans-serif;
+}
+
+.body {
+    text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 12px;
+}
+
+.presented,
+.forCompleting {
+    margin: 0;
+    color: #6b7280;
+    font-size: 1rem;
+    font-style: italic;
+}
+
+.recipient {
+    margin: 0;
+    font-size: 2.8rem;
+    color: #111827;
+    line-height: 1.1;
+}
+
+.courseTitle {
+    margin: 0;
+    font-size: 1.6rem;
+    color: #4338ca;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.summary {
+    margin: 6px auto 0;
+    max-width: 560px;
+    font-size: 0.95rem;
+    color: #6b7280;
+    line-height: 1.5;
+    font-style: italic;
+}
+
+.footerRow {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 24px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(99, 102, 241, 0.18);
+    font-family: "Inter", "Helvetica", sans-serif;
+}
+
+.footerCell {
+    text-align: center;
+}
+
+.footerValue {
+    font-size: 1rem;
+    color: #111827;
+    font-weight: 600;
+    word-break: break-all;
+}
+
+.footerLabel {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #6b7280;
+    margin-top: 4px;
+}
+
+.seal {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    font-weight: 800;
+    box-shadow: 0 8px 22px rgba(99, 102, 241, 0.4);
+}
+
+.verifyHint {
+    color: #6b7280;
+    font-size: 0.85rem;
+    margin: 0;
+    text-align: center;
+}
+
+@media print {
+    .pageWrap {
+        background: #fff;
+        padding: 0;
+    }
+
+    .actions,
+    .verifyHint {
+        display: none;
+    }
+
+    .certificate {
+        box-shadow: none;
+        border-radius: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .pageWrap {
+        padding: 20px 14px;
+    }
+
+    .certificate {
+        aspect-ratio: auto;
+        padding: 28px 22px;
+    }
+
+    .recipient {
+        font-size: 2rem;
+    }
+
+    .courseTitle {
+        font-size: 1.25rem;
+    }
+
+    .footerRow {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .seal {
+        justify-self: center;
+    }
+}

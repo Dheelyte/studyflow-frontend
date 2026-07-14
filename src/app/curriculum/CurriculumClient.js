@@ -269,6 +269,9 @@ export default function CurriculumClient() {
                                                             onClick={(e) => handleTopicClick(e)}
                                                             title="Click 'Start Learning' to create your course first"
                                                         >
+                                                            <div className={`${styles.resourceIcon} ${styles.mediaIcon}`}>
+                                                                <VideoIcon size={20} />
+                                                            </div>
                                                             <div className={styles.resourceInfo}>
                                                                 <div className={styles.resourceHeaderRow}>
                                                                     <div className={styles.resourceTitleGroup}>

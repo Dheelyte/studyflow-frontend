@@ -11,7 +11,7 @@ import styles from "./HowItWorksAnimation.module.css";
 const SCENES = {
     setYourGoal: {
         component: SetYourGoal,
-        durationInFrames: 330,
+        durationInFrames: 512,
     },
     learnWithAITutor: {
         component: LearnWithAITutor,

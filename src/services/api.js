@@ -264,6 +264,68 @@ export const curriculum = {
         method: 'POST',
         body: JSON.stringify(data)
     }),
+    getChatSession: (topicId) => apiFetch(`/topics/${topicId}/chat`),
+    getChatMessagesPage: (topicId, { beforeId, limit = 50 } = {}) => {
+        const params = new URLSearchParams();
+        if (beforeId != null) params.set('before_id', beforeId);
+        params.set('limit', limit);
+        return apiFetch(`/topics/${topicId}/chat/messages?${params.toString()}`);
+    },
+    sendChatMessage: (topicId, data) => apiFetch(`/topics/${topicId}/chat/messages`, {
+        method: 'POST',
+        body: JSON.stringify(data)
+    }),
+    streamChatMessage: async function* (topicId, data) {
+        const response = await fetch(
+            `${API_URL}/topics/${topicId}/chat/messages/stream`,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(data),
+            }
+        );
+        if (!response.ok || !response.body) {
+            let errMsg = `Stream request failed (${response.status})`;
+            try {
+                const err = await response.json();
+                if (err?.detail) errMsg = err.detail;
+            } catch (e) { /* ignore */ }
+            throw new Error(errMsg);
+        }
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            let nl;
+            while ((nl = buffer.indexOf('\n')) !== -1) {
+                const line = buffer.slice(0, nl).trim();
+                buffer = buffer.slice(nl + 1);
+                if (!line) continue;
+                try {
+                    yield JSON.parse(line);
+                } catch (e) {
+                    console.error('Bad stream chunk:', line, e);
+                }
+            }
+        }
+        const tail = buffer.trim();
+        if (tail) {
+            try { yield JSON.parse(tail); } catch (e) { /* ignore */ }
+        }
+    },
+    clearChatSession: (topicId) => apiFetch(`/topics/${topicId}/chat`, {
+        method: 'DELETE'
+    }),
+    getCertificateStatus: (playlistId) =>
+        apiFetch(`/playlists/${playlistId}/certificate`),
+    issueCertificate: (playlistId) =>
+        apiFetch(`/playlists/${playlistId}/certificate`, { method: 'POST' }),
+    listMyCertificates: () => apiFetch(`/me/certificates`),
+    verifyCertificate: (code) => apiFetch(`/certificates/${code}`),
     getQuiz: (moduleId, params) => {
         const searchParams = new URLSearchParams(params);
         return apiFetch(`/modules/${moduleId}/quiz?${searchParams.toString()}`);

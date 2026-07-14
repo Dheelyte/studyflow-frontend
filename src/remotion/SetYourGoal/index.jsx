@@ -18,6 +18,7 @@ import {
   DETAIL_IMAGE_CENTER_Y,
   DETAIL_TITLE_CENTER_Y,
 } from "./CourseDetail";
+import { CurriculumList } from "../LearnWithAITutor/CurriculumList";
 import { Camera, useCameraPath } from "../Camera";
 
 const BAR_CENTER_Y = 340;
@@ -36,6 +37,10 @@ const DETAIL_CURSOR_START = 220;
 const DETAIL_CURSOR_END = 272;
 const DETAIL_BUTTON_PRESS_START = 272;
 const DETAIL_BUTTON_PRESS_END = 290;
+const MODULE_PHASE_START = 295;
+const MODULE_HEADER_START = 310;
+const MODULE_FULLY_SHOWN = 362;
+const SCENE_END = MODULE_FULLY_SHOWN + 150;
 
 export const SetYourGoal = () => {
   const frame = useCurrentFrame();
@@ -117,11 +122,11 @@ export const SetYourGoal = () => {
     );
     cursorX = interpolate(t, [0, 1], [width + 40, DETAIL_BUTTON_CENTER_X]);
     cursorY = interpolate(t, [0, 1], [height + 40, DETAIL_BUTTON_CENTER_Y]);
-  } else if (frame < 300) {
+  } else if (frame < MODULE_PHASE_START) {
     cursorX = DETAIL_BUTTON_CENTER_X;
     cursorY = DETAIL_BUTTON_CENTER_Y;
   } else {
-    const t = Math.min(1, (frame - 300) / 25);
+    const t = Math.min(1, (frame - MODULE_PHASE_START) / 18);
     cursorX = interpolate(t, [0, 1], [DETAIL_BUTTON_CENTER_X, width + 80]);
     cursorY = interpolate(t, [0, 1], [DETAIL_BUTTON_CENTER_Y, height + 80]);
   }
@@ -232,10 +237,35 @@ export const SetYourGoal = () => {
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
 
-  const finalFade = interpolate(frame, [320, 330], [1, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
+  const finalFade = 1;
+
+  // Detail fades out as module appears
+  const detailFadeOut = interpolate(
+    frame,
+    [MODULE_PHASE_START, MODULE_PHASE_START + 18],
+    [1, 0],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+  );
+
+  // Module 1 animations — reuse CurriculumList from LearnWithAITutor
+  // Fade/slide in from the bottom (not the side)
+  const moduleRise = interpolate(
+    frame,
+    [MODULE_PHASE_START + 6, MODULE_PHASE_START + 36],
+    [0, 1],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+  );
+  const moduleRiseEased = easeInOut(moduleRise);
+  const moduleTranslateY = (1 - moduleRiseEased) * 120;
+  const moduleOpacity = moduleRise;
+  const moduleTopicReveals = [0, 1, 2, 3].map((i) =>
+    interpolate(
+      frame,
+      [MODULE_HEADER_START + i * 10, MODULE_HEADER_START + 22 + i * 10],
+      [0, 1],
+      { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+    )
+  );
 
   // Follow caret x during typing
   const caretStartX = barLeft + 300;
@@ -259,7 +289,8 @@ export const SetYourGoal = () => {
       { frame: 165, x: buttonTarget.x, y: BAR_CENTER_Y, scale: 1.45 },
       { frame: 180, x: 640, y: BAR_CENTER_Y, scale: 1.1 },
       { frame: PHASE_SWITCH, x: 640, y: 360, scale: 1.0 },
-      { frame: 330, x: 640, y: 360, scale: 1.0 },
+      { frame: MODULE_PHASE_START, x: 640, y: 360, scale: 1.0 },
+      { frame: SCENE_END, x: 640, y: 360, scale: 1.0 },
     ],
     { x: 640, y: 360, scale: 1 }
   );
@@ -309,9 +340,9 @@ export const SetYourGoal = () => {
             />
           )}
 
-          {detailAppear > 0 && (
+          {detailAppear > 0 && detailFadeOut > 0 && (
             <CourseDetail
-              appear={detailAppear}
+              appear={detailAppear * detailFadeOut}
               imageEnter={1}
               titleEnter={1}
               descEnter={1}
@@ -319,6 +350,28 @@ export const SetYourGoal = () => {
               buttonScale={detailButtonScale}
               buttonFlash={detailButtonFlash}
             />
+          )}
+
+          {moduleRise > 0 && (
+            <AbsoluteFill
+              style={{ alignItems: "center", justifyContent: "flex-start" }}
+            >
+              <div
+                style={{
+                  marginTop: 80,
+                  transform: `translateY(${moduleTranslateY}px)`,
+                  opacity: moduleOpacity,
+                }}
+              >
+                <CurriculumList
+                  slideProgress={1}
+                  topicReveals={moduleTopicReveals}
+                  highlightIndex={-1}
+                  highlightPulse={0}
+                  panelOpacity={1}
+                />
+              </div>
+            </AbsoluteFill>
           )}
 
           <Cursor

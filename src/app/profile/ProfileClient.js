@@ -4,7 +4,8 @@ import styles from './page.module.css';
 import { ZapIcon, StarIcon, TrophyIconSimple, ShareIcon } from '@/components/Icons';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/components/ThemeProvider';
-import { users } from '@/services/api';
+import { users, curriculum } from '@/services/api';
+import { useRouter } from 'next/navigation';
 import EditProfileModal from '@/components/EditProfileModal';
 import StatShareModal from '@/components/StatShareModal';
 
@@ -38,6 +39,24 @@ export default function ProfileClient() {
 
     const [heatmapData, setHeatmapData] = useState([]);
     const [tooltipData, setTooltipData] = useState({ visible: false, x: 0, y: 0, count: 0, date: "" });
+    const [certificates, setCertificates] = useState([]);
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!user) return;
+        let cancelled = false;
+        (async () => {
+            try {
+                const data = await curriculum.listMyCertificates();
+                if (!cancelled) setCertificates(data || []);
+            } catch (err) {
+                console.error("Failed to fetch certificates:", err);
+            }
+        })();
+        return () => {
+            cancelled = true;
+        };
+    }, [user?.id]);
 
     const handleInteraction = (e, dayData) => {
         const rect = e.target.getBoundingClientRect();
@@ -244,6 +263,41 @@ export default function ProfileClient() {
                 </div>
             </div>
 
+
+            {/* Certificates */}
+            <div className={styles.certificatesSection}>
+                <div className={styles.sectionTitle}>
+                    <span>Certificates</span>
+                    <span style={{ fontSize: '0.9rem', color: 'var(--secondary)', fontWeight: '400' }}>
+                        {certificates.length} earned
+                    </span>
+                </div>
+                {certificates.length === 0 ? (
+                    <div className={styles.certificatesEmpty}>
+                        Finish every topic and quiz in a course to earn a certificate.
+                    </div>
+                ) : (
+                    <div className={styles.certificatesList}>
+                        {certificates.map((c) => (
+                            <button
+                                key={c.id}
+                                type="button"
+                                className={styles.certificateCard}
+                                onClick={() => router.push(`/certificate/${c.verification_code}`)}
+                            >
+                                <div className={styles.certificateCardIcon}>🏆</div>
+                                <div className={styles.certificateCardBody}>
+                                    <div className={styles.certificateCardTitle}>{c.playlist_title}</div>
+                                    <div className={styles.certificateCardMeta}>
+                                        Issued {new Date(c.issued_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                                    </div>
+                                </div>
+                                <div className={styles.certificateCardArrow}>›</div>
+                            </button>
+                        ))}
+                    </div>
+                )}
+            </div>
 
             {/* Settings Section */}
             <div className={styles.settingsSection}>

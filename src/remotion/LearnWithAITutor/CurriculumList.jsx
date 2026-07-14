@@ -9,7 +9,7 @@ const TOPICS = [
   },
   {
     title: "Types of Data & Variables",
-    description: "Categorical, numerical, ordinal — know what you're working with.",
+    description: "Categorical, numerical, ordinal - know what you're working with.",
     xp: "+11 XP",
   },
   {

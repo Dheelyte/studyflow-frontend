@@ -29,7 +29,7 @@ const arcPath = (from, to, t, lift = 60) => {
 };
 
 const QUESTION =
-  "How do you handle missing values in a large DataFrame? Torn between dropna() and smart imputation — what's your go-to?";
+  "How do you handle missing values in a large DataFrame? Torn between dropna() and smart imputation - what's your go-to?";
 
 const COMMENTS = [
   {
@@ -37,14 +37,14 @@ const COMMENTS = [
     initials: "MK",
     avatarGradient: "linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)",
     time: "12s",
-    content: "Use SimpleImputer with median — saves your pipeline.",
+    content: "Use SimpleImputer with median - saves your pipeline.",
   },
   {
     author: "Jordan S.",
     initials: "JS",
     avatarGradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
     time: "28s",
-    content: "Plot missingness first — tells you if it's MCAR.",
+    content: "Plot missingness first - tells you if it's MCAR.",
   },
   {
     author: "Priya N.",

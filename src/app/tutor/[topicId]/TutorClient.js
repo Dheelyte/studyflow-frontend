@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { curriculum } from "@/services/api";
 import styles from "./page.module.css";
 import { ChevronLeft, VideoIcon, CheckCircleIcon, ZapIcon } from "@/components/Icons";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 // Help icon (question mark in circle)
 const HelpIcon = ({ size = 24 }) => (
@@ -35,14 +37,61 @@ export default function TutorClient({ params }) {
     const [error, setError] = useState(null);
 
     const [playerReady, setPlayerReady] = useState(false);
-    const [explaining, setExplaining] = useState(false);
-    const [explanation, setExplanation] = useState(null);
     const [isCompleted, setIsCompleted] = useState(false);
     const [completing, setCompleting] = useState(false);
+
+    // Chat state
+    const [messages, setMessages] = useState([]);
+    const [chatLoading, setChatLoading] = useState(true);
+    const [sending, setSending] = useState(false);
+    const [chatInput, setChatInput] = useState("");
+    const [showScrollDown, setShowScrollDown] = useState(false);
+    const [clearing, setClearing] = useState(false);
+    const [hasMoreMessages, setHasMoreMessages] = useState(false);
+    const [loadingOlder, setLoadingOlder] = useState(false);
+    const [showClearConfirm, setShowClearConfirm] = useState(false);
+    const [chatExpanded, setChatExpanded] = useState(false);
 
     const playerRef = useRef(null);
     const playerContainerRef = useRef(null);
     const ytScriptLoaded = useRef(false);
+    const messagesContainerRef = useRef(null);
+    const chatInputRef = useRef(null);
+
+    const autoSizeChatInput = () => {
+        const el = chatInputRef.current;
+        if (!el) return;
+        el.style.height = "auto";
+        const maxHeight = 140;
+        el.style.height = `${Math.min(el.scrollHeight, maxHeight)}px`;
+        el.style.overflowY = el.scrollHeight > maxHeight ? "auto" : "hidden";
+    };
+
+    useEffect(() => {
+        autoSizeChatInput();
+    }, [chatInput]);
+
+    // Close the clear-chat confirmation modal on Escape
+    useEffect(() => {
+        if (!showClearConfirm) return;
+        const onKey = (e) => {
+            if (e.key === "Escape" && !clearing) setShowClearConfirm(false);
+        };
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+    }, [showClearConfirm, clearing]);
+
+    // Sync the browser tab title with the current topic title
+    useEffect(() => {
+        if (typeof document === "undefined") return;
+        const previous = document.title;
+        if (topicTitle) {
+            document.title = topicTitle;
+        }
+        return () => {
+            document.title = previous;
+        };
+    }, [topicTitle]);
 
     // Fetch video data for this topic
     useEffect(() => {
@@ -55,6 +104,7 @@ export default function TutorClient({ params }) {
                 setVideoId(data.youtube_video_id);
                 if (data.title) setTopicTitle(data.title);
                 if (data.description) setTopicDescription(data.description);
+                setIsCompleted(Boolean(data.is_completed));
             } catch (err) {
                 console.error("Failed to fetch topic video:", err);
                 setError(err.message || "Failed to load video");
@@ -83,6 +133,7 @@ export default function TutorClient({ params }) {
                     modestbranding: 1,
                     rel: 0,
                     fs: 1,
+                    iv_load_policy: 3,
                 },
                 events: {
                     onReady: () => setPlayerReady(true),
@@ -116,33 +167,241 @@ export default function TutorClient({ params }) {
         };
     }, [initPlayer]);
 
-    // "I don't understand" handler
-    const handleExplain = async () => {
-        if (!videoId || explaining) return;
+    // Load existing chat history for this topic
+    useEffect(() => {
+        if (!topicId) return;
+        let cancelled = false;
+        (async () => {
+            try {
+                setChatLoading(true);
+                const data = await curriculum.getChatSession(topicId);
+                if (!cancelled) {
+                    setMessages(data.messages || []);
+                    setHasMoreMessages(Boolean(data.has_more));
+                }
+            } catch (err) {
+                console.error("Failed to load chat:", err);
+            } finally {
+                if (!cancelled) setChatLoading(false);
+            }
+        })();
+        return () => { cancelled = true; };
+    }, [topicId]);
 
-        let timestamp = 0;
-        if (playerRef.current && typeof playerRef.current.getCurrentTime === "function") {
-            playerRef.current.pauseVideo();
-            timestamp = playerRef.current.getCurrentTime();
+    const scrollToBottom = () => {
+        if (messagesContainerRef.current) {
+            messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+            setShowScrollDown(false);
         }
+    };
+
+    useEffect(() => {
+        const el = messagesContainerRef.current;
+        if (!el) return;
+        const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+        if (distanceFromBottom < 80) {
+            el.scrollTop = el.scrollHeight;
+            setShowScrollDown(false);
+        } else {
+            setShowScrollDown(true);
+        }
+    }, [messages, sending]);
+
+    // On first load, jump to the bottom of the chat once messages are rendered
+    const didInitialScrollRef = useRef(false);
+    useEffect(() => {
+        if (didInitialScrollRef.current) return;
+        if (chatLoading) return;
+        const el = messagesContainerRef.current;
+        if (!el) return;
+        el.scrollTop = el.scrollHeight;
+        setShowScrollDown(false);
+        didInitialScrollRef.current = true;
+    }, [chatLoading, messages]);
+
+    const loadOlderMessages = async () => {
+        if (loadingOlder || !hasMoreMessages || messages.length === 0) return;
+        const el = messagesContainerRef.current;
+        const previousHeight = el ? el.scrollHeight : 0;
+        const previousTop = el ? el.scrollTop : 0;
+        const oldestId = messages[0]?.id;
+        if (oldestId == null || typeof oldestId !== "number") return;
+        try {
+            setLoadingOlder(true);
+            const page = await curriculum.getChatMessagesPage(topicId, {
+                beforeId: oldestId,
+                limit: 50,
+            });
+            const older = page.messages || [];
+            setHasMoreMessages(Boolean(page.has_more));
+            if (older.length > 0) {
+                setMessages((prev) => [...older, ...prev]);
+                requestAnimationFrame(() => {
+                    const node = messagesContainerRef.current;
+                    if (node) {
+                        node.scrollTop =
+                            node.scrollHeight - previousHeight + previousTop;
+                    }
+                });
+            }
+        } catch (err) {
+            console.error("Failed to load older messages:", err);
+        } finally {
+            setLoadingOlder(false);
+        }
+    };
+
+    const handleMessagesScroll = () => {
+        const el = messagesContainerRef.current;
+        if (!el) return;
+        const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+        setShowScrollDown(distanceFromBottom > 80);
+        if (el.scrollTop < 60 && hasMoreMessages && !loadingOlder) {
+            loadOlderMessages();
+        }
+    };
+
+    const handleClearChat = () => {
+        if (clearing || messages.length === 0) return;
+        setShowClearConfirm(true);
+    };
+
+    const confirmClearChat = async () => {
+        if (clearing) return;
+        try {
+            setClearing(true);
+            await curriculum.clearChatSession(topicId);
+            setMessages([]);
+            setHasMoreMessages(false);
+            setShowClearConfirm(false);
+        } catch (err) {
+            console.error("Failed to clear chat:", err);
+        } finally {
+            setClearing(false);
+        }
+    };
+
+    const getCurrentTimestamp = () => {
+        if (playerRef.current && typeof playerRef.current.getCurrentTime === "function") {
+            return playerRef.current.getCurrentTime();
+        }
+        return null;
+    };
+
+    const sendMessage = async (content, { timestamp = null, pauseVideo = false } = {}) => {
+        if (!content.trim() || sending) return;
+
+        if (pauseVideo && playerRef.current && typeof playerRef.current.pauseVideo === "function") {
+            playerRef.current.pauseVideo();
+        }
+
+        const optimisticUser = {
+            id: `tmp-${Date.now()}`,
+            role: "user",
+            content,
+            video_timestamp: timestamp,
+            created_at: new Date().toISOString(),
+        };
+        setMessages((prev) => [...prev, optimisticUser]);
+        setSending(true);
+        requestAnimationFrame(() => scrollToBottom());
+
+        const streamingAssistantId = `streaming-${Date.now()}`;
+        let streamingStarted = false;
+        let streamingErrored = false;
+        let accumulated = "";
 
         try {
-            setExplaining(true);
-            setExplanation(null);
-            const data = await curriculum.explainTopic(topicId, {
-                video_id: videoId,
-                timestamp: Math.round(timestamp),
-            });
-            setExplanation(data);
+            for await (const event of curriculum.streamChatMessage(topicId, {
+                content,
+                video_timestamp: timestamp,
+            })) {
+                if (event.type === "user_message" && event.message) {
+                    // Swap optimistic user message with the persisted one
+                    setMessages((prev) => [
+                        ...prev.filter((m) => m.id !== optimisticUser.id),
+                        event.message,
+                    ]);
+                } else if (event.type === "chunk" && typeof event.text === "string") {
+                    accumulated += event.text;
+                    if (!streamingStarted) {
+                        streamingStarted = true;
+                        setMessages((prev) => [
+                            ...prev,
+                            {
+                                id: streamingAssistantId,
+                                role: "assistant",
+                                content: accumulated,
+                                video_timestamp: timestamp ?? null,
+                                created_at: new Date().toISOString(),
+                                _streaming: true,
+                            },
+                        ]);
+                    } else {
+                        setMessages((prev) =>
+                            prev.map((m) =>
+                                m.id === streamingAssistantId
+                                    ? { ...m, content: accumulated }
+                                    : m
+                            )
+                        );
+                    }
+                } else if (event.type === "done" && event.message) {
+                    setMessages((prev) => {
+                        const withoutStreaming = prev.filter(
+                            (m) => m.id !== streamingAssistantId
+                        );
+                        return [...withoutStreaming, event.message];
+                    });
+                } else if (event.type === "error") {
+                    streamingErrored = true;
+                    console.error("Chat stream error:", event.error);
+                }
+            }
         } catch (err) {
-            console.error("Failed to get explanation:", err);
-            setExplanation({
-                explanation: "Sorry, I couldn't generate an explanation right now. Please try again.",
-                transcript_excerpt: null,
+            console.error("Failed to stream message:", err);
+            streamingErrored = true;
+            setMessages((prev) => {
+                const withoutStreaming = prev.filter(
+                    (m) => m.id !== streamingAssistantId && m.id !== optimisticUser.id
+                );
+                return [
+                    ...withoutStreaming,
+                    {
+                        id: `err-${Date.now()}`,
+                        role: "assistant",
+                        content: "Sorry, I couldn't reply right now. Please try again.",
+                        video_timestamp: null,
+                        created_at: new Date().toISOString(),
+                    },
+                ];
             });
         } finally {
-            setExplaining(false);
+            setSending(false);
+            if (streamingErrored && !accumulated) {
+                // No partial reply arrived — error UI already added above.
+            }
         }
+    };
+
+    const handleExplain = () => {
+        const timestamp = getCurrentTimestamp();
+        const tsLabel = timestamp != null ? ` (at ${Math.round(timestamp)}s)` : "";
+        sendMessage(
+            `I don't understand what's happening in the video${tsLabel}. Can you explain?`,
+            { timestamp: timestamp != null ? Math.round(timestamp) : null, pauseVideo: true }
+        );
+    };
+
+    const handleChatSubmit = (e) => {
+        e.preventDefault();
+        const content = chatInput.trim();
+        if (!content) return;
+        setChatInput("");
+        const ts = getCurrentTimestamp();
+        sendMessage(content, {
+            timestamp: ts != null && ts > 0 ? Math.round(ts) : null,
+        });
     };
 
     // Mark complete handler
@@ -230,7 +489,15 @@ export default function TutorClient({ params }) {
                     <div className={styles.videoSection}>
                         <div className={styles.playerWrapper}>
                             {videoId ? (
-                                <div ref={playerContainerRef} style={{ width: "100%", height: "100%" }} />
+                                <>
+                                    <div ref={playerContainerRef} style={{ width: "100%", height: "100%" }} />
+                                    {!playerReady && (
+                                        <div className={styles.playerPlaceholder}>
+                                            <VideoIcon size={48} />
+                                            <span>Loading video...</span>
+                                        </div>
+                                    )}
+                                </>
                             ) : (
                                 <div className={styles.playerPlaceholder}>
                                     <VideoIcon size={48} />
@@ -243,10 +510,10 @@ export default function TutorClient({ params }) {
                             <button
                                 className={styles.helpButton}
                                 onClick={handleExplain}
-                                disabled={explaining || !videoId}
+                                disabled={sending || !videoId}
                             >
                                 <HelpIcon size={20} />
-                                {explaining ? "Thinking..." : "I don't understand this part"}
+                                {sending ? "Thinking..." : "I don't understand this part"}
                             </button>
                         </div>
 
@@ -258,7 +525,7 @@ export default function TutorClient({ params }) {
                     </div>
 
                     {/* Explanation panel */}
-                    <div className={styles.panel}>
+                    <div className={`${styles.panel} ${chatExpanded ? styles.panelExpanded : ""}`}>
                         <div className={styles.panelHeader}>
                             <div className={styles.panelIcon}>
                                 <ZapIcon size={20} fill="var(--primary)" />
@@ -267,44 +534,219 @@ export default function TutorClient({ params }) {
                                 <h3>AI Tutor</h3>
                                 <p>Ask for help at any point in the video</p>
                             </div>
+                            {messages.length > 0 && (
+                                <button
+                                    type="button"
+                                    className={styles.clearChatButton}
+                                    onClick={handleClearChat}
+                                    disabled={clearing}
+                                    title="Clear chat"
+                                >
+                                    {clearing ? "Clearing..." : "Clear"}
+                                </button>
+                            )}
+                            <button
+                                type="button"
+                                className={styles.expandChatButton}
+                                onClick={() => setChatExpanded((v) => !v)}
+                                aria-label={chatExpanded ? "Shrink chat" : "Expand chat"}
+                                title={chatExpanded ? "Shrink chat" : "Expand chat"}
+                            >
+                                {chatExpanded ? (
+                                    <svg
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    >
+                                        <polyline points="4 14 10 14 10 20" />
+                                        <polyline points="20 10 14 10 14 4" />
+                                        <line x1="14" y1="10" x2="21" y2="3" />
+                                        <line x1="3" y1="21" x2="10" y2="14" />
+                                    </svg>
+                                ) : (
+                                    <svg
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                    >
+                                        <polyline points="15 3 21 3 21 9" />
+                                        <polyline points="9 21 3 21 3 15" />
+                                        <line x1="21" y1="3" x2="14" y2="10" />
+                                        <line x1="3" y1="21" x2="10" y2="14" />
+                                    </svg>
+                                )}
+                            </button>
                         </div>
 
                         <div className={styles.panelBody}>
-                            {explaining ? (
-                                <div className={styles.loadingDots}>
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                </div>
-                            ) : explanation ? (
-                                <div className={styles.explanation}>
-                                    <div className={styles.explanationText}>
-                                        {explanation.explanation}
+                            <div
+                                className={styles.chatMessages}
+                                ref={messagesContainerRef}
+                                onScroll={handleMessagesScroll}
+                            >
+                                {chatLoading ? (
+                                    <div className={styles.chatSkeleton}>
+                                        <div className={`${styles.skeletonBubble} ${styles.skeletonAssistant}`} />
+                                        <div className={`${styles.skeletonBubble} ${styles.skeletonUser}`} />
+                                        <div className={`${styles.skeletonBubble} ${styles.skeletonAssistant}`} />
                                     </div>
-                                    {explanation.transcript_excerpt && (
-                                        <div className={styles.transcriptExcerpt}>
-                                            <span className={styles.transcriptLabel}>From the video</span>
-                                            {explanation.transcript_excerpt}
+                                ) : messages.length === 0 ? (
+                                    <div className={styles.emptyState}>
+                                        <div className={styles.emptyStateIcon}>
+                                            <LightbulbIcon size={28} />
                                         </div>
-                                    )}
-                                </div>
-                            ) : (
-                                <div className={styles.emptyState}>
-                                    <div className={styles.emptyStateIcon}>
-                                        <LightbulbIcon size={28} />
+                                        <h4>Ask the AI tutor anything</h4>
+                                        <p>
+                                            Type a question below, or click "I don't understand this part"
+                                            while watching the video to get a contextual explanation.
+                                        </p>
                                     </div>
-                                    <h4>Need help understanding?</h4>
-                                    <p>
-                                        Click "I don't understand this part" while watching the video.
-                                        The AI tutor will pause the video and explain what's happening
-                                        at that moment.
-                                    </p>
-                                </div>
+                                ) : (
+                                    messages.map((m) => (
+                                        <div
+                                            key={m.id}
+                                            className={`${styles.chatMessage} ${m.role === "user" ? styles.chatMessageUser : styles.chatMessageAssistant}`}
+                                        >
+                                            <div className={styles.chatBubble}>
+                                                {m.role === "assistant" ? (
+                                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                                        {m.content}
+                                                    </ReactMarkdown>
+                                                ) : (
+                                                    <p>{m.content}</p>
+                                                )}
+                                                {m.video_timestamp != null && (
+                                                    <span className={styles.chatTimestamp}>
+                                                        @ {Math.round(m.video_timestamp)}s
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                                {sending && !messages.some((m) => m._streaming) && (
+                                    <div className={`${styles.chatMessage} ${styles.chatMessageAssistant}`}>
+                                        <div className={styles.chatBubble}>
+                                            <div className={styles.loadingDots}>
+                                                <span></span>
+                                                <span></span>
+                                                <span></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {showScrollDown && (
+                                <button
+                                    type="button"
+                                    className={styles.scrollDownButton}
+                                    onClick={scrollToBottom}
+                                    aria-label="Scroll to latest"
+                                >
+                                    ↓
+                                </button>
                             )}
+
+                            <form className={styles.chatInputRow} onSubmit={handleChatSubmit}>
+                                <textarea
+                                    ref={chatInputRef}
+                                    className={styles.chatInput}
+                                    value={chatInput}
+                                    onChange={(e) => setChatInput(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter" && !e.shiftKey) {
+                                            e.preventDefault();
+                                            handleChatSubmit(e);
+                                        }
+                                    }}
+                                    placeholder="Ask a follow-up question..."
+                                    rows={1}
+                                    disabled={sending}
+                                />
+                                <button
+                                    type="submit"
+                                    className={styles.chatSendButton}
+                                    disabled={sending || !chatInput.trim()}
+                                >
+                                    Send
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
+
+            {showClearConfirm && (
+                <div
+                    className={styles.modalOverlay}
+                    onClick={() => {
+                        if (!clearing) setShowClearConfirm(false);
+                    }}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="clear-chat-title"
+                >
+                    <div
+                        className={styles.modalCard}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className={styles.modalIcon}>
+                            <svg
+                                width="22"
+                                height="22"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            >
+                                <polyline points="3 6 5 6 21 6" />
+                                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                                <path d="M10 11v6" />
+                                <path d="M14 11v6" />
+                                <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
+                            </svg>
+                        </div>
+                        <h3 id="clear-chat-title" className={styles.modalTitle}>
+                            Clear this chat?
+                        </h3>
+                        <p className={styles.modalBody}>
+                            All messages in this conversation will be permanently
+                            deleted. This can't be undone.
+                        </p>
+                        <div className={styles.modalActions}>
+                            <button
+                                type="button"
+                                className={styles.modalCancel}
+                                onClick={() => setShowClearConfirm(false)}
+                                disabled={clearing}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                className={styles.modalConfirm}
+                                onClick={confirmClearChat}
+                                disabled={clearing}
+                            >
+                                {clearing ? "Clearing..." : "Clear chat"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

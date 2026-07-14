@@ -86,7 +86,7 @@ export default function PostCard({ id, author, time, content, likes: initialLike
             if (res) {
                 const mapped = res.map(c => ({
                     id: c.id,
-                    author: c.user?.email ? c.user.email.split('@')[0] : 'User',
+                    author: c.user_name || (c.user?.email ? c.user.email.split('@')[0] : 'User'),
                     content: c.content,
                     time: formatTimeAgo(c.created_at)
                 }));
@@ -139,7 +139,7 @@ export default function PostCard({ id, author, time, content, likes: initialLike
                 if (res) {
                     const commentObj = {
                         id: res.id,
-                        author: res.user?.email ? res.user.email.split('@')[0] : 'You', 
+                        author: res.user_name || (res.user?.email ? res.user.email.split('@')[0] : 'You'), 
                         content: res.content,
                         time: 'Just now'
                     };

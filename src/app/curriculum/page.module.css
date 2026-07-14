@@ -71,7 +71,7 @@
 .courseImage {
     width: 160px;
     height: 160px;
-    background: linear-gradient(135deg, #6366f1, #a855f7);
+    background: #6366f1;
     box-shadow: 0 20px 50px -10px rgba(99, 102, 241, 0.5);
     display: flex;
     justify-content: center;
@@ -408,6 +408,7 @@
 
 .resourceCard {
     display: flex;
+    min-width: 0;
     gap: 16px;
     padding: 16px;
     background: rgba(99, 102, 241, 0.05);
@@ -452,11 +453,12 @@
 
 .resourceIcon {
     color: #6366f1;
-    margin-top: 2px;
+    margin-top: 12px;
 }
 
 .resourceInfo {
     flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -498,6 +500,9 @@
     font-size: 0.85rem;
     margin: 0;
     line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 @media (max-width: 768px) {

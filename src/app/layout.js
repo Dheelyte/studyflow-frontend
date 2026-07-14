@@ -12,6 +12,13 @@ export const metadata = {
     default: 'Primerly',
   },
   description: "Master any skill with your personal AI tutor.",
+  icons: {
+    icon: [
+      { url: '/Primerly Logo.png', type: 'image/png' },
+    ],
+    shortcut: '/Primerly Logo.png',
+    apple: '/Primerly Logo.png',
+  },
 };
 
 export default function RootLayout({ children }) {

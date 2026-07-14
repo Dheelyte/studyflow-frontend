@@ -19,7 +19,7 @@ export const RemotionRoot = () => (
     <Composition
       id="SetYourGoal"
       component={SetYourGoal}
-      durationInFrames={330}
+      durationInFrames={512}
       fps={30}
       width={1280}
       height={720}

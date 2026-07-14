@@ -119,6 +119,9 @@ export default function CourseClient({ params }) {
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     const [showQuizModal, setShowQuizModal] = useState(false);
     const [activeQuizModule, setActiveQuizModule] = useState(null);
+    const [certStatus, setCertStatus] = useState(null);
+    const [issuingCertificate, setIssuingCertificate] = useState(false);
+    const [certError, setCertError] = useState(null);
 
     const fetchedRef = useRef(null);
 
@@ -197,6 +200,40 @@ export default function CourseClient({ params }) {
         fetchCourse();
     }, [courseId]);
 
+    const refreshCertificateStatus = async () => {
+        if (!courseId) return;
+        try {
+            const data = await curriculum.getCertificateStatus(courseId);
+            setCertStatus(data);
+        } catch (err) {
+            console.error("Failed to load certificate status:", err);
+        }
+    };
+
+    useEffect(() => {
+        refreshCertificateStatus();
+    }, [courseId]);
+
+    const handleClaimCertificate = async () => {
+        if (issuingCertificate || !courseId) return;
+        try {
+            setIssuingCertificate(true);
+            setCertError(null);
+            const cert = await curriculum.issueCertificate(courseId);
+            setCertStatus((prev) => ({
+                ...(prev || {}),
+                eligible: true,
+                certificate: cert,
+            }));
+            router.push(`/certificate/${cert.verification_code}`);
+        } catch (err) {
+            console.error("Failed to issue certificate:", err);
+            setCertError(err?.message || "Could not issue certificate");
+        } finally {
+            setIssuingCertificate(false);
+        }
+    };
+
     const toggleModule = (id) => {
         setExpandedModules(prev => ({ ...prev, [id]: !prev[id] }));
     };
@@ -213,46 +250,14 @@ export default function CourseClient({ params }) {
 
             if (target) {
                 target.scrollIntoView({ behavior: "smooth", block: "center" });
-                setHighlightResource(true);
+                setHighlightResource(nextUpTopic ? "next-up" : "first");
                 setTimeout(() => setHighlightResource(false), 4500);
             }
         }, 100);
     };
 
-    const handleTopicClick = async (topicId, isCompleted, isLocked) => {
+    const handleTopicClick = (topicId, isCompleted, isLocked) => {
         if (isLocked) return;
-
-        // Mark as completed if not already
-        if (!isCompleted) {
-            try {
-                await curriculum.completeTopic(topicId);
-                // Update local state
-                setCurriculumData(prev => {
-                    if (!prev || !prev._raw) return prev;
-                    const newRaw = JSON.parse(JSON.stringify(prev._raw));
-                    let found = false;
-                    for (const m of newRaw.modules || []) {
-                        for (const l of m.lessons || []) {
-                            for (const t of l.topics || []) {
-                                if (t.id === topicId) {
-                                    t.is_completed = true;
-                                    found = true;
-                                    break;
-                                }
-                            }
-                            if (found) break;
-                        }
-                        if (found) break;
-                    }
-                    if (found) return normalizeCourseData(newRaw);
-                    return prev;
-                });
-            } catch (err) {
-                console.error("Failed to mark topic complete:", err);
-            }
-        }
-
-        // Navigate to tutor page
         router.push(`/tutor/${topicId}`);
     };
 
@@ -282,6 +287,7 @@ export default function CourseClient({ params }) {
             }
             return normalizeCourseData(newRaw);
         });
+        refreshCertificateStatus();
     };
 
     if (loading) {
@@ -376,6 +382,47 @@ export default function CourseClient({ params }) {
                 </div>
             )}
 
+            {certStatus && (certStatus.eligible || certStatus.certificate) && (
+                <div className={styles.certificateBanner}>
+                    <div className={styles.certificateBannerIcon}>🏆</div>
+                    <div className={styles.certificateBannerText}>
+                        <div className={styles.certificateBannerTitle}>
+                            {certStatus.certificate
+                                ? "Certificate earned"
+                                : "You're eligible for a certificate!"}
+                        </div>
+                        <div className={styles.certificateBannerSubtitle}>
+                            {certStatus.certificate
+                                ? "View, print, or share your certificate of completion."
+                                : "Every topic completed and every quiz passed. Claim your certificate."}
+                        </div>
+                        {certError && (
+                            <div className={styles.certificateBannerError}>{certError}</div>
+                        )}
+                    </div>
+                    {certStatus.certificate ? (
+                        <button
+                            className={styles.certificateBannerButton}
+                            onClick={() =>
+                                router.push(
+                                    `/certificate/${certStatus.certificate.verification_code}`
+                                )
+                            }
+                        >
+                            View certificate
+                        </button>
+                    ) : (
+                        <button
+                            className={styles.certificateBannerButton}
+                            onClick={handleClaimCertificate}
+                            disabled={issuingCertificate}
+                        >
+                            {issuingCertificate ? "Issuing..." : "Claim certificate"}
+                        </button>
+                    )}
+                </div>
+            )}
+
             <div className={styles.content}>
 
                 {curriculumData.learning_objectives && curriculumData.learning_objectives.length > 0 && (
@@ -437,9 +484,9 @@ export default function CourseClient({ params }) {
                                                                 className={`
                                                                     ${styles.resourceCard}
                                                                     ${topic.is_completed ? styles.completedResource : ''}
-                                                                    ${isFirstTopic && highlightResource ? styles.highlight : ""}
+                                                                    ${isFirstTopic && highlightResource === "first" ? styles.highlight : ""}
                                                                     ${topic.isNextUp ? styles.nextUpResource : ""}
-                                                                    ${topic.isNextUp && highlightResource ? styles.highlight : ""}
+                                                                    ${topic.isNextUp && highlightResource === "next-up" ? styles.highlight : ""}
                                                                 `}
                                                                 onClick={() => handleTopicClick(topic.topic_id, topic.is_completed, topic.isLocked)}
                                                                 style={{
@@ -523,6 +570,129 @@ export default function CourseClient({ params }) {
                         );
                     })}
                 </div>
+
+                {/* Certificate achievement at the bottom — encourages completion */}
+                {certStatus && (
+                    (() => {
+                        const earned = Boolean(certStatus.certificate);
+                        const eligible = certStatus.eligible;
+                        const totalTopics = certStatus.total_topics || 0;
+                        const completedTopics = certStatus.completed_topics || 0;
+                        const totalModules = certStatus.total_modules || 0;
+                        const passedQuizzes = certStatus.passed_quizzes || 0;
+                        const topicsLeft = Math.max(0, totalTopics - completedTopics);
+                        const quizzesLeft = Math.max(0, totalModules - passedQuizzes);
+                        const overallProgress = totalTopics + totalModules > 0
+                            ? Math.round(
+                                ((completedTopics + passedQuizzes) /
+                                    (totalTopics + totalModules)) * 100
+                            )
+                            : 0;
+
+                        return (
+                            <div
+                                className={`${styles.certificateAchievement} ${earned ? styles.certificateAchievementEarned : ""}`}
+                            >
+                                <div className={styles.achievementPreviewCol}>
+                                    <div className={`${styles.miniCertificate} ${!earned ? styles.miniCertificateLocked : ""}`}>
+                                        <div className={styles.miniCertBrand}>Primerly</div>
+                                        <div className={styles.miniCertEyebrow}>Certificate of Completion</div>
+                                        <div className={styles.miniCertName}>
+                                            {earned ? certStatus.certificate.recipient_name : "Your Name"}
+                                        </div>
+                                        <div className={styles.miniCertCourse}>
+                                            {curriculumData?.curriculum_title || "This course"}
+                                        </div>
+                                        <div className={styles.miniCertSeal}>✓</div>
+                                        {!earned && (
+                                            <div className={styles.miniCertLockOverlay}>
+                                                <div className={styles.miniCertLockIcon}>🔒</div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className={styles.achievementInfoCol}>
+                                    <h3 className={styles.achievementTitle}>
+                                        {earned
+                                            ? "You earned your certificate 🎉"
+                                            : eligible
+                                            ? "You unlocked your certificate!"
+                                            : "Earn your Certificate of Completion"}
+                                    </h3>
+                                    <p className={styles.achievementDescription}>
+                                        {earned
+                                            ? "Share it on LinkedIn, print it, or save it as a PDF — it's yours forever."
+                                            : eligible
+                                            ? "You've completed every topic and passed every quiz. Claim your shareable, verifiable certificate."
+                                            : "Complete every topic and pass every module quiz to unlock a shareable, verifiable certificate with your name on it."}
+                                    </p>
+
+                                    {!earned && totalTopics > 0 && (
+                                        <>
+                                            <div className={styles.achievementProgressBar}>
+                                                <div
+                                                    className={styles.achievementProgressFill}
+                                                    style={{ width: `${overallProgress}%` }}
+                                                />
+                                            </div>
+                                            <div className={styles.achievementProgressLabel}>
+                                                {overallProgress}% toward certificate
+                                            </div>
+                                            <ul className={styles.achievementChecklist}>
+                                                <li className={topicsLeft === 0 ? styles.achievementDone : ""}>
+                                                    <span className={styles.achievementCheck}>
+                                                        {topicsLeft === 0 ? "✓" : "○"}
+                                                    </span>
+                                                    {topicsLeft === 0
+                                                        ? `All ${totalTopics} topics completed`
+                                                        : `${completedTopics} / ${totalTopics} topics completed`}
+                                                </li>
+                                                <li className={quizzesLeft === 0 ? styles.achievementDone : ""}>
+                                                    <span className={styles.achievementCheck}>
+                                                        {quizzesLeft === 0 ? "✓" : "○"}
+                                                    </span>
+                                                    {quizzesLeft === 0
+                                                        ? `All ${totalModules} module quizzes passed`
+                                                        : `${passedQuizzes} / ${totalModules} module quizzes passed`}
+                                                </li>
+                                            </ul>
+                                        </>
+                                    )}
+
+                                    {certError && !earned && (
+                                        <div className={styles.certificateBannerError} style={{ marginTop: 10 }}>
+                                            {certError}
+                                        </div>
+                                    )}
+
+                                    <div className={styles.achievementActions}>
+                                        {earned ? (
+                                            <button
+                                                className={styles.certificateBannerButton}
+                                                onClick={() =>
+                                                    router.push(
+                                                        `/certificate/${certStatus.certificate.verification_code}`
+                                                    )
+                                                }
+                                            >
+                                                View certificate
+                                            </button>
+                                        ) : eligible ?? (
+                                            <button
+                                                className={styles.certificateBannerButton}
+                                                onClick={handleClaimCertificate}
+                                                disabled={issuingCertificate}
+                                            >
+                                                {issuingCertificate ? "Issuing..." : "Claim your certificate"}
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })()
+                )}
             </div>
         </div>
     );

@@ -81,7 +81,7 @@ export const CourseHeader = ({
             opacity: descEnter,
           }}
         >
-          Master the art of turning raw data into clear insights — statistics,
+          Master the art of turning raw data into clear insights - statistics,
           visualisation, and storytelling with numbers.
         </p>
       </div>

@@ -87,7 +87,7 @@ export const CourseDetail = ({
           fontWeight: 500,
         }}
       >
-        Master the art of turning raw data into clear insights — statistics,
+        Master the art of turning raw data into clear insights - statistics,
         visualisation, and storytelling with numbers.
       </div>
 

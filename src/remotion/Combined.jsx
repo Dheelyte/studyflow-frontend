@@ -6,7 +6,7 @@ import { GamifiedMotivation } from "./GamifiedMotivation";
 import { CommunityQuestion } from "./CommunityQuestion";
 
 export const SCENE_DURATIONS = {
-  SetYourGoal: 330,
+  SetYourGoal: 512,
   LearnWithAITutor: 390,
   QuizScene: 450,
   GamifiedMotivation: 390,

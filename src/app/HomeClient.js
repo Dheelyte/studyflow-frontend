@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import styles from './page.module.css';
 import { ZapIcon, SearchIcon, StarIcon, ChevronRight, CheckCircleIcon, VideoIcon, MessageSquareIcon } from '@/components/Icons';
@@ -47,35 +48,35 @@ export default function HomeClient() {
 
     const testimonials = [
         {
-            quote: "I was overwhelmed by the amount of React tutorials online. Primerly curated exactly what I needed.",
+            quote: "I used to drown in eight React playlists at once. Primerly gave me one path — and an AI tutor that actually answered my questions in context.",
             name: "Chinedu O.",
             role: "Frontend Dev",
             color: "#eab308",
             gradient: "linear-gradient(135deg, #eab308, #f59e0b)"
         },
         {
-            quote: "The gamification keeps me coming back. I finally finished a course without dropping out halfway!",
+            quote: "I had never finished a YouTube course before. The streaks and quizzes pulled me all the way through to the certificate.",
             name: "Amara N.",
             role: "Student",
             color: "#10b981",
             gradient: "linear-gradient(135deg, #10b981, #3b82f6)"
         },
         {
-            quote: "Community support is unmatched. I got help with my Python bug in minutes.",
+            quote: "Asking the tutor at the exact second I got stuck in the video was the unlock. No more pausing to Google what the speaker just said.",
             name: "Yusuf I.",
             role: "Data Analyst",
             color: "#ec4899",
             gradient: "linear-gradient(135deg, #f59e0b, #ec4899)"
         },
         {
-            quote: "I landed my first job after completing the Full Stack path. Best investment ever.",
+            quote: "Structured path plus a verifiable certificate at the end — I finally have something to show recruiters from my self-study.",
             name: "Sarah J.",
             role: "Junior Dev",
             color: "#6366f1",
             gradient: "linear-gradient(135deg, #6366f1, #8b5cf6)"
         },
         {
-            quote: "The personalized roadmap saved me months of aimless searching.",
+            quote: "I stopped opening twelve tabs every time I started a new topic. Primerly just hands me the path.",
             name: "David K.",
             role: "Product Designer",
             color: "#f43f5e",
@@ -91,7 +92,8 @@ export default function HomeClient() {
             <header className={`${styles.header} ${scrolled ? styles.headerScrolled : ''}`}>
                 <div className={styles.headerInner}>
                     <div className={styles.headerBrand}>
-                        <ZapIcon size={24} fill="var(--primary)" /> Primerly
+                        <Image src="/Primerly Logo.png" alt="Primerly" width={24} height={24} priority />
+                        Primerly
                     </div>
                     <nav className={styles.headerNav} aria-label="Primary">
                         <a href="#how-it-works" className={styles.headerNavLink}>How it works</a>
@@ -112,12 +114,13 @@ export default function HomeClient() {
                 <div className={styles.heroGrain} aria-hidden />
                 <FadeIn direction="up">
                     <h1 className={styles.title}>
-                        Master <span className={styles.titleAccent}>any skill</span> with your personal <ScrambleText text="AI tutor" className={styles.titleAccent} />.
+                        Structured learning, with your personal <span className={styles.titleAccent}>AI tutor</span>
+                        {/* Stop scrolling. Start <span className={styles.titleAccent}>learning</span>, with your personal <ScrambleText text="AI tutor" className={styles.titleAccent} /> */}
                     </h1>
                 </FadeIn>
                 <FadeIn direction="up" delay={0.1}>
                     <p className={styles.subtitle}>
-                        AI builds your personalized roadmap, an on-demand video tutor explains every concept, smart quizzes lock in what you learn, and a community keeps you moving.
+                        Type what you want to learn. Primerly turns YouTube into a structured path, an AI tutor explains anything that's fuzzy right inside the video, and you walk away with a verifiable certificate.
                     </p>
                 </FadeIn>
 
@@ -147,32 +150,32 @@ export default function HomeClient() {
                     {[
                         {
                             icon: <SearchIcon size={28} />,
-                            title: "Set your goal",
-                            description: "Tell Primerly the topic you want to master. A single sentence turns into a full, personalized learning path — hand-picked videos, notes, and quizzes.",
+                            title: "Type what you want to learn",
+                            description: "One sentence — 'data analysis', 'Rust foundations', 'Japanese N5'. Primerly pulls the right YouTube videos and orders them into a focused, end-to-end course so you stop bouncing between random tutorials.",
                             scene: "setYourGoal",
                         },
                         {
                             icon: <VideoIcon size={28} />,
-                            title: "Learn with your AI Tutor",
-                            description: "Watch curated videos organized into a clear curriculum. Tap Explain this ✨ on any lesson and your tutor breaks it down — no judgement, no context-switching.",
+                            title: "Learn with your AI tutor",
+                            description: "Every video has a tutor sitting next to it. Ask anything at any timestamp and it answers in context — grounded in what was just said on screen, not a generic web search.",
                             scene: "learnWithAITutor",
                         },
                         {
                             icon: <CheckCircleIcon size={28} />,
-                            title: "Master with quizzes",
-                            description: "Every module ends with an AI-generated quiz. Get instant feedback, celebrate the wins, and move on only when you've actually got it.",
+                            title: "Prove it with quizzes",
+                            description: "Each module ends with an AI-generated quiz tied to the videos you just watched. Move on only when you've actually got it — no more illusion of progress.",
                             scene: "quiz",
                         },
                         {
                             icon: <ZapIcon size={28} />,
-                            title: "Stay motivated",
-                            description: "Streaks, XP, and a heatmap of your grind turn every study session into visible progress you'll want to protect.",
+                            title: "Earn a verifiable certificate",
+                            description: "Streaks, XP, and a progress map keep you moving. Finish every topic and pass every quiz, and you walk away with a shareable Certificate of Completion anyone can verify.",
                             scene: "gamifiedMotivation",
                         },
                         {
                             icon: <MessageSquareIcon size={28} />,
-                            title: "Grow with community",
-                            description: "Ask questions in topic communities and learn from people on the same path. Likes, comments, and friendly nudges make the journey feel less solo.",
+                            title: "Stay accountable with community",
+                            description: "Drop questions in topic channels and compare paths with people learning the same thing on YouTube. Less of the lonely tab-hopping, more of the 'we figured it out together'.",
                             scene: "communityQuestion",
                         },
                     ].map((card, i) => (
@@ -198,7 +201,7 @@ export default function HomeClient() {
             {/* 3. REVIEWS (TESTIMONIALS) SECTION */}
             <section id="reviews" className={styles.testimonialsSection}>
                 <FadeIn>
-                    <h2 className={styles.sectionHeading}>Loved by learners everywhere</h2>
+                    <h2 className={styles.sectionHeading}>Loved by self-taught learners</h2>
                 </FadeIn>
                 <div className={styles.marqueeContainer} style={{ marginTop: '60px', maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}>
                     <div className={styles.testimonialMarqueeTrack}>
@@ -228,7 +231,7 @@ export default function HomeClient() {
                 <div className={styles.communityContent}>
                     <FadeIn direction="right">
                         <h2 className={styles.communityTitle}>Learn better, together.</h2>
-                        <p className={styles.communityText}>Join thousands of learners in topic-specific channels. Share progress, drop reactions, spin up threaded replies, and stay motivated together.</p>
+                        <p className={styles.communityText}>Compare paths, swap tips, and stay accountable with people learning the same things on YouTube. Topic channels, threaded replies, and reactions — without the algorithm-driven distractions.</p>
                         <div className={styles.communityTags}>
                             <span className={styles.communityTag}>#ReactJs</span>
                             <span className={styles.communityTag}>#Python</span>
@@ -277,7 +280,7 @@ export default function HomeClient() {
             {/* 5. POPULAR TOPICS SECTION */}
             <section id="topics" className={styles.topicsSection}>
                 <FadeIn>
-                    <h2 className={styles.sectionHeading}>Endless Learning Possibilities</h2>
+                    <h2 className={styles.sectionHeading}>If it's on YouTube, you can master it here</h2>
                 </FadeIn>
                 <div className={styles.marqueeContainer} style={{ marginBottom: '24px' }}>
                     <div className={styles.marqueeTrack}>
@@ -310,8 +313,8 @@ export default function HomeClient() {
             {/* 7. CTA SECTION */}
             <section className={styles.ctaSection}>
                 <FadeIn direction="up" className={styles.flexColumnCentered}>
-                    <h2>Ready to start your flow?</h2>
-                    <p>Join learners mastering new skills every day.</p>
+                    <h2>Stop scrolling. Start finishing.</h2>
+                    <p>Turn YouTube into a structured course you'll actually complete — free.</p>
                     <Link href="/signup" className={styles.ctaButtonLarge}>Get Started for Free</Link>
                 </FadeIn>
             </section>
@@ -324,16 +327,14 @@ export default function HomeClient() {
                 <div className={styles.footerGrid}>
                     <div className={styles.footerBrand}>
                         <div style={{ display: 'flex', gap: '8px', fontWeight: '800', fontSize: '1.2rem', alignItems: 'center' }}>
-                            <ZapIcon size={24} fill="var(--primary)" /> Primerly
+                            <Image src="/Primerly Logo.png" alt="Primerly" width={24} height={24} />
+                            Primerly
                         </div>
-                        <p>Master any skill with your personal AI tutor.</p>
+                        <p>Turn YouTube into a structured learning path. Earn a real certificate.</p>
                     </div>
                     <div className={styles.footerColumn}>
                         <h4>Product</h4>
                         <div className={styles.footerLinks}>
-                            <Link href="/curriculum">Curriculum</Link>
-                            <Link href="/library">Library</Link>
-                            <Link href="/dashboard">Dashboard</Link>
                             <Link href="/community">Community</Link>
                         </div>
                     </div>
@@ -370,16 +371,17 @@ function FAQSection() {
     const [openIndex, setOpenIndex] = useState(0);
 
     const questions = [
-        { q: "Is Primerly really free?", a: "Yes! You can generate unlimited curriculums on the free plan. We may introduce premium features later." },
-        { q: "How accurate is the AI?", a: "We use Claude to curate high-quality resources. The content is constantly vetted by our algorithm." },
-        { q: "How does the streak system work?", a: "You build a streak by completing at least one lesson or quiz every day. Streaks unlock special badges and community flair!" },
-        { q: "Can I share my progress?", a: "Absolutely. You can share your daily streaks to social media or directly with your friends." },
-        { q: "What topics can I learn?", a: "Anything! From 'Quantum Physics' to 'Cake Baking'. If it has online resources, Primerly can build a path for it." },
-        { q: "How do I join a community?", a: "Once you start a course, you're automatically invited to the relevant topic channel where you can chat with fellow learners." },
-        { q: "What is the AI Tutor?", a: "Every lesson opens in an interactive video player. Hit 'Explain this ✨' whenever something feels fuzzy and the AI tutor breaks it down in plain language, in context." },
-        { q: "How do quizzes work?", a: "Each module ships with an AI-generated quiz tuned to the lessons you just finished. Passing it earns XP, fuels your streak, and confirms you've actually mastered the material." },
+        { q: "Is Primerly really free?", a: "Yes. You can build unlimited learning paths on the free plan. We may introduce premium features later." },
+        { q: "Where do the videos come from?", a: "Straight from YouTube. We curate the most useful videos for what you want to learn and wrap them in a structured path with a tutor, quizzes, and a certificate — so you get the upside of free content without the rabbit hole." },
+        { q: "How is the AI tutor different from ChatGPT in another tab?", a: "It's grounded in the exact video you're watching. Ask a question at any timestamp and the tutor answers using what was just said on screen, so explanations are in context instead of generic." },
+        { q: "Do I get a certificate?", a: "Yes. Finish every topic and pass every module quiz, and you'll earn a Certificate of Completion with a unique verification code — shareable and verifiable by anyone via a public link." },
+        { q: "How does the streak system work?", a: "You build a streak by completing at least one lesson or quiz every day. Streaks unlock badges and community flair." },
+        { q: "Can I share my progress?", a: "Yes. Share streaks, XP, and certificates directly to social media or with a public verification link." },
+        { q: "What topics can I learn?", a: "Anything with good YouTube coverage — from 'quantum physics' to 'cake baking'. If creators teach it on YouTube, Primerly can structure it for you." },
+        { q: "How do I join a community?", a: "When you start a course, you're invited to the matching topic channel — that's where you compare paths and ask questions when the tutor isn't enough." },
+        { q: "How do quizzes work?", a: "Each module ships with an AI-generated quiz tied to the videos you just watched. Passing earns XP, fuels your streak, and counts toward your certificate." },
         { q: "Can I sign in with Google, GitHub, or Apple?", a: "Yes. One-click social sign-in is supported for Google, GitHub, and Apple — no password required." },
-        { q: "Is there a mobile app?", a: "Primerly is fully responsive and works great on any device. A native app is coming soon!" }
+        { q: "Is there a mobile app?", a: "Primerly is fully responsive and works great on any device. A native app is coming soon." }
     ];
 
     return (

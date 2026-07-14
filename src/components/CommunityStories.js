@@ -59,6 +59,10 @@ export default function CommunityStories() {
     };
   }, [displayCommunities.length]); // Re-run if list length changes
 
+  if (!loading && displayCommunities.length === 0) {
+    return null;
+  }
+
   return (
     <div style={{display:'flex', flexDirection:'column', gap:'12px', marginBottom: '16px', marginTop: '8px'}}>
         <div style={{

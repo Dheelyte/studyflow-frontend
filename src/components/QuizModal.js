@@ -335,7 +335,7 @@ export default function QuizModal({ isOpen, onClose, moduleTitle, moduleId, onCo
                                 <p className={styles.resultSubtext}>
                                     {isPassed
                                         ? `You passed the ${moduleTitle} quiz!`
-                                        : `You need ${PASS_MARK}% to pass. Review the material and try again—you've got this!`}
+                                        : `You need ${PASS_MARK}% to pass. Review the material and try again-you've got this!`}
                                 </p>
                                 <div className={styles.footer} style={{ width: '100%', justifyContent: 'center', gap: '1rem', border: 'none' }}>
                                     {isPassed ? (

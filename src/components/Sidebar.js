@@ -1,9 +1,10 @@
 "use client";
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import styles from './Sidebar.module.css';
-import { HomeIcon, LibraryIcon, ZapIcon, ChevronLeft, ChevronRight, XIcon, LaptopIcon, UserIcon, SunIcon, MoonIcon, UsersIcon } from './Icons';
+import { HomeIcon, LibraryIcon, ChevronLeft, ChevronRight, XIcon, LaptopIcon, UserIcon, SunIcon, MoonIcon, UsersIcon } from './Icons';
 import { useAuth } from '@/context/AuthContext';
 
 export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse, isMobile }) {
@@ -65,7 +66,8 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
 
                 <nav className={styles.navContainer}>
                     <Link href="/" className={styles.logo} style={{ textDecoration: 'none' }}>
-                        <ZapIcon size={28} fill="var(--primary)" /> <span>Primerly</span>
+                        <Image src="/Primerly Logo.png" alt="Primerly" width={28} height={28} priority />
+                        <span>Primerly</span>
                     </Link>
 
                     <Link href="/dashboard" className={styles.navItem} onClick={handleProtectedNav}>

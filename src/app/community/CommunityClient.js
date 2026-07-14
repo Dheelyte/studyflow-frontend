@@ -218,7 +218,7 @@ export default function CommunityClient() {
 
             <div className={styles.mainColumn}>
                 <div className={styles.header}>
-                    <h1 className={styles.title}>Community Flow</h1>
+                    <h1 className={styles.title}>Community</h1>
                     <p className={styles.subtitle}>Discover new groups and share your progress.</p>
                 </div>
 
@@ -258,9 +258,11 @@ export default function CommunityClient() {
                 </div>
             </div>
 
-            <div className={styles.sidebar}>
-                <ExploreSidebar />
-            </div>
+            {user && (
+                <div className={styles.sidebar}>
+                    <ExploreSidebar />
+                </div>
+            )}
 
             <style jsx global>{`
         @keyframes pulse {

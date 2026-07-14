@@ -206,16 +206,6 @@
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: conic-gradient(from 200deg at 50% 110%,
-        transparent 0deg,
-        color-mix(in srgb, var(--primary) 18%, transparent) 25deg,
-        transparent 50deg,
-        color-mix(in srgb, #ec4899 14%, transparent) 75deg,
-        transparent 100deg,
-        color-mix(in srgb, #f59e0b 14%, transparent) 125deg,
-        transparent 150deg);
-    -webkit-mask-image: radial-gradient(ellipse 90% 110% at 50% 100%, #000 10%, transparent 80%);
-    mask-image: radial-gradient(ellipse 90% 110% at 50% 100%, #000 10%, transparent 80%);
 }
 
 .ctaSection::after {
@@ -415,7 +405,7 @@
     white-space: nowrap;
 }
 
-/* Hero video — browser-chrome bezel */
+/* Hero video - browser-chrome bezel */
 .heroVideoBezel {
     max-width: 1000px;
     width: 100%;
@@ -1542,7 +1532,7 @@
 }
 
 /* ==========================================================
-   Community — threaded reply mock
+   Community - threaded reply mock
    ========================================================== */
 .mockPostStack {
     display: flex;

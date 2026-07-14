@@ -24,6 +24,19 @@ export default function ClientLayout({ children }) {
     }
   }, [pathname]);
 
+  // Auto-collapse the sidebar by default on the tutor page
+  const hasAutoCollapsedTutor = useRef(false);
+  useEffect(() => {
+    if (pathname?.startsWith('/tutor')) {
+      if (!hasAutoCollapsedTutor.current) {
+        setIsSidebarCollapsed(true);
+        hasAutoCollapsedTutor.current = true;
+      }
+    } else {
+      hasAutoCollapsedTutor.current = false;
+    }
+  }, [pathname]);
+
   // Hide sidebar on auth pages AND Landing Page (root /) AND Info Pages
   const isAuthPage =
     pathname?.startsWith('/login') ||
@@ -36,7 +49,11 @@ export default function ClientLayout({ children }) {
     pathname === '/privacy-policy' ||
     pathname === '/terms-of-service' ||
     pathname === '/cookie-policy' ||
-    pathname?.startsWith('/curriculum');
+    pathname?.startsWith('/curriculum') ||
+    pathname?.startsWith('/certificate');
+
+  // Pages that suppress the mobile bottom nav (immersive layouts)
+  const hideMobileBottomNav = pathname?.startsWith('/tutor');
 
   // Check screen size for responsiveness
   useEffect(() => {
@@ -85,11 +102,11 @@ export default function ClientLayout({ children }) {
             />
           )}
 
-          {isMobile && !isAuthPage && <BottomNav />}
+          {isMobile && !isAuthPage && !hideMobileBottomNav && <BottomNav />}
           <div className={styles.mainWrapper}>
             {!isAuthPage && <MobileHeader onMenuClick={toggleSidebar} />}
 
-            <main ref={mainRef} className={`${styles.contentScroll} ${!isAuthPage ? styles.withBottomNav : ''}`}>
+            <main ref={mainRef} className={`${styles.contentScroll} ${!isAuthPage && !hideMobileBottomNav ? styles.withBottomNav : ''}`}>
               {(pathname === '/about' || pathname === '/contact' || pathname === '/privacy-policy' || pathname === '/terms-of-service' || pathname === '/cookie-policy') && (
                 <div
                   onClick={() => router.back()}
