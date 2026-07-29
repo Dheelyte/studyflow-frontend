@@ -1776,3 +1776,47 @@
         grid-template-columns: repeat(14, 1fr);
     }
 }
+/* Published course marquee, directly below the hero */
+.courseMarqueeSection {
+    padding: 40px 0 72px;
+    background: var(--background);
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.courseMarqueeHeader {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: 0 auto 28px;
+    padding: 0 24px;
+}
+
+.courseMarqueeHeading {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--foreground);
+    margin: 0;
+}
+
+.courseMarqueeLink {
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 0.92rem;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.courseMarqueeLink:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+    .courseMarqueeHeading {
+        font-size: 1.15rem;
+    }
+}

@@ -17,7 +17,7 @@ export const useRedirectState = () => {
         };
         
         try {
-            sessionStorage.setItem(`studyspotify_state_${key}`, JSON.stringify(state));
+            sessionStorage.setItem(`primerly_state_${key}`, JSON.stringify(state));
         } catch (e) {
             console.warn('Failed to save redirect state:', e);
         }
@@ -31,7 +31,7 @@ export const useRedirectState = () => {
     const restoreState = useCallback((key) => {
         if (!key) return null;
 
-        const storageKey = `studyspotify_state_${key}`;
+        const storageKey = `primerly_state_${key}`;
         const storedItem = sessionStorage.getItem(storageKey);
 
         if (!storedItem) return null;

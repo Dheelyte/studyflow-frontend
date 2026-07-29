@@ -2,11 +2,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import CourseSkeleton from '@/components/CourseSkeleton';
-import { curriculum } from "@/services/api";
+import { curriculum, gallery, projects } from "@/services/api";
+import { useAuth } from "@/context/AuthContext";
 import styles from "./page.module.css";
 import { PlayIcon, ClockIcon, ChevronDown, ChevronUp, ZapIcon, ShareIcon, CheckCircleIcon, VideoIcon, TrophyIconSimple } from "@/components/Icons";
 import ShareModal from "@/components/ShareModal";
 import QuizModal from "@/components/QuizModal";
+import EnrollButton from "@/components/EnrollButton";
+import ProjectPanel from "@/components/ProjectPanel";
+import ScreenTutorPanel from "@/components/ScreenTutorPanel";
 
 // Helper to normalize API response to component state structure
 const normalizeCourseData = (apiData) => {
@@ -103,9 +107,49 @@ const normalizeCourseData = (apiData) => {
     };
 };
 
-export default function CourseClient({ params }) {
+// The public gallery payload, reshaped into exactly what the authenticated view renders,
+// so logged-out visitors get the real course layout instead of a separate page. Nothing is
+// completed and no ids are exposed; the interactive parts are gated on `isPreview` below.
+const normalizePublicCourseData = (course) => {
+    if (!course) return null;
+
+    const modules = (course.modules || []).map((m, mIdx) => ({
+        module_id: `preview-${mIdx}`,
+        module_title: m.title,
+        lessons: (m.lessons || []).map((l) => ({
+            lesson_title: l.title,
+            estimated_time: l.estimated_time || "1 hour",
+            topics: (l.topics || []).map((t) => ({
+                topic_id: null,
+                title: t.title,
+                description: t.description,
+                youtube_video_id: null,
+                is_completed: false,
+                isNextUp: false,
+                isLocked: false,
+            })),
+        })),
+        is_module_completed: false,
+        isQuizLocked: true,
+        isQuizNextUp: false,
+        quiz_completed: false,
+    }));
+
+    return {
+        _raw: course,
+        curriculum_title: course.title,
+        overview: course.description || "No description available.",
+        modules,
+        learning_objectives: course.objectives || [],
+        completionPercentage: 0,
+        isStarted: false,
+    };
+};
+
+export default function CourseClient({ params, publicCourse = null }) {
     const resolvedParams = React.use(params);
-    const courseId = resolvedParams?.id;
+    // Courses are addressed by slug; the API also accepts a numeric id for old links.
+    const courseId = resolvedParams?.slug;
     const router = useRouter();
 
     const [curriculumData, setCurriculumData] = useState(null);
@@ -122,6 +166,12 @@ export default function CourseClient({ params }) {
     const [certStatus, setCertStatus] = useState(null);
     const [issuingCertificate, setIssuingCertificate] = useState(false);
     const [certError, setCertError] = useState(null);
+    const [publishState, setPublishState] = useState({ isPublic: false, slug: null });
+    const [publishing, setPublishing] = useState(false);
+    const [publishError, setPublishError] = useState(null);
+    const { user, loading: authLoading } = useAuth();
+    // Logged out on a published course: same layout, interactions swapped for sign-up prompts.
+    const isPreview = !authLoading && !user && !!publicCourse;
 
     const fetchedRef = useRef(null);
 
@@ -131,6 +181,29 @@ export default function CourseClient({ params }) {
 
             if (!fetchKey) {
                 setLoading(false);
+                return;
+            }
+
+            // Wait for auth to resolve before deciding what to do.
+            if (authLoading) return;
+
+            // Never call the authenticated course endpoint while logged out: a 401
+            // there triggers a global hard redirect to /login (see services/api.js),
+            // which would blow away the public preview before it can render.
+            if (!user) {
+                setLoading(false);
+                if (publicCourse) {
+                    // Same layout as the signed-in view, built from public data.
+                    const previewData = normalizePublicCourseData(publicCourse);
+                    setCurriculumData(previewData);
+                    // Signed-in visitors get a module opened for them; match that so the
+                    // outline isn't a wall of collapsed headers.
+                    if (previewData?.modules?.length) {
+                        setExpandedModules({ [previewData.modules[0].module_id]: true });
+                    }
+                } else {
+                    router.push(`/login?redirect=${encodeURIComponent(`/course/${courseId}`)}`);
+                }
                 return;
             }
 
@@ -147,6 +220,10 @@ export default function CourseClient({ params }) {
                 }
 
                 setCurriculumData(data);
+                setPublishState({
+                    isPublic: !!response?.is_public,
+                    slug: response?.slug || null,
+                });
                 document.title = `${data.curriculum_title} | Primerly`;
 
                 if (data.completionPercentage !== undefined) {
@@ -190,7 +267,13 @@ export default function CourseClient({ params }) {
                 }
             } catch (err) {
                 console.error("Failed to fetch course:", err);
-                setError(err.message || "Failed to load course");
+                // If the course is published we can still render the real layout from
+                // public data rather than dropping the user on an error screen.
+                if (publicCourse) {
+                    setCurriculumData(normalizePublicCourseData(publicCourse));
+                } else {
+                    setError(err.message || "Failed to load course");
+                }
                 fetchedRef.current = null;
             } finally {
                 setLoading(false);
@@ -198,7 +281,7 @@ export default function CourseClient({ params }) {
         };
 
         fetchCourse();
-    }, [courseId]);
+    }, [courseId, user, authLoading]);
 
     const refreshCertificateStatus = async () => {
         if (!courseId) return;
@@ -211,8 +294,11 @@ export default function CourseClient({ params }) {
     };
 
     useEffect(() => {
+        // Certificates are per-user, so this endpoint needs auth. Calling it while
+        // logged out 401s, and that triggers the global redirect to /login.
+        if (authLoading || !user) return;
         refreshCertificateStatus();
-    }, [courseId]);
+    }, [courseId, user, authLoading]);
 
     const handleClaimCertificate = async () => {
         if (issuingCertificate || !courseId) return;
@@ -238,6 +324,20 @@ export default function CourseClient({ params }) {
         setExpandedModules(prev => ({ ...prev, [id]: !prev[id] }));
     };
 
+    const handleTogglePublish = async () => {
+        const nextIsPublic = !publishState.isPublic;
+        setPublishError(null);
+        setPublishing(true);
+        try {
+            const result = await gallery.setPublishState(courseId, nextIsPublic);
+            setPublishState({ isPublic: result.is_public, slug: result.slug });
+        } catch (err) {
+            setPublishError(err.message || "Could not update publish setting.");
+        } finally {
+            setPublishing(false);
+        }
+    };
+
     const handlePlay = () => {
         if (!isStarted) {
             setIsStarted(true);
@@ -256,9 +356,14 @@ export default function CourseClient({ params }) {
         }, 100);
     };
 
+    const goSignUp = () =>
+        router.push(`/signup?redirect=${encodeURIComponent(`/course/${courseId}`)}`);
+
     const handleTopicClick = (topicId, isCompleted, isLocked) => {
+        // In preview the lesson itself is gated, so a click becomes the sign-up prompt.
+        if (isPreview) return goSignUp();
         if (isLocked) return;
-        router.push(`/tutor/${topicId}`);
+        router.push(`/lesson/${topicId}`);
     };
 
     useEffect(() => {
@@ -290,11 +395,11 @@ export default function CourseClient({ params }) {
         refreshCertificateStatus();
     };
 
-    if (loading) {
+    if (loading || authLoading) {
         return <CourseSkeleton />;
     }
 
-    if (error) {
+    if (error && !curriculumData) {
         return (
             <div className={styles.container} style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={{ color: 'var(--text-error)', textAlign: 'center' }}>
@@ -316,6 +421,18 @@ export default function CourseClient({ params }) {
             </div>
         );
     }
+
+    // The lesson the learner is up to — what the screen tutor assumes they're working on.
+    const activeTopicId = (() => {
+        for (const m of curriculumData.modules || []) {
+            for (const l of m.lessons || []) {
+                for (const t of l.topics || []) {
+                    if (t.isNextUp) return t.topic_id;
+                }
+            }
+        }
+        return curriculumData.modules?.[0]?.lessons?.[0]?.topics?.[0]?.topic_id ?? null;
+    })();
 
     return (
         <div className={styles.container}>
@@ -341,15 +458,62 @@ export default function CourseClient({ params }) {
             </div>
 
             <div className={styles.controls}>
-                <button className={styles.playButton} onClick={handlePlay}>
-                    <PlayIcon size={24} fill="white" />
-                    {isStarted ? "Continue Learning" : "Start Learning"}
-                </button>
+                {isPreview ? (
+                    <EnrollButton slug={courseId} compact />
+                ) : (
+                    <button className={styles.playButton} onClick={handlePlay}>
+                        <PlayIcon size={24} fill="white" />
+                        {isStarted ? "Continue Learning" : "Start Learning"}
+                    </button>
+                )}
 
                 <button className={styles.iconButton} title="Share Course" onClick={() => setShowShareModal(true)}>
                     <ShareIcon />
                 </button>
             </div>
+
+            {user?.id && curriculumData._raw?.user_id === user.id && (
+                /* Same .content wrapper as the sections below, so the panel lines up with
+                   them instead of spanning the full width of the page. */
+                <div className={styles.content}>
+                    <div className={styles.publishPanel}>
+                        <div className={styles.publishText}>
+                            <div className={styles.publishTitle}>
+                                {publishState.isPublic ? "Published to the gallery" : "Publish to the gallery"}
+                            </div>
+                            <p className={styles.publishDescription}>
+                                {publishState.isPublic
+                                    ? "Anyone can find and start this course. Your progress stays private — learners get their own."
+                                    : "Share this course publicly so other learners can find and start it. Your progress stays private."}
+                            </p>
+                            {publishState.isPublic && publishState.slug && (
+                                /* The public URL is this same page, so link to the gallery
+                                   listing instead of back to where they already are. */
+                                <a
+                                    className={styles.publishLink}
+                                    href="/explore"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                >
+                                    See it in the gallery →
+                                </a>
+                            )}
+                            {publishError && <p className={styles.publishError}>{publishError}</p>}
+                        </div>
+                        <button
+                            className={styles.publishButton}
+                            onClick={handleTogglePublish}
+                            disabled={publishing}
+                        >
+                            {publishing
+                                ? "Saving…"
+                                : publishState.isPublic
+                                    ? "Unpublish"
+                                    : "Publish"}
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {showShareModal && (
                 <ShareModal
@@ -536,12 +700,14 @@ export default function CourseClient({ params }) {
                                                         : '1px solid rgba(255,215,0,0.3)',
                                                     justifyContent: 'flex-start',
                                                     gap: '12px',
-                                                    cursor: module.isQuizLocked ? 'not-allowed' : 'pointer',
+                                                    cursor: isPreview ? 'pointer' : (module.isQuizLocked ? 'not-allowed' : 'pointer'),
                                                     textAlign: 'left',
                                                     padding: '16px',
-                                                    opacity: module.isQuizLocked ? 0.5 : 1,
+                                                    opacity: isPreview ? 1 : (module.isQuizLocked ? 0.5 : 1),
                                                     position: 'relative'
-                                                }} onClick={() => !module.isQuizLocked && !module.quiz_completed && handleOpenQuiz(module.module_id, module.module_title)}>
+                                                }} onClick={() => isPreview
+                                                    ? goSignUp()
+                                                    : (!module.isQuizLocked && !module.quiz_completed && handleOpenQuiz(module.module_id, module.module_title))}>
 
                                                 {module.isQuizNextUp && <div className={styles.nextUpBadge}>Next Up</div>}
 
@@ -553,22 +719,59 @@ export default function CourseClient({ params }) {
                                                 </div>
                                                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                                                     <span style={{ fontWeight: '700', color: 'var(--foreground)' }}>
-                                                        {module.quiz_completed ? "Quiz Completed" : (module.isQuizLocked ? "Quiz Locked" : "Ready to test your knowledge?")}
+                                                        {isPreview
+                                                            ? "Module quiz"
+                                                            : (module.quiz_completed ? "Quiz Completed" : (module.isQuizLocked ? "Quiz Locked" : "Ready to test your knowledge?"))}
                                                     </span>
                                                     <span style={{ fontSize: '0.85rem', color: 'var(--secondary)' }}>
-                                                        {module.quiz_completed
-                                                            ? `You've passed the ${module.module_title} quiz!`
-                                                            : (module.isQuizLocked ? "Complete all previous items to unlock." : `Take the ${module.module_title} Quiz`)}
+                                                        {isPreview
+                                                            ? "Start the course to take this quiz."
+                                                            : (module.quiz_completed
+                                                                ? `You've passed the ${module.module_title} quiz!`
+                                                                : (module.isQuizLocked ? "Complete all previous items to unlock." : `Take the ${module.module_title} Quiz`))}
                                                     </span>
                                                 </div>
                                             </button>
                                         </div>
+
+                                        {!isPreview && module.module_id !== undefined && (
+                                            <div className={styles.moduleProject}>
+                                                <ProjectPanel
+                                                    kind="practice"
+                                                    load={() => projects.getModuleProject(module.module_id)}
+                                                />
+                                            </div>
+                                        )}
 
                                     </div>
                                 )}
                             </div>
                         );
                     })}
+                </div>
+
+                {/* Capstone — the thing they can actually show someone. Logged out gets the
+                    public teaser (title + summary), since the brief is behind enrolment. */}
+                <div className={styles.capstoneSection}>
+                    {isPreview ? (
+                        publicCourse?.capstone && (
+                            <div className={styles.capstoneTeaser}>
+                                <div className={styles.capstoneTeaserKicker}>You'll build</div>
+                                <h3 className={styles.capstoneTeaserTitle}>{publicCourse.capstone.title}</h3>
+                                <p className={styles.capstoneTeaserSummary}>{publicCourse.capstone.summary}</p>
+                                {publicCourse.capstone.estimated_time && (
+                                    <span className={styles.capstoneTeaserTime}>
+                                        about {publicCourse.capstone.estimated_time}
+                                    </span>
+                                )}
+                            </div>
+                        )
+                    ) : (
+                        <ProjectPanel
+                            kind="capstone"
+                            load={() => projects.getCapstone(courseId)}
+                        />
+                    )}
                 </div>
 
                 {/* Certificate achievement at the bottom — encourages completion */}
@@ -694,6 +897,16 @@ export default function CourseClient({ params }) {
                     })()
                 )}
             </div>
+
+            {/* Course-scoped only, and needs an account: the widget auto-follows the
+                lesson the learner is up to. */}
+            {!isPreview && user && (
+                <ScreenTutorPanel
+                    topicId={activeTopicId}
+                    courseTitle={curriculumData.curriculum_title}
+                    courseRef={courseId}
+                />
+            )}
         </div>
     );
 }

@@ -3,7 +3,7 @@ import TutorClient from './TutorClient';
 
 export async function generateMetadata() {
     return {
-        title: 'Tutor',
+        title: 'Lesson',
     };
 }
 

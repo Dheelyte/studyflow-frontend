@@ -4,6 +4,7 @@ import Spinner from '@/components/Spinner';
 
 export const metadata = {
   title: 'Forgot Password',
+  description: 'Reset your Primerly account password.',
 };
 
 export default function ForgotPasswordPage() {

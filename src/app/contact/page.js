@@ -1,5 +1,6 @@
 export const metadata = {
   title: 'Contact Us',
+  description: 'Get in touch with the Primerly team — questions, feedback, or partnership ideas.',
 };
 
 export default function ContactPage() {

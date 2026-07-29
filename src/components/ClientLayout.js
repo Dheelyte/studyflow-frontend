@@ -24,10 +24,10 @@ export default function ClientLayout({ children }) {
     }
   }, [pathname]);
 
-  // Auto-collapse the sidebar by default on the tutor page
+  // Auto-collapse the sidebar by default on the lesson page
   const hasAutoCollapsedTutor = useRef(false);
   useEffect(() => {
-    if (pathname?.startsWith('/tutor')) {
+    if (pathname?.startsWith('/lesson')) {
       if (!hasAutoCollapsedTutor.current) {
         setIsSidebarCollapsed(true);
         hasAutoCollapsedTutor.current = true;
@@ -53,7 +53,7 @@ export default function ClientLayout({ children }) {
     pathname?.startsWith('/certificate');
 
   // Pages that suppress the mobile bottom nav (immersive layouts)
-  const hideMobileBottomNav = pathname?.startsWith('/tutor');
+  const hideMobileBottomNav = pathname?.startsWith('/lesson');
 
   // Check screen size for responsiveness
   useEffect(() => {

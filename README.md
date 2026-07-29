@@ -1,8 +1,8 @@
 # Primerly
 
-**Master any skill with your personal AI tutor.**
+**Master tech and digital skills with your personal AI tutor.**
 
-Primerly is a learning platform that turns "I want to learn X" into a complete, personalized course in seconds. Tell it what you want to master - *Data Analysis*, *Public Speaking*, *Watercolor Painting*, *React Hooks*, *Music Theory* - and Primerly builds you a full learning path: curated videos, lessons, quizzes, an AI tutor that explains anything on demand, and a community of people learning the same thing alongside you.
+Primerly is a learning platform that turns "I want to learn X" into a complete, personalized course in seconds. Tell it the tech skill you want to master - *Data Analysis*, *React Hooks*, *UI/UX Design*, *Cloud Computing*, *Cybersecurity* - and Primerly builds you a full learning path: curated videos, lessons, quizzes, an AI tutor that explains anything on demand, and a community of people learning the same thing alongside you.
 
 This repository contains everything that powers Primerly: the website you see, the brain that generates the courses, and the systems that track your progress.
 
@@ -14,11 +14,11 @@ Primerly is built for people who want to learn something new but don't know wher
 
 That includes:
 
-- **Students** preparing for exams or going deeper than the syllabus
-- **Career switchers** picking up a new skill (tech, design, marketing, finance, anything)
-- **Self-taught learners** who'd rather follow a real plan than wander through tutorials
-- **Hobbyists** finally learning the guitar, the language, or the recipe technique they keep putting off
-- **Working professionals** topping up specific skills in short, focused sessions
+- **Students** going deeper than the syllabus into real, employable tech skills
+- **Career switchers** breaking into tech (software, data, design, cloud, digital marketing)
+- **Self-taught developers** who'd rather follow a real plan than wander through tutorials
+- **Builders** finally learning the coding, design, or automation skill they keep putting off
+- **Working professionals** topping up specific tech skills in short, focused sessions
 
 If "I'd love to learn that, but I don't have time to figure out *how* to learn it" sounds familiar - Primerly is for you.
 
@@ -29,7 +29,7 @@ If "I'd love to learn that, but I don't have time to figure out *how* to learn i
 Think of Primerly as a tutor, librarian, study buddy, and motivational coach in one place. Here's what happens when you use it:
 
 ### 1. You tell Primerly what you want to learn
-You type a topic - anything from *"Cybersecurity Fundamentals"* to *"History of Jazz"*. You can pick how deep you want to go (beginner, intermediate, advanced) and roughly how much time you want to spend.
+You type a tech topic - *"Cybersecurity Fundamentals"*, *"React Hooks"*, *"SQL for Data Analysis"* - and Primerly takes it from there.
 
 ### 2. Primerly builds your roadmap
 Behind the scenes, Primerly's AI assembles a structured course just for you: clear modules, lessons in the right order, hand-picked videos and reading material, and quizzes to lock in what you learn. No more "where do I even start?"
@@ -41,7 +41,7 @@ Each lesson has a curated video plus written notes. If something doesn't click, 
 At the end of every module, Primerly generates a short quiz to make sure the ideas actually stuck. You get instant feedback on what you got right, what you missed, and why.
 
 ### 5. You stay motivated
-Primerly tracks your **streaks** (consecutive days of study), awards **XP** for progress, and shows your activity on a heatmap - so you can see your effort building up over time. It's the Duolingo-style "I don't want to break my streak" feeling, but for any subject.
+Primerly tracks your **streaks** (consecutive days of study), awards **XP** for progress, and shows your activity on a heatmap - so you can see your effort building up over time. It's the Duolingo-style "I don't want to break my streak" feeling, but for tech skills.
 
 ### 6. You learn alongside other people
 Primerly has a built-in **community**: topic-specific channels where learners ask questions, share progress, and cheer each other on. You're never the only person stuck on the same concept.
@@ -162,4 +162,4 @@ You may see the project referred to as **StudyFlow** in some places (folder name
 - The backend has its own technical README in `studyflow-backend/README.md`
 - The homepage itself is the best demo - it explains the product visually with animated walkthroughs of every feature.
 
-Built with the belief that anyone can learn anything, given the right plan, the right help, and a little encouragement to come back tomorrow. 💜
+Built with the belief that anyone can learn tech skills, given the right plan, the right help, and a little encouragement to come back tomorrow. 💜

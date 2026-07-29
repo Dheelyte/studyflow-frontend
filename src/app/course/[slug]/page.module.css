@@ -952,3 +952,119 @@
         font-size: 1.2rem;
     }
 }
+
+/* Gallery publishing (author only) */
+.publishPanel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin: 24px 0 8px;
+    padding: 20px 24px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+}
+
+.publishText {
+    flex: 1;
+    min-width: 240px;
+}
+
+.publishTitle {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 6px;
+}
+
+.publishDescription {
+    color: var(--secondary);
+    font-size: 0.88rem;
+    line-height: 1.55;
+    margin: 0;
+}
+
+.publishLink {
+    display: inline-block;
+    margin-top: 10px;
+    color: var(--primary);
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.publishLink:hover {
+    text-decoration: underline;
+}
+
+.publishError {
+    color: #f43f5e;
+    font-size: 0.85rem;
+    margin: 10px 0 0;
+}
+
+.publishButton {
+    background: var(--primary);
+    color: #ffffff;
+    border: none;
+    font-weight: 700;
+    font-size: 0.92rem;
+    padding: 12px 24px;
+    border-radius: 10px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s ease;
+}
+
+.publishButton:hover:not(:disabled) {
+    background: var(--primary-hover);
+}
+
+.publishButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Milestone projects */
+.moduleProject {
+    margin-top: 16px;
+}
+
+.capstoneSection {
+    margin: 32px 0 8px;
+}
+
+/* Capstone teaser shown to logged-out visitors (brief stays behind enrolment) */
+.capstoneTeaser {
+    background: var(--card);
+    border: 1px solid var(--primary);
+    border-radius: 14px;
+    padding: 24px;
+}
+
+.capstoneTeaserKicker {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 8px;
+}
+
+.capstoneTeaserTitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 10px;
+}
+
+.capstoneTeaserSummary {
+    color: var(--secondary);
+    line-height: 1.6;
+    margin: 0 0 10px;
+}
+
+.capstoneTeaserTime {
+    font-size: 0.85rem;
+    color: var(--secondary);
+}

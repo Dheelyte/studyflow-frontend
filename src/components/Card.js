@@ -6,7 +6,7 @@ const PlayIcon = () => (
     </svg>
 )
 
-export default function Card({ title, description, color, progress, completedModules, totalModules, level, icon: Icon }) {
+export default function Card({ title, description, color, progress, completedModules, totalModules, level, icon: Icon, meta }) {
   const hasModuleInfo = typeof completedModules === 'number' && typeof totalModules === 'number';
 
   return (
@@ -21,7 +21,7 @@ export default function Card({ title, description, color, progress, completedMod
             <div className={styles.description}>{description}</div>
             
         </div>
-        {typeof progress === 'number' && (
+        {typeof progress === 'number' ? (
             <>
                 <div className={styles.percentage}>
 
@@ -37,7 +37,12 @@ export default function Card({ title, description, color, progress, completedMod
                     <div className={styles.progressFill} style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}></div>
                 </div>
             </>
-        )}
+        ) : meta ? (
+            /* Courses the viewer hasn't started have no progress — show size/uptake instead. */
+            <div className={styles.percentage}>
+                <span className={styles.statsModules}>{meta}</span>
+            </div>
+        ) : null}
       </div>
     </div>
   );

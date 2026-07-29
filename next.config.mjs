@@ -1,6 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  /* config options here */
+  async redirects() {
+    return [
+      // The lesson view moved from /tutor/:topicId to /lesson/:topicId.
+      { source: '/tutor/:topicId', destination: '/lesson/:topicId', permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;

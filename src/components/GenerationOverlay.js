@@ -25,8 +25,8 @@ const LOG_MESSAGES = [
     "Initializing knowledge engine...",
     "Connecting to global learning graph...",
     "Parsing educational documentation...",
-    "Optimizing for experience level...",
-    "Generating localized examples...",
+    "Sequencing modules and lessons...",
+    "Matching topics to YouTube coverage...",
     "Finalizing curriculum path..."
 ];
 

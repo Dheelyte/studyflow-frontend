@@ -4,6 +4,7 @@ import Spinner from '@/components/Spinner';
 
 export const metadata = {
     title: 'Login',
+    description: 'Log in to Primerly to continue your structured tech-skill learning path.',
 };
 
 export default function LoginPage() {

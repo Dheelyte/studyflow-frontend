@@ -1,0 +1,68 @@
+.container {
+    width: 100%;
+    max-width: 100vw;
+    overflow: hidden;
+    position: relative;
+    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+
+.track {
+    display: flex;
+    width: max-content;
+    animation-name: courseScroll;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    /* Held still until the marquee is scrolled into view. */
+    animation-play-state: paused;
+}
+
+.running {
+    animation-play-state: running;
+}
+
+/* More specific than .running, so hover and keyboard focus win without !important. */
+.running:hover,
+.running:focus-within {
+    animation-play-state: paused;
+}
+
+.item {
+    /* Spacing lives on the item, not as a flex gap, so translateX(-50%) lands
+       exactly on the start of the duplicated set with no seam. */
+    flex: 0 0 260px;
+    width: 260px;
+    margin-right: 24px;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+@keyframes courseScroll {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .track,
+    .running {
+        animation: none;
+    }
+
+    .container {
+        overflow-x: auto;
+    }
+}
+
+@media (max-width: 640px) {
+    .item {
+        flex-basis: 210px;
+        width: 210px;
+        margin-right: 16px;
+    }
+}

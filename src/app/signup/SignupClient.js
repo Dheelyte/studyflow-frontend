@@ -232,7 +232,7 @@ export default function SignupClient() {
 
                 <div className={styles.footer}>
                     Already have an account? {/* Dynamic link based on redirect */}
-                    <Link href={redirect ? `/signup?redirect=${encodeURIComponent(redirect)}` : "/login"} className={styles.link}>Log in</Link>
+                    <Link href={redirect ? `/login?redirect=${encodeURIComponent(redirect)}` : "/login"} className={styles.link}>Log in</Link>
                 </div>
             </div>
         </div>

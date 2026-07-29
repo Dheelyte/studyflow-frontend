@@ -5,14 +5,15 @@ import Link from 'next/link';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import styles from './page.module.css';
-import { ZapIcon, SearchIcon, StarIcon, ChevronRight, CheckCircleIcon, VideoIcon, MessageSquareIcon } from '@/components/Icons';
+import { ZapIcon, SearchIcon, ChevronRight, CheckCircleIcon, VideoIcon, MessageSquareIcon } from '@/components/Icons';
 import IntegratedSearchBar from '@/components/IntegratedSearchBar';
 import FadeIn from '@/components/FadeIn';
-import ScrambleText from '@/components/ScrambleText';
+import CourseMarquee from '@/components/CourseMarquee';
+import { faqs } from '@/lib/faq';
 
 const HowItWorksAnimation = dynamic(() => import('@/components/HowItWorksAnimation'), { ssr: false });
 
-export default function HomeClient() {
+export default function HomeClient({ featuredCourses = [] }) {
     const router = useRouter();
     const [scrolled, setScrolled] = useState(false);
 
@@ -33,9 +34,10 @@ export default function HomeClient() {
     };
 
 
-    const topics = ['Next.js 14', 'Python for AI', 'UI/UX Principles', 'Rust Foundations', 'Cybersecurity', 'Digital Marketing', 'Piano Basics', 'Calculus I', 'Three.js', 'System Design', 'Japanese N5', 'Guitar Solos', 'Docker Mastery', 'Figma Secrets', 'Blockchain Dev'];
+    const topics = ['Next.js 14', 'Python for AI', 'UI/UX Principles', 'Rust Foundations', 'Cybersecurity', 'Digital Marketing', 'SQL & Databases', 'AWS Fundamentals', 'Three.js', 'System Design', 'Git & GitHub', 'API Design', 'Docker Mastery', 'Figma Secrets', 'Blockchain Dev'];
     const marqueeTopics = [...topics, ...topics];
-    const marqueeTopicsReverse = [...topics.reverse(), ...topics];
+    const reversedTopics = [...topics].reverse();
+    const marqueeTopicsReverse = [...reversedTopics, ...reversedTopics];
 
     const examples = [
         "Graphic Design", "Software Development", "Forex & Crypto Trading", "Data Analysis",
@@ -46,45 +48,35 @@ export default function HomeClient() {
     ];
     const marqueeExamples = [...examples, ...examples];
 
-    const testimonials = [
+    const whyCards = [
         {
-            quote: "I used to drown in eight React playlists at once. Primerly gave me one path — and an AI tutor that actually answered my questions in context.",
-            name: "Chinedu O.",
-            role: "Frontend Dev",
-            color: "#eab308",
+            title: "One path, not eight playlists",
+            text: "Type a tech skill and get a single ordered course built from the best YouTube videos — no more juggling half-finished playlists and twelve open tabs.",
             gradient: "linear-gradient(135deg, #eab308, #f59e0b)"
         },
         {
-            quote: "I had never finished a YouTube course before. The streaks and quizzes pulled me all the way through to the certificate.",
-            name: "Amara N.",
-            role: "Student",
-            color: "#10b981",
+            title: "Answers inside the video",
+            text: "The AI tutor sits next to every video. Ask at the exact timestamp you got stuck and it answers in context — no pausing to Google what the speaker just said.",
             gradient: "linear-gradient(135deg, #10b981, #3b82f6)"
         },
         {
-            quote: "Asking the tutor at the exact second I got stuck in the video was the unlock. No more pausing to Google what the speaker just said.",
-            name: "Yusuf I.",
-            role: "Data Analyst",
-            color: "#ec4899",
+            title: "Quizzes that keep you honest",
+            text: "Every module ends with an AI-generated quiz tied to the videos you just watched, so progress means you actually got it — not that you let it autoplay.",
             gradient: "linear-gradient(135deg, #f59e0b, #ec4899)"
         },
         {
-            quote: "Structured path plus a verifiable certificate at the end — I finally have something to show recruiters from my self-study.",
-            name: "Sarah J.",
-            role: "Junior Dev",
-            color: "#6366f1",
+            title: "A certificate anyone can verify",
+            text: "Finish the path and pass the quizzes to earn a Certificate of Completion with a unique verification code and a public link.",
             gradient: "linear-gradient(135deg, #6366f1, #8b5cf6)"
         },
         {
-            quote: "I stopped opening twelve tabs every time I started a new topic. Primerly just hands me the path.",
-            name: "David K.",
-            role: "Product Designer",
-            color: "#f43f5e",
+            title: "Momentum built in",
+            text: "Streaks, XP, and a progress map turn showing up daily into a habit — designed to get you to the end, not just the sign-up.",
             gradient: "linear-gradient(135deg, #f43f5e, #fb7185)"
         }
     ];
 
-    const marqueeTestimonials = [...testimonials, ...testimonials];
+    const marqueeWhyCards = [...whyCards, ...whyCards];
 
     return (
         <div className={styles.container}>
@@ -97,7 +89,8 @@ export default function HomeClient() {
                     </div>
                     <nav className={styles.headerNav} aria-label="Primary">
                         <a href="#how-it-works" className={styles.headerNavLink}>How it works</a>
-                        <a href="#reviews" className={styles.headerNavLink}>Reviews</a>
+                        <Link href="/explore" className={styles.headerNavLink}>Explore</Link>
+                        <a href="#reviews" className={styles.headerNavLink}>Why Primerly</a>
                         <a href="#community" className={styles.headerNavLink}>Community</a>
                         <a href="#topics" className={styles.headerNavLink}>Topics</a>
                         <a href="#faq" className={styles.headerNavLink}>FAQ</a>
@@ -114,13 +107,12 @@ export default function HomeClient() {
                 <div className={styles.heroGrain} aria-hidden />
                 <FadeIn direction="up">
                     <h1 className={styles.title}>
-                        Structured learning, with your personal <span className={styles.titleAccent}>AI tutor</span>
-                        {/* Stop scrolling. Start <span className={styles.titleAccent}>learning</span>, with your personal <ScrambleText text="AI tutor" className={styles.titleAccent} /> */}
+                        Learn in-demand tech skills, with your personal <span className={styles.titleAccent}>AI tutor</span>
                     </h1>
                 </FadeIn>
                 <FadeIn direction="up" delay={0.1}>
                     <p className={styles.subtitle}>
-                        Type what you want to learn. Primerly turns YouTube into a structured path, an AI tutor explains anything that's fuzzy right inside the video, and you walk away with a verifiable certificate.
+                        Type the tech skill you want to learn — coding, data, design, cloud. Primerly turns YouTube into a structured path, an AI tutor explains anything that's fuzzy right inside the video, and you walk away with a verifiable certificate.
                     </p>
                 </FadeIn>
 
@@ -141,7 +133,24 @@ export default function HomeClient() {
                 </FadeIn>
             </section>
 
-            {/* 2. HOW IT WORKS SECTION */}
+            {/* 2. PUBLISHED COURSES — only rendered when real published courses exist */}
+            {featuredCourses.length > 0 && (
+                <section id="courses" className={styles.courseMarqueeSection}>
+                    <FadeIn>
+                        <div className={styles.courseMarqueeHeader}>
+                            <h2 className={styles.courseMarqueeHeading}>
+                                Courses built by Primerly learners
+                            </h2>
+                            <Link href="/explore" className={styles.courseMarqueeLink}>
+                                Explore all courses →
+                            </Link>
+                        </div>
+                    </FadeIn>
+                    <CourseMarquee courses={featuredCourses} />
+                </section>
+            )}
+
+            {/* 3. HOW IT WORKS SECTION */}
             <section id="how-it-works" className={styles.howItWorks}>
                 <FadeIn>
                     <h2 className={styles.sectionHeading}>How it works</h2>
@@ -151,7 +160,7 @@ export default function HomeClient() {
                         {
                             icon: <SearchIcon size={28} />,
                             title: "Type what you want to learn",
-                            description: "One sentence — 'data analysis', 'Rust foundations', 'Japanese N5'. Primerly pulls the right YouTube videos and orders them into a focused, end-to-end course so you stop bouncing between random tutorials.",
+                            description: "One sentence — 'data analysis', 'Rust foundations', 'UI/UX design'. Primerly pulls the right YouTube videos and orders them into a focused, end-to-end course so you stop bouncing between random tutorials.",
                             scene: "setYourGoal",
                         },
                         {
@@ -198,35 +207,25 @@ export default function HomeClient() {
                 </div>
             </section>
 
-            {/* 3. REVIEWS (TESTIMONIALS) SECTION */}
+            {/* 4. WHY PRIMERLY SECTION */}
             <section id="reviews" className={styles.testimonialsSection}>
                 <FadeIn>
-                    <h2 className={styles.sectionHeading}>Loved by self-taught learners</h2>
+                    <h2 className={styles.sectionHeading}>Built for how self-taught devs actually learn</h2>
                 </FadeIn>
                 <div className={styles.marqueeContainer} style={{ marginTop: '60px', maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}>
                     <div className={styles.testimonialMarqueeTrack}>
-                        {marqueeTestimonials.map((item, i) => (
+                        {marqueeWhyCards.map((item, i) => (
                             <div key={i} className={styles.testimonialCard}>
-                                <div style={{ marginBottom: '24px', display: 'flex', gap: '4px', color: '#eab308' }}>
-                                    {[1, 2, 3, 4, 5].map(star => <StarIcon key={star} size={16} fill="currentColor" stroke="none" />)}
-                                </div>
-                                <p className={styles.quote}>&quot;{item.quote}&quot;</p>
-                                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                                    <div className={styles.avatarRing} style={{ background: item.gradient || 'var(--primary)' }}>
-                                        <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'var(--card)' }}></div>
-                                    </div>
-                                    <div>
-                                        <div style={{ fontWeight: '700' }}>{item.name}</div>
-                                        <div style={{ fontSize: '0.8rem', color: 'var(--secondary)' }}>{item.role}</div>
-                                    </div>
-                                </div>
+                                <div style={{ width: '44px', height: '4px', borderRadius: '2px', background: item.gradient, marginBottom: '20px' }}></div>
+                                <div style={{ fontWeight: '700', fontSize: '1.05rem', marginBottom: '10px' }}>{item.title}</div>
+                                <p className={styles.quote}>{item.text}</p>
                             </div>
                         ))}
                     </div>
                 </div>
             </section>
 
-            {/* 4. LEARN BETTER TOGETHER (COMMUNITY) SECTION */}
+            {/* 5. LEARN BETTER TOGETHER (COMMUNITY) SECTION */}
             <section id="community" className={styles.communitySection}>
                 <div className={styles.communityContent}>
                     <FadeIn direction="right">
@@ -248,25 +247,20 @@ export default function HomeClient() {
                             <div style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
                                 <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #6366f1, #a855f7)' }}></div>
                                 <div>
-                                    <div style={{ fontWeight: '700', fontSize: '0.9rem' }}>Sarah J.</div>
-                                    <div style={{ fontSize: '0.75rem', color: 'var(--secondary)' }}>Just now • #ReactMastery</div>
+                                    <div style={{ fontWeight: '700', fontSize: '0.9rem' }}>A learner in #ReactMastery</div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--secondary)' }}>example post</div>
                                 </div>
                             </div>
-                            <div style={{ fontSize: '0.9rem', lineHeight: '1.5', marginBottom: '12px' }}>
+                            <div style={{ fontSize: '0.9rem', lineHeight: '1.5' }}>
                                 Finally understood <strong>useEffect</strong> thanks to the module 3 visualizer! 🚀
-                            </div>
-                            <div style={{ display: 'flex', gap: '16px', color: 'var(--secondary)', fontSize: '0.85rem' }}>
-                                <span>❤️ 142</span>
-                                <span>💬 18</span>
-                                <span>🔁 6</span>
                             </div>
                         </div>
                         <div className={styles.mockReplyCard}>
                             <div style={{ display: 'flex', gap: '10px', marginBottom: '8px' }}>
                                 <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: 'linear-gradient(135deg, #10b981, #14b8a6)' }}></div>
                                 <div>
-                                    <div style={{ fontWeight: '700', fontSize: '0.82rem' }}>David K.</div>
-                                    <div style={{ fontSize: '0.7rem', color: 'var(--secondary)' }}>replying to Sarah</div>
+                                    <div style={{ fontWeight: '700', fontSize: '0.82rem' }}>A reply from the channel</div>
+                                    <div style={{ fontSize: '0.7rem', color: 'var(--secondary)' }}>example reply</div>
                                 </div>
                             </div>
                             <div style={{ fontSize: '0.85rem', lineHeight: '1.5' }}>
@@ -277,10 +271,10 @@ export default function HomeClient() {
                 </div>
             </section>
 
-            {/* 5. POPULAR TOPICS SECTION */}
+            {/* 6. POPULAR TOPICS SECTION */}
             <section id="topics" className={styles.topicsSection}>
                 <FadeIn>
-                    <h2 className={styles.sectionHeading}>If it's on YouTube, you can master it here</h2>
+                    <h2 className={styles.sectionHeading}>If it's tech and it's on YouTube, you can master it here</h2>
                 </FadeIn>
                 <div className={styles.marqueeContainer} style={{ marginBottom: '24px' }}>
                     <div className={styles.marqueeTrack}>
@@ -288,8 +282,7 @@ export default function HomeClient() {
                             <div key={`${topic}-${i}-1`} className={styles.topicCard} style={{ minWidth: '220px' }}>
                                 <div className={styles.topicTitle}>{topic}</div>
                                 <div className={styles.topicMeta}>
-                                    <span>{40 + i} Resources</span>
-                                    <span>{1200 + (i * 123)} Learners</span>
+                                    <span>Path • Quizzes • Certificate</span>
                                 </div>
                             </div>
                         ))}
@@ -301,8 +294,7 @@ export default function HomeClient() {
                             <div key={`${topic}-${i}-2`} className={styles.topicCard} style={{ minWidth: '220px' }}>
                                 <div className={styles.topicTitle}>{topic}</div>
                                 <div className={styles.topicMeta}>
-                                    <span>{30 + i} Resources</span>
-                                    <span>{800 + (i * 45)} Learners</span>
+                                    <span>Path • Quizzes • Certificate</span>
                                 </div>
                             </div>
                         ))}
@@ -314,7 +306,7 @@ export default function HomeClient() {
             <section className={styles.ctaSection}>
                 <FadeIn direction="up" className={styles.flexColumnCentered}>
                     <h2>Stop scrolling. Start finishing.</h2>
-                    <p>Turn YouTube into a structured course you'll actually complete — free.</p>
+                    <p>Turn YouTube into a structured tech course you'll actually complete — free.</p>
                     <Link href="/signup" className={styles.ctaButtonLarge}>Get Started for Free</Link>
                 </FadeIn>
             </section>
@@ -330,11 +322,12 @@ export default function HomeClient() {
                             <Image src="/Primerly Logo.png" alt="Primerly" width={24} height={24} />
                             Primerly
                         </div>
-                        <p>Turn YouTube into a structured learning path. Earn a real certificate.</p>
+                        <p>Turn YouTube into structured tech-skill paths. Earn a real certificate.</p>
                     </div>
                     <div className={styles.footerColumn}>
                         <h4>Product</h4>
                         <div className={styles.footerLinks}>
+                            <Link href="/explore">Explore Courses</Link>
                             <Link href="/community">Community</Link>
                         </div>
                     </div>
@@ -370,20 +363,6 @@ export default function HomeClient() {
 function FAQSection() {
     const [openIndex, setOpenIndex] = useState(0);
 
-    const questions = [
-        { q: "Is Primerly really free?", a: "Yes. You can build unlimited learning paths on the free plan. We may introduce premium features later." },
-        { q: "Where do the videos come from?", a: "Straight from YouTube. We curate the most useful videos for what you want to learn and wrap them in a structured path with a tutor, quizzes, and a certificate — so you get the upside of free content without the rabbit hole." },
-        { q: "How is the AI tutor different from ChatGPT in another tab?", a: "It's grounded in the exact video you're watching. Ask a question at any timestamp and the tutor answers using what was just said on screen, so explanations are in context instead of generic." },
-        { q: "Do I get a certificate?", a: "Yes. Finish every topic and pass every module quiz, and you'll earn a Certificate of Completion with a unique verification code — shareable and verifiable by anyone via a public link." },
-        { q: "How does the streak system work?", a: "You build a streak by completing at least one lesson or quiz every day. Streaks unlock badges and community flair." },
-        { q: "Can I share my progress?", a: "Yes. Share streaks, XP, and certificates directly to social media or with a public verification link." },
-        { q: "What topics can I learn?", a: "Anything with good YouTube coverage — from 'quantum physics' to 'cake baking'. If creators teach it on YouTube, Primerly can structure it for you." },
-        { q: "How do I join a community?", a: "When you start a course, you're invited to the matching topic channel — that's where you compare paths and ask questions when the tutor isn't enough." },
-        { q: "How do quizzes work?", a: "Each module ships with an AI-generated quiz tied to the videos you just watched. Passing earns XP, fuels your streak, and counts toward your certificate." },
-        { q: "Can I sign in with Google, GitHub, or Apple?", a: "Yes. One-click social sign-in is supported for Google, GitHub, and Apple — no password required." },
-        { q: "Is there a mobile app?", a: "Primerly is fully responsive and works great on any device. A native app is coming soon." }
-    ];
-
     return (
         <section className={styles.faqSection}>
             <div className={styles.faqContainer}>
@@ -391,7 +370,7 @@ function FAQSection() {
                     <h2 className={styles.sectionHeading} style={{ marginBottom: '40px', textAlign: 'center' }}>Frequently Asked Questions</h2>
                 </FadeIn>
                 <div style={{ width: '100%' }}>
-                    {questions.map((item, i) => (
+                    {faqs.map((item, i) => (
                         <FadeIn key={i} delay={0.1 * i} direction="up" className={styles.faqItem} style={{ width: '100%' }}>
                             <button className={styles.faqQuestion} onClick={() => setOpenIndex(openIndex === i ? null : i)}>
                                 {item.q}

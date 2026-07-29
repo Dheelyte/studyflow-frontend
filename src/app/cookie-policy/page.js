@@ -1,5 +1,6 @@
 export const metadata = {
   title: 'Cookie Policy',
+  description: 'How Primerly uses cookies and similar technologies.',
 };
 
 export default function CookiePolicy() {

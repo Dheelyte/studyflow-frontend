@@ -35,7 +35,7 @@ export default function LibraryClient() {
             totalModules: item.progress?.total_modules || 0,
             level: item.playlist?.level,
             color: colors[index % colors.length],
-            link: `/course/${item.playlist?.id || 1}`
+            link: `/course/${item.playlist?.slug || item.playlist?.id}`
           }));
           setCourses(mapped);
         }

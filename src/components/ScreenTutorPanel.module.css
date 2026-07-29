@@ -1,0 +1,472 @@
+.launcher {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--primary);
+    color: #ffffff;
+    border: none;
+    border-radius: 999px;
+    padding: 14px 22px;
+    font-size: 0.92rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+}
+
+.launcher:hover {
+    background: var(--primary-hover);
+}
+
+.panel {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 60;
+    width: min(400px, calc(100vw - 32px));
+    max-height: min(80vh, 720px);
+    overflow-y: auto;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.32);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.title {
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.subtitle {
+    font-size: 0.8rem;
+    color: var(--secondary);
+    margin-top: 2px;
+}
+
+.close {
+    background: none;
+    border: none;
+    color: var(--secondary);
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 4px;
+}
+
+.statusRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: 0.8rem;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.dotLive {
+    background: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+.dotOff {
+    background: var(--secondary);
+}
+
+.statusText {
+    color: var(--secondary);
+    flex: 1;
+    min-width: 140px;
+}
+
+.quota {
+    color: var(--secondary);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.intro {
+    display: grid;
+    gap: 10px;
+}
+
+.introText,
+.introHint {
+    font-size: 0.85rem;
+    line-height: 1.55;
+    color: var(--secondary);
+    margin: 0;
+}
+
+.introHint {
+    font-size: 0.8rem;
+    opacity: 0.85;
+}
+
+.shareControls {
+    display: flex;
+    gap: 8px;
+}
+
+.compose {
+    display: grid;
+    gap: 10px;
+}
+
+.preview {
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    display: block;
+}
+
+.input {
+    width: 100%;
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--foreground);
+    font-family: inherit;
+    font-size: 0.9rem;
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+.styleRow {
+    display: flex;
+    gap: 16px;
+    font-size: 0.84rem;
+    color: var(--secondary);
+}
+
+.styleOption {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.styleOption input {
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+}
+
+.primary {
+    background: var(--primary);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 20px;
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+}
+
+.primary:hover:not(:disabled) {
+    background: var(--primary-hover);
+}
+
+.secondary {
+    background: transparent;
+    color: var(--foreground);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 11px 16px;
+    font-weight: 600;
+    font-size: 0.86rem;
+    cursor: pointer;
+}
+
+.secondary:hover:not(:disabled) {
+    border-color: var(--primary);
+}
+
+.primary:disabled,
+.secondary:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.answer {
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+    /* Grow to the full answer and let the panel do the scrolling. Without this
+       the flex column shrinks the box to a sliver, since a scrollable flex item
+       has an automatic minimum size of zero. */
+    flex-shrink: 0;
+}
+
+/* The tutor replies in markdown, so style what the renderer emits. Selectors are
+   scoped to .answerBody to keep them off the rest of the panel. */
+.answerBody > :first-child {
+    margin-top: 0;
+}
+
+.answerBody > :last-child {
+    margin-bottom: 0;
+}
+
+.answerBody p {
+    margin: 0 0 10px;
+}
+
+.answerBody strong {
+    font-weight: 700;
+}
+
+.answerBody em {
+    font-style: italic;
+}
+
+.answerBody ul,
+.answerBody ol {
+    margin: 0 0 10px;
+    padding-left: 20px;
+}
+
+.answerBody li {
+    margin-bottom: 4px;
+}
+
+.answerBody li > ul,
+.answerBody li > ol {
+    margin: 4px 0 0;
+}
+
+.answerBody h1,
+.answerBody h2,
+.answerBody h3,
+.answerBody h4 {
+    margin: 14px 0 6px;
+    font-size: 0.94rem;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.answerBody code {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 5px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.82em;
+}
+
+.answerBody pre {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin: 0 0 10px;
+    overflow-x: auto;
+}
+
+/* The <pre> already provides the frame, so the inner <code> stays unstyled. */
+.answerBody pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 0.82rem;
+}
+
+.answerBody a {
+    color: var(--primary);
+    text-decoration: underline;
+}
+
+.answerBody blockquote {
+    margin: 0 0 10px;
+    padding-left: 10px;
+    border-left: 3px solid var(--border);
+    color: var(--secondary);
+}
+
+.answerBody table {
+    width: 100%;
+    margin: 0 0 10px;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+}
+
+.answerBody th,
+.answerBody td {
+    border: 1px solid var(--border);
+    padding: 5px 8px;
+    text-align: left;
+}
+
+.answerBody hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 12px 0;
+}
+
+.linkButton {
+    display: block;
+    margin-top: 12px;
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.error {
+    color: #f43f5e;
+    font-size: 0.84rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Floating (Document Picture-in-Picture) variant: fills its own window, so the
+   fixed positioning and shadow of the docked panel would be wrong here. */
+.pipRoot {
+    position: static;
+    width: 100%;
+    min-height: 100vh;
+    box-sizing: border-box;
+    background: var(--background);
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.headActions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.headButton {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--secondary);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.headButton:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+/* Region marking on the frozen frame */
+.previewWrap {
+    position: relative;
+    display: block;
+    touch-action: none;
+    cursor: crosshair;
+    user-select: none;
+}
+
+.regionBox {
+    position: absolute;
+    border: 2px solid var(--primary);
+    background: rgba(99, 102, 241, 0.18);
+    pointer-events: none;
+    border-radius: 2px;
+}
+
+.regionHint {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: var(--secondary);
+}
+
+.regionHint .linkButton {
+    margin-top: 0;
+    font-size: 0.78rem;
+}
+
+/* Pin picker */
+.pinRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: 0.8rem;
+}
+
+.pinLabel {
+    color: var(--secondary);
+    white-space: nowrap;
+}
+
+.select {
+    flex: 1;
+    min-width: 160px;
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    color: var(--foreground);
+    font-family: inherit;
+    font-size: 0.84rem;
+}
+
+/* Voice input */
+.recording {
+    background: #f43f5e;
+    color: #ffffff;
+    border: 1px solid #f43f5e;
+    border-radius: 8px;
+    padding: 11px 16px;
+    font-weight: 700;
+    font-size: 0.86rem;
+    cursor: pointer;
+    animation: recordPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes recordPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.72; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .recording { animation: none; }
+}

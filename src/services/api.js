@@ -245,6 +245,82 @@ export const comments = {
     }),
 };
 
+export const screenTutor = {
+    getStatus: () => apiFetch('/screen-tutor/status'),
+    // Lessons and already-generated projects the tutor can be pinned to.
+    getPinTargets: (courseRef) => apiFetch(`/playlists/${courseRef}/tutor-targets`),
+    // Streams newline-delimited JSON events: status | chunk | done | error.
+    // The frame is forwarded to the model and never stored server-side.
+    ask: async function* (payload) {
+        const response = await fetch(`${API_URL}/screen-tutor/ask`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(payload),
+        });
+        if (!response.ok || !response.body) {
+            let errMsg = `Screen tutor request failed (${response.status})`;
+            try {
+                const err = await response.json();
+                if (err?.detail) errMsg = typeof err.detail === 'string' ? err.detail : errMsg;
+            } catch (e) { /* ignore */ }
+            throw new Error(errMsg);
+        }
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            let nl;
+            while ((nl = buffer.indexOf('\n')) !== -1) {
+                const line = buffer.slice(0, nl).trim();
+                buffer = buffer.slice(nl + 1);
+                if (!line) continue;
+                try {
+                    yield JSON.parse(line);
+                } catch (e) {
+                    console.error('Bad stream chunk:', line, e);
+                }
+            }
+        }
+        const tail = buffer.trim();
+        if (tail) {
+            try { yield JSON.parse(tail); } catch (e) { /* ignore */ }
+        }
+    },
+};
+
+export const projects = {
+    // Briefs are generated on first request, so these can take a few seconds.
+    getCapstone: (courseRef) => apiFetch(`/playlists/${courseRef}/project`),
+    getModuleProject: (moduleId) => apiFetch(`/modules/${moduleId}/project`),
+    updateProgress: (projectId, data) => apiFetch(`/projects/${projectId}/progress`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+    }),
+};
+
+export const gallery = {
+    list: ({ limit = 24, offset = 0, featured = false } = {}) => {
+        const params = new URLSearchParams({
+            limit: String(limit),
+            offset: String(offset),
+            featured: String(featured),
+        });
+        return apiFetch(`/gallery?${params.toString()}`);
+    },
+    get: (slug) => apiFetch(`/gallery/${encodeURIComponent(slug)}`),
+    enroll: (slug) => apiFetch(`/gallery/${encodeURIComponent(slug)}/enroll`, {
+        method: 'POST',
+    }),
+    setPublishState: (playlistId, isPublic) => apiFetch(`/playlists/${playlistId}/publish`, {
+        method: 'POST',
+        body: JSON.stringify({ is_public: isPublic }),
+    }),
+};
+
 export const curriculum = {
     generate: (params) => {
         const searchParams = new URLSearchParams(params);

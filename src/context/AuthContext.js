@@ -15,7 +15,12 @@ export function AuthProvider({ children }) {
     const pathname = usePathname();
 
     const checkUser = useCallback(async (force = false) => {
-        if (!force && typeof window !== 'undefined' && (pathname === '/' || pathname.startsWith('/course/') || pathname.startsWith('/library') || pathname.startsWith('/curriculum'))) {
+        // Skip the session round-trip only on pages that never read `user`.
+        // /course/ and /library both branch on it — /course/ to decide between the
+        // full and preview views, /library via AuthGuard — so skipping there leaves
+        // `user` null for a signed-in visitor and bounces them to /login.
+        // Anonymous visitors are still spared the call by the localStorage check below.
+        if (!force && typeof window !== 'undefined' && (pathname === '/' || pathname.startsWith('/curriculum'))) {
             setLoading(false);
             return;
         }

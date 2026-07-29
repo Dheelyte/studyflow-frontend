@@ -30,7 +30,7 @@ export default function IntegratedSearchBar({ redirect = false, onSearch, shadow
                 <input
                     type="text"
                     className={styles.searchInput}
-                    placeholder="What do you want to learn?"
+                    placeholder='Try "React", "SQL", or "UI/UX design"'
                     value={themeQuery}
                     onChange={(e) => setQuery(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleStart()}

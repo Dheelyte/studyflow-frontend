@@ -68,7 +68,7 @@ export default function DashboardClient() {
                         title: item.playlist?.title || "Untitled",
                         description: "Your personalized curriculum",
                         color: colors[index % colors.length],
-                        link: `/course/${item.playlist?.id || 1}`,
+                        link: `/course/${item.playlist?.slug || item.playlist?.id}`,
                         progress: item.progress?.percentage || 0,
                         completedModules: item.progress?.completed_modules || 0,
                         totalModules: item.progress?.total_modules || 0,
@@ -121,7 +121,7 @@ export default function DashboardClient() {
 
 
             <div className={styles.heroSection}>
-                <h1 className={styles.greeting}>{greeting || 'Hello'}, {user?.first_name || 'Learner'}. Ready to flow?</h1>
+                <h1 className={styles.greeting}>{greeting || 'Hello'}, {user?.first_name || 'Learner'}. What are you learning today?</h1>
                 <IntegratedSearchBar redirect={true} shadow={false} />
             </div>
 

@@ -4,15 +4,19 @@ import Spinner from '@/components/Spinner';
 
 export async function generateMetadata({ searchParams }) {
     const resolvedSearchParams = await searchParams;
-    const topic = resolvedSearchParams?.topic;
+    const rawTopic = resolvedSearchParams?.topic || '';
 
-    if (topic) {
-        // Simple capitalization for better display
-        const title = topic.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-        return {
-            title: `${title}`,
-        };
-    }
+    // The topic is raw user input headed for <title>: strip to plain characters and cap length.
+    const topic = rawTopic.replace(/[^\w\s.+#&-]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 60);
+
+    const title = topic
+        ? topic.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
+        : 'Curriculum';
+
+    return {
+        title,
+        robots: { index: false },
+    };
 }
 
 export default function CurriculumPage() {

@@ -6,6 +6,7 @@ import styles from "./page.module.css";
 import { ChevronLeft, VideoIcon, CheckCircleIcon, ZapIcon } from "@/components/Icons";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import ScreenTutorPanel from "@/components/ScreenTutorPanel";
 
 // Help icon (question mark in circle)
 const HelpIcon = ({ size = 24 }) => (
@@ -531,7 +532,7 @@ export default function TutorClient({ params }) {
                                 <ZapIcon size={20} fill="var(--primary)" />
                             </div>
                             <div className={styles.panelHeaderText}>
-                                <h3>AI Tutor</h3>
+                                <h3>AI Chat Tutor</h3>
                                 <p>Ask for help at any point in the video</p>
                             </div>
                             {messages.length > 0 && (
@@ -747,6 +748,9 @@ export default function TutorClient({ params }) {
                     </div>
                 </div>
             )}
+
+            {/* On a lesson the context is unambiguous — this exact topic. */}
+            <ScreenTutorPanel topicId={topicId ? Number(topicId) : null} courseTitle={topicTitle} />
         </div>
     );
 }
