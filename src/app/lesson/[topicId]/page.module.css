@@ -870,7 +870,7 @@
     }
 }
 
-/* Responsive — native-app feel on mobile */
+/* Responsive , native-app feel on mobile */
 @media (max-width: 900px) {
     .container {
         min-height: 100%;

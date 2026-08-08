@@ -10,7 +10,7 @@ const MIN_CROP_PX = 16;
 
 /**
  * Holds a screen-share session locally for the lifetime of the page and grabs
- * single frames on demand. The stream is never sent anywhere — only the frames
+ * single frames on demand. The stream is never sent anywhere , only the frames
  * the learner explicitly captures are, and only when they press send.
  */
 export default function useScreenShare() {
@@ -89,7 +89,7 @@ export default function useScreenShare() {
     /** Grab the current frame as a downscaled JPEG data URL, or null.
      *
      * The native-resolution frame is retained so a later crop is taken from the
-     * moment that was captured — the live feed has moved on by then — and at full
+     * moment that was captured , the live feed has moved on by then , and at full
      * detail rather than from the already-downscaled upload.
      */
     const captureFrame = useCallback(() => {

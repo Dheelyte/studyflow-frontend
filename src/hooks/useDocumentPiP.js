@@ -19,7 +19,7 @@ function clonePageStyles(pipWindow) {
             style.textContent = cssText;
             pipWindow.document.head.appendChild(style);
         } catch {
-            // Cross-origin sheets throw on cssRules access — re-link them instead.
+            // Cross-origin sheets throw on cssRules access , re-link them instead.
             if (sheet.href) {
                 const link = pipWindow.document.createElement('link');
                 link.rel = 'stylesheet';

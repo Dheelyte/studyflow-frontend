@@ -549,3 +549,94 @@ input:checked+.slider:before {
     font-size: 1.4rem;
     line-height: 1;
 }
+
+/* --- Subscription section --- */
+
+.planBadge {
+    display: inline-block;
+    background: rgba(99, 102, 241, 0.12);
+    color: var(--primary);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    padding: 3px 10px;
+    border-radius: 99px;
+    vertical-align: middle;
+}
+
+.upgradeLink {
+    background: var(--primary);
+    color: white;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 9px 18px;
+    border-radius: 10px;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+.upgradeLink:hover {
+    background: var(--primary-hover);
+}
+
+.cancelPlanBtn {
+    background: transparent;
+    color: var(--secondary);
+    border: 1px solid var(--border);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 9px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.cancelPlanBtn:hover:not(:disabled) {
+    color: var(--foreground);
+    background: var(--hover);
+}
+
+.cancelPlanBtn:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.usageList {
+    display: grid;
+    gap: 14px;
+    padding: 4px 0 8px;
+}
+
+.usageRow {
+    display: grid;
+    gap: 6px;
+}
+
+.usageHeader {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--foreground);
+}
+
+.usageCount {
+    color: var(--secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.usageMeter {
+    height: 6px;
+    border-radius: 99px;
+    background: var(--hover);
+    overflow: hidden;
+}
+
+.usageMeterFill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 99px;
+    transition: width 0.3s ease;
+}

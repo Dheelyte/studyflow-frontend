@@ -1,12 +1,11 @@
-import Link from 'next/link';
-import CourseGalleryCard from '@/components/CourseGalleryCard';
 import { fetchPublicCourses } from '@/lib/gallery-server';
+import ExploreClient from './ExploreClient';
 import styles from './page.module.css';
 
 export const metadata = {
     title: 'Explore Courses',
     description:
-        'Browse structured tech courses published by the Primerly community — coding, data, design, cloud and more, each with an AI tutor, quizzes, and a certificate.',
+        'Browse structured tech courses published by the Primerly community , coding, data, design, cloud and more, each with an AI tutor, quizzes, and a certificate.',
 };
 
 export const revalidate = 300;
@@ -24,24 +23,7 @@ export default async function ExplorePage() {
                 </p>
             </header>
 
-            {courses.length > 0 ? (
-                <div className={styles.grid}>
-                    {courses.map((course) => (
-                        <CourseGalleryCard key={course.slug} course={course} />
-                    ))}
-                </div>
-            ) : (
-                <div className={styles.emptyState}>
-                    <h2 className={styles.emptyTitle}>No published courses yet</h2>
-                    <p className={styles.emptyText}>
-                        Nobody has published a course to the gallery yet. Build one for the tech
-                        skill you want to learn, and you can publish it here when it's ready.
-                    </p>
-                    <Link href="/signup" className={styles.emptyCta}>
-                        Build your first course
-                    </Link>
-                </div>
-            )}
+            <ExploreClient initialCourses={courses} />
         </div>
     );
 }

@@ -38,7 +38,7 @@ export default function Card({ title, description, color, progress, completedMod
                 </div>
             </>
         ) : meta ? (
-            /* Courses the viewer hasn't started have no progress — show size/uptake instead. */
+            /* Courses the viewer hasn't started have no progress , show size/uptake instead. */
             <div className={styles.percentage}>
                 <span className={styles.statsModules}>{meta}</span>
             </div>

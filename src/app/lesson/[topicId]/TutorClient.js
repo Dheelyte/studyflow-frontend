@@ -7,6 +7,7 @@ import { ChevronLeft, VideoIcon, CheckCircleIcon, ZapIcon } from "@/components/I
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import ScreenTutorPanel from "@/components/ScreenTutorPanel";
+import UpgradeModal from "@/components/UpgradeModal";
 
 // Help icon (question mark in circle)
 const HelpIcon = ({ size = 24 }) => (
@@ -48,6 +49,7 @@ export default function TutorClient({ params }) {
     const [chatInput, setChatInput] = useState("");
     const [showScrollDown, setShowScrollDown] = useState(false);
     const [clearing, setClearing] = useState(false);
+    const [quotaError, setQuotaError] = useState(null);
     const [hasMoreMessages, setHasMoreMessages] = useState(false);
     const [loadingOlder, setLoadingOlder] = useState(false);
     const [showClearConfirm, setShowClearConfirm] = useState(false);
@@ -362,6 +364,18 @@ export default function TutorClient({ params }) {
         } catch (err) {
             console.error("Failed to stream message:", err);
             streamingErrored = true;
+
+            // Daily tutor-message limit reached: show the upgrade prompt instead
+            // of an error bubble, and put the unsent message back in the input.
+            if (err.status === 402 && err.data?.code === "quota_exceeded") {
+                setQuotaError(err.data);
+                setChatInput(content);
+                setMessages((prev) =>
+                    prev.filter((m) => m.id !== streamingAssistantId && m.id !== optimisticUser.id)
+                );
+                return;
+            }
+
             setMessages((prev) => {
                 const withoutStreaming = prev.filter(
                     (m) => m.id !== streamingAssistantId && m.id !== optimisticUser.id
@@ -380,7 +394,7 @@ export default function TutorClient({ params }) {
         } finally {
             setSending(false);
             if (streamingErrored && !accumulated) {
-                // No partial reply arrived — error UI already added above.
+                // No partial reply arrived , error UI already added above.
             }
         }
     };
@@ -749,7 +763,11 @@ export default function TutorClient({ params }) {
                 </div>
             )}
 
-            {/* On a lesson the context is unambiguous — this exact topic. */}
+            {quotaError && (
+                <UpgradeModal quota={quotaError} onClose={() => setQuotaError(null)} />
+            )}
+
+            {/* On a lesson the context is unambiguous , this exact topic. */}
             <ScreenTutorPanel topicId={topicId ? Number(topicId) : null} courseTitle={topicTitle} />
         </div>
     );

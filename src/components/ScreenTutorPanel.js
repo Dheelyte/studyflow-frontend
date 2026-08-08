@@ -7,7 +7,9 @@ import useScreenShare from '@/hooks/useScreenShare';
 import useDocumentPiP from '@/hooks/useDocumentPiP';
 import useAudioRecorder from '@/hooks/useAudioRecorder';
 import { screenTutor } from '@/services/api';
+import { useAuth } from '@/context/AuthContext';
 import { ZapIcon } from '@/components/Icons';
+import UpgradeModal from '@/components/UpgradeModal';
 import styles from './ScreenTutorPanel.module.css';
 
 export default function ScreenTutorPanel({
@@ -28,6 +30,8 @@ export default function ScreenTutorPanel({
     const [streaming, setStreaming] = useState(false);
     const [error, setError] = useState(null);
     const [quota, setQuota] = useState(null);
+    const [quotaError, setQuotaError] = useState(null);
+    const { plan } = useAuth();
 
     // Region marking: normalised rect over the frozen frame.
     const [region, setRegion] = useState(null);
@@ -191,11 +195,24 @@ export default function ScreenTutorPanel({
                     // doesn't stutter through a streaming response.
                     if (speakAnswers && event.answer) speak(event.answer);
                 } else if (event.type === 'error') {
-                    setError(event.error);
+                    if (event.quota_exhausted) {
+                        setQuotaError({
+                            metric: 'screen_tutor_questions',
+                            limit: quota?.daily_limit ?? 0,
+                            used: quota?.daily_limit ?? 0,
+                            plan: plan || 'free',
+                        });
+                    } else {
+                        setError(event.error);
+                    }
                 }
             }
         } catch (err) {
-            setError(err.message || 'Something went wrong asking about your screen.');
+            if (err.status === 402 && err.data?.code === 'quota_exceeded') {
+                setQuotaError(err.data);
+            } else {
+                setError(err.message || 'Something went wrong asking about your screen.');
+            }
         } finally {
             setStreaming(false);
         }
@@ -203,7 +220,7 @@ export default function ScreenTutorPanel({
 
     const speak = (text) => {
         if (typeof window === 'undefined' || !window.speechSynthesis) return;
-        // Markdown reads badly aloud — strip the syntax, keep the words.
+        // Markdown reads badly aloud , strip the syntax, keep the words.
         const plain = text
             .replace(/```[\s\S]*?```/g, ' (code block) ')
             .replace(/`([^`]+)`/g, '$1')
@@ -230,8 +247,8 @@ export default function ScreenTutorPanel({
 
     const askAgainDirect = async () => {
         setAnswerStyle('direct');
-        // Re-send the same frame and the same question — including the recording,
-        // if they asked out loud — for the full answer.
+        // Re-send the same frame and the same question , including the recording,
+        // if they asked out loud , for the full answer.
         send(lastAudioRef.current, 'direct');
     };
 
@@ -255,7 +272,7 @@ export default function ScreenTutorPanel({
                 </div>
                 <div className={styles.headActions}>
                     {/* Floating keeps the tutor visible while the learner works in
-                        another app — the whole point of the widget. */}
+                        another app , the whole point of the widget. */}
                     {pip.isSupported && (
                         <button
                             className={styles.headButton}
@@ -275,7 +292,7 @@ export default function ScreenTutorPanel({
                 </div>
             </div>
 
-            {/* Sharing state is always visible — the learner should never wonder
+            {/* Sharing state is always visible , the learner should never wonder
                 whether their screen is being read. */}
             <div className={styles.statusRow}>
                 <span className={`${styles.dot} ${share.isSharing && !share.isPaused ? styles.dotLive : styles.dotOff}`} />
@@ -283,7 +300,7 @@ export default function ScreenTutorPanel({
                     {!share.isSharing
                         ? 'Not sharing your screen'
                         : share.isPaused
-                            ? 'Paused — the tutor cannot see your screen'
+                            ? 'Paused , the tutor cannot see your screen'
                             : 'The tutor can read your screen when you ask'}
                 </span>
                 {quota?.remaining != null && (
@@ -296,7 +313,7 @@ export default function ScreenTutorPanel({
                     <p className={styles.introText}>
                         Share your editor window and ask questions about what's on screen.
                         Nothing is captured until you press <strong>Capture screen</strong>, and
-                        screenshots are never stored — they go to the tutor and are discarded.
+                        screenshots are never stored , they go to the tutor and are discarded.
                     </p>
                     <p className={styles.introHint}>
                         Tip: share the single window you're working in rather than your whole
@@ -385,7 +402,7 @@ export default function ScreenTutorPanel({
                                         <option value="">The lesson I&apos;m up to</option>
                                         {targets.map((t) => (
                                             <option key={`${t.kind}:${t.id}`} value={`${t.kind}:${t.id}`}>
-                                                {t.sublabel ? `${t.sublabel} — ${t.label}` : t.label}
+                                                {t.sublabel ? `${t.sublabel} , ${t.label}` : t.label}
                                             </option>
                                         ))}
                                     </select>
@@ -475,6 +492,10 @@ export default function ScreenTutorPanel({
 
             {pip.error && <p className={styles.error}>{pip.error}</p>}
             {error && <p className={styles.error}>{error}</p>}
+
+            {quotaError && (
+                <UpgradeModal quota={quotaError} onClose={() => setQuotaError(null)} />
+            )}
         </div>
     );
 

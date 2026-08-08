@@ -1,0 +1,245 @@
+.page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 120px 24px 80px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.eyebrow {
+    display: inline-block;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 12px;
+}
+
+.title {
+    font-size: clamp(2rem, 4.5vw, 2.8rem);
+    font-weight: 800;
+    line-height: 1.15;
+    margin: 0 auto 12px;
+    max-width: 640px;
+    text-wrap: balance;
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    color: var(--secondary);
+    line-height: 1.6;
+    max-width: 560px;
+    margin: 0 auto 28px;
+}
+
+.toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 4px;
+}
+
+.toggle button {
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: none;
+    background: transparent;
+    color: var(--secondary);
+    padding: 8px 20px;
+    border-radius: 99px;
+    cursor: pointer;
+}
+
+.toggleOn {
+    background: var(--primary) !important;
+    color: white !important;
+}
+
+.toggleSave {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #34d399;
+    padding-right: 12px;
+    white-space: nowrap;
+}
+
+.checkoutError {
+    text-align: center;
+    color: #f87171;
+    margin: 0 0 24px;
+}
+
+/* Explicit 3-up rather than auto-fit: this page renders inside the 260px
+   sidebar, so the container is much narrower than the viewport and auto-fit
+   silently orphaned the third tier onto its own row. */
+.plans {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    align-items: start;
+}
+
+@media (max-width: 1100px) {
+    .plans {
+        grid-template-columns: 1fr;
+        max-width: 420px;
+        margin-inline: auto;
+    }
+}
+
+.plan {
+    position: relative;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 28px;
+}
+
+.planRecommended {
+    border: 2px solid var(--primary);
+    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.15);
+}
+
+.tab {
+    position: absolute;
+    top: -12px;
+    left: 24px;
+    background: var(--primary);
+    color: white;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 99px;
+}
+
+.planName {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0 0 2px;
+}
+
+.planTagline {
+    color: var(--secondary);
+    font-size: 0.9rem;
+    margin: 0 0 18px;
+}
+
+.price {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-variant-numeric: tabular-nums;
+}
+
+.priceAmount {
+    font-size: 2.3rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.pricePer {
+    color: var(--secondary);
+    font-size: 0.95rem;
+}
+
+.priceNote {
+    font-size: 0.82rem;
+    color: var(--secondary);
+    margin: 2px 0 20px;
+    min-height: 20px;
+}
+
+.cta {
+    display: block;
+    width: 100%;
+    text-align: center;
+    font-family: inherit;
+    font-size: 0.98rem;
+    font-weight: 600;
+    padding: 13px 0;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-bottom: 24px;
+    transition: all 0.2s;
+}
+
+.cta:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.ctaPrimary {
+    background: var(--primary);
+    color: white;
+    border: none;
+}
+
+.ctaPrimary:hover:not(:disabled) {
+    background: var(--primary-hover);
+}
+
+.ctaGhost {
+    background: transparent;
+    color: var(--foreground);
+    border: 1px solid var(--border);
+}
+
+.ctaGhost:hover:not(:disabled) {
+    background: var(--hover);
+}
+
+.features {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+    font-size: 0.92rem;
+}
+
+.feature {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+}
+
+.featureNum {
+    font-weight: 700;
+    color: var(--primary);
+    font-variant-numeric: tabular-nums;
+    min-width: 22px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.featureCheck {
+    color: #34d399;
+    flex-shrink: 0;
+    display: flex;
+    align-self: center;
+}
+
+.honesty {
+    margin: 40px auto 0;
+    padding: 18px 22px;
+    border: 1px dashed var(--border);
+    border-radius: 14px;
+    font-size: 0.9rem;
+    color: var(--secondary);
+    line-height: 1.6;
+    max-width: 720px;
+}
+
+.honesty strong {
+    color: var(--foreground);
+}

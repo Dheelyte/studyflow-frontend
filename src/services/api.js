@@ -4,6 +4,15 @@ export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000
 let isRefreshing = false;
 let failedQueue = [];
 
+// Broadcast that the session is unrecoverable so AuthContext can drop the user.
+// Routing stays with AuthGuard, which knows which paths actually need auth.
+export const SESSION_EXPIRED_EVENT = 'primerly:session-expired';
+
+const notifySessionExpired = () => {
+    if (typeof window === 'undefined') return;
+    window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
+};
+
 const processQueue = (error, token = null) => {
     failedQueue.forEach(prom => {
         if (error) {
@@ -95,10 +104,12 @@ async function apiFetch(endpoint, options = {}) {
                 console.error("Session refresh failed", refreshErr);
                 processQueue(refreshErr, null);
                 isRefreshing = false;
-                // Redirect because refresh failed, meaning user is not logged in / session invalid
-                if (window.location.pathname !== '/login') {
-                    window.location.href = '/login';
-                }
+                // Don't navigate from here: public pages (/, /pricing, /explore,
+                // /course/*) make authenticated calls opportunistically, and a
+                // hard redirect would eject a visitor who was never asked to log
+                // in. Announce the dead session instead , AuthContext clears the
+                // user and AuthGuard sends them to /login only on protected paths.
+                notifySessionExpired();
                 throw new Error('Session expired');
             }
         }
@@ -260,11 +271,15 @@ export const screenTutor = {
         });
         if (!response.ok || !response.body) {
             let errMsg = `Screen tutor request failed (${response.status})`;
+            let errData = null;
             try {
-                const err = await response.json();
-                if (err?.detail) errMsg = typeof err.detail === 'string' ? err.detail : errMsg;
+                errData = await response.json();
+                if (errData?.detail) errMsg = typeof errData.detail === 'string' ? errData.detail : errMsg;
             } catch (e) { /* ignore */ }
-            throw new Error(errMsg);
+            const error = new Error(errMsg);
+            error.status = response.status;
+            error.data = errData;
+            throw error;
         }
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
@@ -303,12 +318,13 @@ export const projects = {
 };
 
 export const gallery = {
-    list: ({ limit = 24, offset = 0, featured = false } = {}) => {
+    list: ({ limit = 24, offset = 0, featured = false, q = '' } = {}) => {
         const params = new URLSearchParams({
             limit: String(limit),
             offset: String(offset),
             featured: String(featured),
         });
+        if (q && q.trim().length >= 2) params.set('q', q.trim());
         return apiFetch(`/gallery?${params.toString()}`);
     },
     get: (slug) => apiFetch(`/gallery/${encodeURIComponent(slug)}`),
@@ -319,6 +335,16 @@ export const gallery = {
         method: 'POST',
         body: JSON.stringify({ is_public: isPublic }),
     }),
+};
+
+export const billing = {
+    status: () => apiFetch('/billing/status'),
+    checkout: (tier, interval) => apiFetch('/billing/checkout', {
+        method: 'POST',
+        body: JSON.stringify({ tier, interval }),
+    }),
+    verify: (reference) => apiFetch(`/billing/verify?reference=${encodeURIComponent(reference)}`),
+    cancel: () => apiFetch('/billing/cancel', { method: 'POST' }),
 };
 
 export const curriculum = {
@@ -363,11 +389,15 @@ export const curriculum = {
         );
         if (!response.ok || !response.body) {
             let errMsg = `Stream request failed (${response.status})`;
+            let errData = null;
             try {
-                const err = await response.json();
-                if (err?.detail) errMsg = err.detail;
+                errData = await response.json();
+                if (errData?.detail) errMsg = errData.detail;
             } catch (e) { /* ignore */ }
-            throw new Error(errMsg);
+            const error = new Error(errMsg);
+            error.status = response.status;
+            error.data = errData;
+            throw error;
         }
         const reader = response.body.getReader();
         const decoder = new TextDecoder();

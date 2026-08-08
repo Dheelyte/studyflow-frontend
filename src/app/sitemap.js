@@ -5,6 +5,7 @@ export default async function sitemap() {
     const routes = [
         { path: '', priority: 1 },
         { path: '/explore', priority: 0.9 },
+        { path: '/pricing', priority: 0.9 },
         { path: '/about', priority: 0.8 },
         { path: '/contact', priority: 0.5 },
         { path: '/login', priority: 0.5 },

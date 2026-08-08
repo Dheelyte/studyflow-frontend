@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { auth } from '@/services/api';
+import { auth, SESSION_EXPIRED_EVENT } from '@/services/api';
 import { useRouter, usePathname } from 'next/navigation';
 
 const AuthContext = createContext();
@@ -16,11 +16,12 @@ export function AuthProvider({ children }) {
 
     const checkUser = useCallback(async (force = false) => {
         // Skip the session round-trip only on pages that never read `user`.
-        // /course/ and /library both branch on it — /course/ to decide between the
-        // full and preview views, /library via AuthGuard — so skipping there leaves
+        // /course/ and /library both branch on it , /course/ to decide between the
+        // full and preview views, /library via AuthGuard , so skipping there leaves
         // `user` null for a signed-in visitor and bounces them to /login.
+        // /curriculum needs `user` too now: generation requires auth and shows quota.
         // Anonymous visitors are still spared the call by the localStorage check below.
-        if (!force && typeof window !== 'undefined' && (pathname === '/' || pathname.startsWith('/curriculum'))) {
+        if (!force && typeof window !== 'undefined' && pathname === '/') {
             setLoading(false);
             return;
         }
@@ -54,6 +55,19 @@ export function AuthProvider({ children }) {
     useEffect(() => {
         checkUser();
     }, [checkUser]);
+
+    // A request somewhere found the session unrecoverable. Drop the user so the
+    // UI reflects signed-out state; AuthGuard handles redirecting if the current
+    // page actually requires auth.
+    useEffect(() => {
+        const onSessionExpired = () => {
+            setUser(null);
+            localStorage.removeItem(USER_DATA_KEY);
+            setLoading(false);
+        };
+        window.addEventListener(SESSION_EXPIRED_EVENT, onSessionExpired);
+        return () => window.removeEventListener(SESSION_EXPIRED_EVENT, onSessionExpired);
+    }, []);
 
     const login = useCallback(async (credentials) => {
         const { email, password } = credentials;
@@ -107,6 +121,8 @@ export function AuthProvider({ children }) {
         updateUser,
         checkUser,
         isAuthenticated: !!user,
+        plan: user?.plan || 'free',
+        isPaid: !!user && user.plan && user.plan !== 'free',
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

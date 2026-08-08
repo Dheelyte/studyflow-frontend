@@ -9,6 +9,7 @@ export default function robots() {
             // courses. Private ones emit noindex from their own metadata.
             disallow: [
                 '/curriculum',
+                '/billing/',
                 '/dashboard',
                 '/library',
                 '/profile',

@@ -422,7 +422,7 @@ export default function CourseClient({ params, publicCourse = null }) {
         );
     }
 
-    // The lesson the learner is up to — what the screen tutor assumes they're working on.
+    // The lesson the learner is up to , what the screen tutor assumes they're working on.
     const activeTopicId = (() => {
         for (const m of curriculumData.modules || []) {
             for (const l of m.lessons || []) {
@@ -483,7 +483,7 @@ export default function CourseClient({ params, publicCourse = null }) {
                             </div>
                             <p className={styles.publishDescription}>
                                 {publishState.isPublic
-                                    ? "Anyone can find and start this course. Your progress stays private — learners get their own."
+                                    ? "Anyone can find and start this course. Your progress stays private , learners get their own."
                                     : "Share this course publicly so other learners can find and start it. Your progress stays private."}
                             </p>
                             {publishState.isPublic && publishState.slug && (
@@ -750,7 +750,7 @@ export default function CourseClient({ params, publicCourse = null }) {
                     })}
                 </div>
 
-                {/* Capstone — the thing they can actually show someone. Logged out gets the
+                {/* Capstone , the thing they can actually show someone. Logged out gets the
                     public teaser (title + summary), since the brief is behind enrolment. */}
                 <div className={styles.capstoneSection}>
                     {isPreview ? (
@@ -774,7 +774,7 @@ export default function CourseClient({ params, publicCourse = null }) {
                     )}
                 </div>
 
-                {/* Certificate achievement at the bottom — encourages completion */}
+                {/* Certificate achievement at the bottom , encourages completion */}
                 {certStatus && (
                     (() => {
                         const earned = Boolean(certStatus.certificate);
@@ -825,7 +825,7 @@ export default function CourseClient({ params, publicCourse = null }) {
                                     </h3>
                                     <p className={styles.achievementDescription}>
                                         {earned
-                                            ? "Share it on LinkedIn, print it, or save it as a PDF — it's yours forever."
+                                            ? "Share it on LinkedIn, print it, or save it as a PDF. It's yours forever."
                                             : eligible
                                             ? "You've completed every topic and passed every quiz. Claim your shareable, verifiable certificate."
                                             : "Complete every topic and pass every module quiz to unlock a shareable, verifiable certificate with your name on it."}

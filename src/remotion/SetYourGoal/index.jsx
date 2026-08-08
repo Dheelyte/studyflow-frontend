@@ -247,7 +247,7 @@ export const SetYourGoal = () => {
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
 
-  // Module 1 animations — reuse CurriculumList from LearnWithAITutor
+  // Module 1 animations , reuse CurriculumList from LearnWithAITutor
   // Fade/slide in from the bottom (not the side)
   const moduleRise = interpolate(
     frame,

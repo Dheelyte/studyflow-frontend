@@ -4,8 +4,9 @@ import styles from './page.module.css';
 import { ZapIcon, StarIcon, TrophyIconSimple, ShareIcon } from '@/components/Icons';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/components/ThemeProvider';
-import { users, curriculum } from '@/services/api';
+import { users, curriculum, billing } from '@/services/api';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import EditProfileModal from '@/components/EditProfileModal';
 import StatShareModal from '@/components/StatShareModal';
 
@@ -40,7 +41,35 @@ export default function ProfileClient() {
     const [heatmapData, setHeatmapData] = useState([]);
     const [tooltipData, setTooltipData] = useState({ visible: false, x: 0, y: 0, count: 0, date: "" });
     const [certificates, setCertificates] = useState([]);
+    const [billingStatus, setBillingStatus] = useState(null);
+    const [cancelling, setCancelling] = useState(false);
     const router = useRouter();
+
+    useEffect(() => {
+        if (!user) return;
+        let cancelled = false;
+        billing.status()
+            .then((data) => { if (!cancelled) setBillingStatus(data); })
+            .catch(() => { /* subscription card is non-essential */ });
+        return () => { cancelled = true; };
+    }, [user?.id]);
+
+    const handleCancelSubscription = async () => {
+        if (!window.confirm("Cancel your subscription? You'll keep your current plan until the end of the billing period.")) {
+            return;
+        }
+        try {
+            setCancelling(true);
+            await billing.cancel();
+            const data = await billing.status();
+            setBillingStatus(data);
+        } catch (err) {
+            console.error('Failed to cancel subscription', err);
+            alert('Could not cancel right now. Please try again.');
+        } finally {
+            setCancelling(false);
+        }
+    };
 
     useEffect(() => {
         if (!user) return;
@@ -295,6 +324,71 @@ export default function ProfileClient() {
                                 <div className={styles.certificateCardArrow}>›</div>
                             </button>
                         ))}
+                    </div>
+                )}
+            </div>
+
+            {/* Subscription Section */}
+            <div className={styles.settingsSection}>
+                <div className={styles.sectionTitle}>
+                    <span>Subscription</span>
+                </div>
+                <div className={styles.settingRow}>
+                    <div className={styles.settingLabel}>
+                        <span>
+                            Current plan:{' '}
+                            <span className={styles.planBadge}>
+                                {(billingStatus?.plan || user?.plan || 'free').toUpperCase()}
+                            </span>
+                        </span>
+                        <span className={styles.settingDesc}>
+                            {billingStatus?.subscription?.current_period_end
+                                ? billingStatus.subscription.status === 'non_renewing'
+                                    ? `Ends ${new Date(billingStatus.subscription.current_period_end).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })} , won't renew`
+                                    : `Renews ${new Date(billingStatus.subscription.current_period_end).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}`
+                                : 'Library courses, certificates & community are always free'}
+                        </span>
+                    </div>
+                    {billingStatus?.plan && billingStatus.plan !== 'free' ? (
+                        billingStatus.subscription?.status === 'non_renewing' ? (
+                            <Link href="/pricing" className={styles.upgradeLink}>Resubscribe</Link>
+                        ) : (
+                            <button
+                                onClick={handleCancelSubscription}
+                                className={styles.cancelPlanBtn}
+                                disabled={cancelling}
+                            >
+                                {cancelling ? 'Cancelling…' : 'Cancel plan'}
+                            </button>
+                        )
+                    ) : (
+                        <Link href="/pricing" className={styles.upgradeLink}>Upgrade</Link>
+                    )}
+                </div>
+                {billingStatus?.usage && (
+                    <div className={styles.usageList}>
+                        {[
+                            { key: 'course_generations', label: 'Custom courses' },
+                            { key: 'chat_messages', label: 'Tutor messages' },
+                            { key: 'screen_tutor_questions', label: 'Screen tutor' },
+                        ].map(({ key, label }) => {
+                            const metric = billingStatus.usage[key];
+                            if (!metric) return null;
+                            const pct = Math.min(100, Math.round((metric.used / metric.limit) * 100));
+                            return (
+                                <div key={key} className={styles.usageRow}>
+                                    <div className={styles.usageHeader}>
+                                        <span>{label}</span>
+                                        <span className={styles.usageCount}>
+                                            {metric.used} / {metric.limit} this {metric.period === 'daily' ? 'day' : 'month'}
+                                        </span>
+                                    </div>
+                                    <div className={styles.usageMeter}>
+                                        <div className={styles.usageMeterFill} style={{ width: `${pct}%` }} />
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
                 )}
             </div>

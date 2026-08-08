@@ -116,3 +116,83 @@
 .noShadow {
     box-shadow: none !important;
 }
+
+/* --- Search-or-generate dropdown --- */
+
+.searchWrapper {
+    position: relative;
+    width: 100%;
+    max-width: 1000px;
+}
+
+.dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.25);
+    list-style: none;
+    margin: 0;
+    padding: 8px;
+    z-index: 60;
+    overflow: hidden;
+}
+
+.option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.optionActive {
+    background: var(--hover);
+}
+
+.optionCustom {
+    border-top: 1px solid var(--border);
+    border-radius: 0 0 10px 10px;
+    margin-top: 4px;
+    padding-top: 14px;
+}
+
+.optionIcon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--hover);
+    color: var(--secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.optionIconCustom {
+    background: rgba(99, 102, 241, 0.12);
+    color: var(--primary);
+}
+
+.optionInfo {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.optionTitle {
+    font-weight: 600;
+    color: var(--foreground);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.optionMeta {
+    font-size: 0.82rem;
+    color: var(--secondary);
+}

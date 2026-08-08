@@ -1,0 +1,217 @@
+.section {
+    /* width:100% is required, not redundant: the landing page's container is a
+       column flexbox, where `margin: 0 auto` suppresses the default stretch and
+       collapses the section to its max-content width. Matches .topicsSection. */
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 80px 24px;
+    text-align: center;
+}
+
+.eyebrow {
+    display: inline-block;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 12px;
+}
+
+.heading {
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 800;
+    line-height: 1.15;
+    margin: 0 auto 12px;
+    max-width: 620px;
+    text-wrap: balance;
+}
+
+.subtitle {
+    font-size: 1.05rem;
+    color: var(--secondary);
+    line-height: 1.6;
+    max-width: 520px;
+    margin: 0 auto 28px;
+}
+
+.toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 4px;
+    margin-bottom: 36px;
+}
+
+.toggle button {
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    border: none;
+    background: transparent;
+    color: var(--secondary);
+    padding: 7px 18px;
+    border-radius: 99px;
+    cursor: pointer;
+}
+
+.toggleOn {
+    background: var(--primary) !important;
+    color: white !important;
+}
+
+.toggleSave {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #34d399;
+    padding-right: 12px;
+    white-space: nowrap;
+}
+
+/* Explicit 3-up: auto-fit derives its column count from the container's
+   resolved width, which makes the row silently break if that width is ever
+   constrained. The three tiers must be comparable side by side. */
+.plans {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    align-items: start;
+    text-align: left;
+}
+
+@media (max-width: 900px) {
+    .plans {
+        grid-template-columns: 1fr;
+        max-width: 420px;
+        margin-inline: auto;
+    }
+}
+
+.plan {
+    position: relative;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 26px;
+}
+
+.planRecommended {
+    border: 2px solid var(--primary);
+    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.15);
+}
+
+.tab {
+    position: absolute;
+    top: -12px;
+    left: 22px;
+    background: var(--primary);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 99px;
+}
+
+.planName {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 10px;
+}
+
+.price {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 18px;
+    font-variant-numeric: tabular-nums;
+}
+
+.priceAmount {
+    font-size: 1.9rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.pricePer {
+    color: var(--secondary);
+    font-size: 0.9rem;
+}
+
+.features {
+    list-style: none;
+    margin: 0 0 22px;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+    font-size: 0.88rem;
+}
+
+.feature {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+}
+
+.featureNum {
+    font-weight: 700;
+    color: var(--primary);
+    font-variant-numeric: tabular-nums;
+    min-width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.featureCheck {
+    color: #34d399;
+    flex-shrink: 0;
+    display: flex;
+    align-self: center;
+}
+
+.cta {
+    display: block;
+    text-align: center;
+    font-size: 0.92rem;
+    font-weight: 600;
+    padding: 12px 0;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.ctaPrimary {
+    background: var(--primary);
+    color: white;
+}
+
+.ctaPrimary:hover {
+    background: var(--primary-hover);
+}
+
+.ctaGhost {
+    color: var(--foreground);
+    border: 1px solid var(--border);
+}
+
+.ctaGhost:hover {
+    background: var(--hover);
+}
+
+.honesty {
+    margin: 32px auto 0;
+    font-size: 0.9rem;
+    color: var(--secondary);
+    max-width: 560px;
+}
+
+.honesty a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+}

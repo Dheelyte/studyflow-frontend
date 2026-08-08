@@ -9,6 +9,7 @@ import { ZapIcon, SearchIcon, ChevronRight, CheckCircleIcon, VideoIcon, MessageS
 import IntegratedSearchBar from '@/components/IntegratedSearchBar';
 import FadeIn from '@/components/FadeIn';
 import CourseMarquee from '@/components/CourseMarquee';
+import PricingSection from '@/components/PricingSection';
 import { faqs } from '@/lib/faq';
 
 const HowItWorksAnimation = dynamic(() => import('@/components/HowItWorksAnimation'), { ssr: false });
@@ -51,17 +52,17 @@ export default function HomeClient({ featuredCourses = [] }) {
     const whyCards = [
         {
             title: "One path, not eight playlists",
-            text: "Type a tech skill and get a single ordered course built from the best YouTube videos — no more juggling half-finished playlists and twelve open tabs.",
+            text: "Type a tech skill and get a single ordered course built from the best YouTube videos , no more juggling half-finished playlists and twelve open tabs.",
             gradient: "linear-gradient(135deg, #eab308, #f59e0b)"
         },
         {
             title: "Answers inside the video",
-            text: "The AI tutor sits next to every video. Ask at the exact timestamp you got stuck and it answers in context — no pausing to Google what the speaker just said.",
+            text: "The AI tutor sits next to every video. Ask at the exact timestamp you got stuck and it answers in context , no pausing to Google what the speaker just said.",
             gradient: "linear-gradient(135deg, #10b981, #3b82f6)"
         },
         {
             title: "Quizzes that keep you honest",
-            text: "Every module ends with an AI-generated quiz tied to the videos you just watched, so progress means you actually got it — not that you let it autoplay.",
+            text: "Every module ends with an AI-generated quiz tied to the videos you just watched, so progress means you actually got it , not that you let it autoplay.",
             gradient: "linear-gradient(135deg, #f59e0b, #ec4899)"
         },
         {
@@ -71,7 +72,7 @@ export default function HomeClient({ featuredCourses = [] }) {
         },
         {
             title: "Momentum built in",
-            text: "Streaks, XP, and a progress map turn showing up daily into a habit — designed to get you to the end, not just the sign-up.",
+            text: "Streaks, XP, and a progress map turn showing up daily into a habit , designed to get you to the end, not just the sign-up.",
             gradient: "linear-gradient(135deg, #f43f5e, #fb7185)"
         }
     ];
@@ -112,7 +113,7 @@ export default function HomeClient({ featuredCourses = [] }) {
                 </FadeIn>
                 <FadeIn direction="up" delay={0.1}>
                     <p className={styles.subtitle}>
-                        Type the tech skill you want to learn — coding, data, design, cloud. Primerly turns YouTube into a structured path, an AI tutor explains anything that's fuzzy right inside the video, and you walk away with a verifiable certificate.
+                        Type the tech skill you want to learn , coding, data, design, cloud. Primerly turns YouTube into a structured path, an AI tutor explains anything that's fuzzy right inside the video, and you walk away with a verifiable certificate.
                     </p>
                 </FadeIn>
 
@@ -128,13 +129,11 @@ export default function HomeClient({ featuredCourses = [] }) {
                     </div>
                 </FadeIn>
 
-                <FadeIn direction="up" delay={0.3} style={{ width: '100%', maxWidth: '900px', marginTop: '12px' }}>
-                    <IntegratedSearchBar onSearch={handleSearch} />
-                </FadeIn>
+                <IntegratedSearchBar onSearch={handleSearch} />
             </section>
 
-            {/* 2. PUBLISHED COURSES — only rendered when real published courses exist */}
-            {featuredCourses.length > 0 && (
+            {/* 2. PUBLISHED COURSES , only rendered when real published courses exist */}
+            {/* {featuredCourses.length > 0 && (
                 <section id="courses" className={styles.courseMarqueeSection}>
                     <FadeIn>
                         <div className={styles.courseMarqueeHeader}>
@@ -148,7 +147,7 @@ export default function HomeClient({ featuredCourses = [] }) {
                     </FadeIn>
                     <CourseMarquee courses={featuredCourses} />
                 </section>
-            )}
+            )} */}
 
             {/* 3. HOW IT WORKS SECTION */}
             <section id="how-it-works" className={styles.howItWorks}>
@@ -160,19 +159,19 @@ export default function HomeClient({ featuredCourses = [] }) {
                         {
                             icon: <SearchIcon size={28} />,
                             title: "Type what you want to learn",
-                            description: "One sentence — 'data analysis', 'Rust foundations', 'UI/UX design'. Primerly pulls the right YouTube videos and orders them into a focused, end-to-end course so you stop bouncing between random tutorials.",
+                            description: "One sentence , 'data analysis', 'Rust foundations', 'UI/UX design'. Primerly pulls the right YouTube videos and orders them into a focused, end-to-end course so you stop bouncing between random tutorials.",
                             scene: "setYourGoal",
                         },
                         {
                             icon: <VideoIcon size={28} />,
                             title: "Learn with your AI tutor",
-                            description: "Every video has a tutor sitting next to it. Ask anything at any timestamp and it answers in context — grounded in what was just said on screen, not a generic web search.",
+                            description: "Every video has a tutor sitting next to it. Ask anything at any timestamp and it answers in context , grounded in what was just said on screen, not a generic web search.",
                             scene: "learnWithAITutor",
                         },
                         {
                             icon: <CheckCircleIcon size={28} />,
                             title: "Prove it with quizzes",
-                            description: "Each module ends with an AI-generated quiz tied to the videos you just watched. Move on only when you've actually got it — no more illusion of progress.",
+                            description: "Each module ends with an AI-generated quiz tied to the videos you just watched. Move on only when you've actually got it , no more illusion of progress.",
                             scene: "quiz",
                         },
                         {
@@ -230,7 +229,7 @@ export default function HomeClient({ featuredCourses = [] }) {
                 <div className={styles.communityContent}>
                     <FadeIn direction="right">
                         <h2 className={styles.communityTitle}>Learn better, together.</h2>
-                        <p className={styles.communityText}>Compare paths, swap tips, and stay accountable with people learning the same things on YouTube. Topic channels, threaded replies, and reactions — without the algorithm-driven distractions.</p>
+                        <p className={styles.communityText}>Compare paths, swap tips, and stay accountable with people learning the same things on YouTube. Topic channels, threaded replies, and reactions , without the algorithm-driven distractions.</p>
                         <div className={styles.communityTags}>
                             <span className={styles.communityTag}>#ReactJs</span>
                             <span className={styles.communityTag}>#Python</span>
@@ -302,11 +301,14 @@ export default function HomeClient({ featuredCourses = [] }) {
                 </div>
             </section>
 
-            {/* 7. CTA SECTION */}
+            {/* 7. PRICING SECTION */}
+            <PricingSection />
+
+            {/* 8. CTA SECTION */}
             <section className={styles.ctaSection}>
                 <FadeIn direction="up" className={styles.flexColumnCentered}>
                     <h2>Stop scrolling. Start finishing.</h2>
-                    <p>Turn YouTube into a structured tech course you'll actually complete — free.</p>
+                    <p>Turn YouTube into a structured tech course you'll actually complete , free.</p>
                     <Link href="/signup" className={styles.ctaButtonLarge}>Get Started for Free</Link>
                 </FadeIn>
             </section>
@@ -328,6 +330,7 @@ export default function HomeClient({ featuredCourses = [] }) {
                         <h4>Product</h4>
                         <div className={styles.footerLinks}>
                             <Link href="/explore">Explore Courses</Link>
+                            <Link href="/pricing">Pricing</Link>
                             <Link href="/community">Community</Link>
                         </div>
                     </div>

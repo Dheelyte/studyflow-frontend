@@ -160,7 +160,7 @@ export default function useAudioRecorder() {
         };
 
         return new Promise((resolve) => {
-            // Already stopped — by the duration cap, or because the track ended.
+            // Already stopped , by the duration cap, or because the track ended.
             // The chunks are still buffered, so use them rather than dropping the
             // recording on the floor.
             if (recorder.state === 'inactive') {

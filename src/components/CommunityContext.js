@@ -126,6 +126,9 @@ export function CommunityProvider({ children }) {
             pathname === '/login' ||
             pathname === '/signup' ||
             pathname.startsWith('/curriculum') ||
+            pathname === '/pricing' ||
+            pathname === '/explore' ||
+            pathname.startsWith('/billing') ||
             pathname === '/about' ||
             pathname === '/contact' ||
             pathname === '/privacy-policy' ||

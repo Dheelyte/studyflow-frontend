@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import styles from './Sidebar.module.css';
-import { HomeIcon, LibraryIcon, ChevronLeft, ChevronRight, XIcon, LaptopIcon, UserIcon, SunIcon, MoonIcon, UsersIcon } from './Icons';
+import { HomeIcon, LibraryIcon, ChevronLeft, ChevronRight, XIcon, LaptopIcon, UserIcon, SunIcon, MoonIcon, UsersIcon, SearchIcon, StarIcon } from './Icons';
 import { useAuth } from '@/context/AuthContext';
 
 export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse, isMobile }) {
@@ -81,6 +81,12 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
                         <span>Library</span>
                     </Link>
 
+                    {/* Explore is public , no auth gate */}
+                    <Link href="/explore" className={styles.navItem} onClick={handleNavClick} title="Explore">
+                        <SearchIcon />
+                        <span>Explore</span>
+                    </Link>
+
                     {/* Community Link (Simplified) */}
                     <Link href="/community" className={styles.navItem} onClick={handleProtectedNav} title="Community">
                         <UsersIcon />
@@ -90,6 +96,12 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
                     <Link href="/profile" className={styles.navItem} onClick={handleProtectedNav}>
                         <UserIcon />
                         <span>Profile</span>
+                    </Link>
+
+                    {/* Pricing is public , no auth gate */}
+                    <Link href="/pricing" className={styles.navItem} onClick={handleNavClick} title="Pricing">
+                        <StarIcon />
+                        <span>Pricing</span>
                     </Link>
 
                 </nav>

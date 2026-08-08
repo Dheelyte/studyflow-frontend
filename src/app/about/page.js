@@ -38,7 +38,7 @@ export default function AboutPage() {
         <section>
           <h2 style={{ fontSize: '2rem', fontWeight: '700', marginBottom: '20px' }}>Our Story</h2>
           <p style={{ color: 'var(--secondary)', lineHeight: '1.6', marginBottom: '16px' }}>
-            Primerly began with a simple observation: there's too much information out there. Whether you want to learn React, data analysis, or cloud engineering, the problem isn't a lack of resources — it's knowing where to start and what path to follow.
+            Primerly began with a simple observation: there's too much information out there. Whether you want to learn React, data analysis, or cloud engineering, the problem isn't a lack of resources , it's knowing where to start and what path to follow.
           </p>
           <p style={{ color: 'var(--secondary)', lineHeight: '1.6' }}>
             We started Primerly to bridge the gap between "I want to learn" and "I've mastered it." By leveraging advanced AI, we organize the world's knowledge into structured, interactive, and gamified curriculums.

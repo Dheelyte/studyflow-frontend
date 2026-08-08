@@ -22,7 +22,7 @@ export default function EnrollButton({ slug, compact = false }) {
         setEnrolling(true);
         try {
             await gallery.enroll(slug);
-            // Same URL — enrolling just unlocks the full learning view.
+            // Same URL , enrolling just unlocks the full learning view.
             router.refresh();
             window.location.reload();
         } catch (err) {

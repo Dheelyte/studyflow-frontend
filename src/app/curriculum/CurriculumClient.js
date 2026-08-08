@@ -2,7 +2,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import GenerationOverlay from '@/components/GenerationOverlay';
-import { curriculum } from "@/services/api";
+import UpgradeModal from '@/components/UpgradeModal';
+import { curriculum, billing } from "@/services/api";
 import styles from "./page.module.css";
 import { useAuth } from "@/context/AuthContext";
 import { useRedirectState } from "@/hooks/useRedirectState";
@@ -10,22 +11,45 @@ import ShareModal from "@/components/ShareModal";
 import Link from "next/link";
 import { PlayIcon, ClockIcon, ChevronDown, ChevronUp, ZapIcon, ShareIcon, CheckCircleIcon, BookOpenIcon, VideoIcon, TrophyIconSimple } from "@/components/Icons";
 
+const DURATION_OPTIONS = [
+    { value: '', label: 'No preference' },
+    { value: '2', label: '~2 weeks' },
+    { value: '4', label: '~4 weeks' },
+    { value: '6', label: '~6 weeks' },
+    { value: '8', label: '~8 weeks' },
+    { value: '12', label: '~12 weeks' },
+];
+
+const LEVEL_OPTIONS = [
+    { value: '', label: 'No preference' },
+    { value: 'beginner', label: 'Beginner' },
+    { value: 'intermediate', label: 'Intermediate' },
+    { value: 'advanced', label: 'Advanced' },
+];
+
 export default function CurriculumClient() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
-    const { user } = useAuth();
+    const { user, loading: authLoading } = useAuth();
     const { saveState, restoreState } = useRedirectState();
 
+    // stage: 'customize' → explicit Generate click → 'generating' → 'preview'
+    const [stage, setStage] = useState('customize');
     const [curriculumData, setCurriculumData] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [showOverlay, setShowOverlay] = useState(true);
+    const [quotaError, setQuotaError] = useState(null);
     const [expandedModules, setExpandedModules] = useState({});
     const [isCreating, setIsCreating] = useState(false);
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
     const [isGlowing, setIsGlowing] = useState(false);
     const startBtnRef = useRef(null);
+
+    const [topic, setTopic] = useState(searchParams.get('topic') || '');
+    const [durationWeeks, setDurationWeeks] = useState('');
+    const [level, setLevel] = useState('');
+    const [genStatus, setGenStatus] = useState(null); // { used, limit } for custom courses
 
     const handleTopicClick = (e) => {
         e.preventDefault();
@@ -38,63 +62,76 @@ export default function CurriculumClient() {
         }
     };
 
-    const fetchedTopicRef = useRef(null);
-
+    // Restore a generated curriculum after the login round-trip.
     useEffect(() => {
-        const fetchCurriculum = async () => {
-            const topic = searchParams.get("topic");
+        const restoredState = restoreState('curriculum_data');
+        if (restoredState && restoredState.data) {
+            setCurriculumData(restoredState.data);
+            if (restoredState.data.modules && restoredState.data.modules.length > 0) {
+                const firstId = restoredState.data.modules[0].module_id !== undefined ? restoredState.data.modules[0].module_id : 0;
+                setExpandedModules({ [firstId]: true });
+            }
+            setStage('preview');
+        }
+    }, [restoreState]);
 
-            const restoredState = restoreState('curriculum_data');
-            if (restoredState && restoredState.data) {
-                setCurriculumData(restoredState.data);
-                if (restoredState.data.modules && restoredState.data.modules.length > 0) {
-                    const firstId = restoredState.data.modules[0].module_id !== undefined ? restoredState.data.modules[0].module_id : 0;
-                    setExpandedModules({ [firstId]: true });
-                }
-                if (topic) {
-                    fetchedTopicRef.current = topic;
-                }
-                setLoading(false);
-                return;
+    // Keep the topic field in sync when arriving from the search bar.
+    useEffect(() => {
+        const urlTopic = searchParams.get('topic');
+        if (urlTopic) setTopic(urlTopic);
+    }, [searchParams]);
+
+    // Show remaining custom-course quota on the Generate button.
+    useEffect(() => {
+        if (!user) {
+            setGenStatus(null);
+            return;
+        }
+        billing.status()
+            .then((data) => setGenStatus(data?.usage?.course_generations || null))
+            .catch(() => setGenStatus(null));
+    }, [user]);
+
+    const handleGenerate = async () => {
+        if (!topic.trim()) return;
+
+        if (!authLoading && !user) {
+            const params = new URLSearchParams({ topic: topic.trim() });
+            const redirectUrl = encodeURIComponent(`${pathname}?${params.toString()}`);
+            router.push(`/login?redirect=${redirectUrl}`);
+            return;
+        }
+
+        try {
+            setStage('generating');
+            setLoading(true);
+            setError(null);
+
+            const params = { topic: topic.trim() };
+            if (durationWeeks) params.duration_weeks = durationWeeks;
+            if (level) params.level = level;
+
+            const data = await curriculum.generate(params);
+
+            if (!data || !data.modules || data.modules.length === 0) {
+                throw new Error("Invalid curriculum data format received");
             }
 
-            if (!topic) {
-                setLoading(false);
-                return;
-            }
-
-            if (fetchedTopicRef.current === topic) {
-                return;
-            }
-            fetchedTopicRef.current = topic;
-
-            try {
-                setLoading(true);
-                const params = { topic };
-
-                const data = await curriculum.generate(params);
-
-                if (!data || !data.modules) {
-                    throw new Error("Invalid curriculum data format received");
-                }
-
-                setCurriculumData(data);
-
-                if (data.modules && data.modules.length > 0) {
-                    const firstId = data.modules[0].module_id !== undefined ? data.modules[0].module_id : 0;
-                    setExpandedModules({ [firstId]: true });
-                }
-            } catch (err) {
-                console.error("Failed to fetch curriculum:", err);
+            setCurriculumData(data);
+            const firstId = data.modules[0].module_id !== undefined ? data.modules[0].module_id : 0;
+            setExpandedModules({ [firstId]: true });
+        } catch (err) {
+            console.error("Failed to generate curriculum:", err);
+            if (err.status === 402 && err.data?.code === 'quota_exceeded') {
+                setQuotaError(err.data);
+                setStage('customize');
+            } else {
                 setError(err.message || "Failed to load curriculum");
-                fetchedTopicRef.current = null;
-            } finally {
-                setLoading(false);
             }
-        };
-
-        fetchCurriculum();
-    }, [searchParams, restoreState]);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const toggleModule = (id) => {
         setExpandedModules(prev => ({ ...prev, [id]: !prev[id] }));
@@ -114,7 +151,8 @@ export default function CurriculumClient() {
                 title: curriculumData.curriculum_title,
                 description: curriculumData.overview,
                 objectives: curriculumData.learning_objectives || [],
-                content: curriculumData
+                content: curriculumData,
+                level: level || null,
             };
 
             const response = await curriculum.createCourse(payload);
@@ -133,12 +171,12 @@ export default function CurriculumClient() {
         }
     };
 
-    if (showOverlay) {
+    if (stage === 'generating') {
         return (
             <GenerationOverlay
-                topic={searchParams.get("topic")}
-                isFinished={!loading}
-                onComplete={() => setShowOverlay(false)}
+                topic={topic}
+                isFinished={!loading && !!curriculumData}
+                onComplete={() => setStage('preview')}
             />
         );
     }
@@ -151,7 +189,7 @@ export default function CurriculumClient() {
                     <p>An error occurred, please try again</p>
                 </div>
                 <button
-                    onClick={() => window.location.reload()}
+                    onClick={() => { setError(null); setStage('customize'); }}
                     style={{
                         padding: '12px 24px',
                         background: 'var(--primary)',
@@ -168,6 +206,96 @@ export default function CurriculumClient() {
                 >
                     Try again
                 </button>
+            </div>
+        );
+    }
+
+    if (stage === 'customize') {
+        const remainingText = genStatus
+            ? `${Math.max(0, genStatus.limit - genStatus.used)} of ${genStatus.limit} custom courses left this month`
+            : null;
+
+        return (
+            <div className={styles.container}>
+                <div className={styles.headerBg}></div>
+
+                <header className={styles.topNav}>
+                    <div className={styles.navBrand}>
+                        <ZapIcon size={24} fill="var(--primary)" />
+                        <span>Primerly</span>
+                    </div>
+                    {!user && (
+                        <Link href="/login" className={styles.navLoginBtn}>
+                            Log In
+                        </Link>
+                    )}
+                </header>
+
+                <div className={styles.customizeWrapper}>
+                    <div className={styles.customizeCard}>
+                        <h1 className={styles.customizeTitle}>Create a custom course</h1>
+                        <p className={styles.customizeSubtitle}>
+                            Tailor the roadmap to your pace and starting point, then generate it with AI.
+                            Looking for something ready-made? <Link href="/explore">Browse the library</Link> , it&apos;s free and unlimited.
+                        </p>
+
+                        <label className={styles.customizeLabel} htmlFor="customTopic">Topic</label>
+                        <input
+                            id="customTopic"
+                            type="text"
+                            className={styles.customizeInput}
+                            placeholder='e.g. "React", "SQL", "UI/UX design"'
+                            value={topic}
+                            onChange={(e) => setTopic(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleGenerate()}
+                        />
+
+                        <div className={styles.customizeRow}>
+                            <div className={styles.customizeField}>
+                                <label className={styles.customizeLabel} htmlFor="customDuration">Duration</label>
+                                <select
+                                    id="customDuration"
+                                    className={styles.customizeSelect}
+                                    value={durationWeeks}
+                                    onChange={(e) => setDurationWeeks(e.target.value)}
+                                >
+                                    {DURATION_OPTIONS.map(opt => (
+                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className={styles.customizeField}>
+                                <label className={styles.customizeLabel} htmlFor="customLevel">Starting level</label>
+                                <select
+                                    id="customLevel"
+                                    className={styles.customizeSelect}
+                                    value={level}
+                                    onChange={(e) => setLevel(e.target.value)}
+                                >
+                                    {LEVEL_OPTIONS.map(opt => (
+                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        <button
+                            className={styles.customizeGenerateBtn}
+                            onClick={handleGenerate}
+                            disabled={!topic.trim()}
+                        >
+                            <ZapIcon size={20} fill="white" />
+                            {user ? 'Generate my course' : 'Log in to generate'}
+                        </button>
+                        {remainingText && (
+                            <p className={styles.customizeQuota}>{remainingText}</p>
+                        )}
+                    </div>
+                </div>
+
+                {quotaError && (
+                    <UpgradeModal quota={quotaError} onClose={() => setQuotaError(null)} />
+                )}
             </div>
         );
     }
