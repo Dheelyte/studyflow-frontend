@@ -9,6 +9,17 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import EditProfileModal from '@/components/EditProfileModal';
 import StatShareModal from '@/components/StatShareModal';
+import { PLANS, formatNaira } from '@/lib/plans';
+
+// Recurring charge amount for a tier+interval, straight from the pricing source of truth.
+const planPrice = (tier, interval) => {
+    const plan = PLANS.find((p) => p.id === tier);
+    if (!plan) return null;
+    return interval === 'annual' ? plan.priceAnnual : plan.priceMonthly;
+};
+
+const formatLongDate = (value) =>
+    new Date(value).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
 
 export default function ProfileClient() {
     const { user, updateUser, checkUser, logout } = useAuth();
@@ -342,10 +353,8 @@ export default function ProfileClient() {
                             </span>
                         </span>
                         <span className={styles.settingDesc}>
-                            {billingStatus?.subscription?.current_period_end
-                                ? billingStatus.subscription.status === 'non_renewing'
-                                    ? `Ends ${new Date(billingStatus.subscription.current_period_end).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })} , won't renew`
-                                    : `Renews ${new Date(billingStatus.subscription.current_period_end).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}`
+                            {billingStatus?.plan && billingStatus.plan !== 'free'
+                                ? `Your ${billingStatus.plan.charAt(0).toUpperCase()}${billingStatus.plan.slice(1)} plan`
                                 : 'Library courses, certificates & community are always free'}
                         </span>
                     </div>
@@ -365,27 +374,75 @@ export default function ProfileClient() {
                         <Link href="/pricing" className={styles.upgradeLink}>Upgrade</Link>
                     )}
                 </div>
+                {(() => {
+                    // Transparent billing dates for paid plans: when the current
+                    // period ends, and whether that means a charge or an ending.
+                    const sub = billingStatus?.subscription;
+                    if (!sub || !sub.current_period_end || billingStatus.plan === 'free') return null;
+                    const endDate = formatLongDate(sub.current_period_end);
+                    const charge = planPrice(sub.tier, sub.interval);
+                    return (
+                        <div className={styles.billingDates}>
+                            {sub.status === 'non_renewing' ? (
+                                <>
+                                    <div className={styles.billingDateRow}>
+                                        <span>Plan ends</span>
+                                        <span className={styles.billingDateValue}>{endDate}</span>
+                                    </div>
+                                    <div className={styles.billingDateRow}>
+                                        <span>Next charge</span>
+                                        <span className={styles.billingDateValue}>None — you won&apos;t be charged again</span>
+                                    </div>
+                                </>
+                            ) : sub.status === 'past_due' ? (
+                                <div className={styles.billingDateRow}>
+                                    <span>Payment overdue</span>
+                                    <span className={styles.billingDateValue}>We&apos;re retrying your card — your plan stays active meanwhile</span>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className={styles.billingDateRow}>
+                                        <span>Renews</span>
+                                        <span className={styles.billingDateValue}>{endDate}</span>
+                                    </div>
+                                    <div className={styles.billingDateRow}>
+                                        <span>Next charge</span>
+                                        <span className={styles.billingDateValue}>
+                                            {charge != null ? `${formatNaira(charge)} on ${endDate}` : endDate}
+                                        </span>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    );
+                })()}
                 {billingStatus?.usage && (
                     <div className={styles.usageList}>
                         {[
-                            { key: 'course_generations', label: 'Custom courses' },
                             { key: 'chat_messages', label: 'Tutor messages' },
                             { key: 'screen_tutor_questions', label: 'Screen tutor' },
                         ].map(({ key, label }) => {
                             const metric = billingStatus.usage[key];
                             if (!metric) return null;
+                            // Max is sold as unlimited — show that, even though a high
+                            // abuse-guard limit exists under the hood.
+                            const unlimited = billingStatus.plan === 'max';
                             const pct = Math.min(100, Math.round((metric.used / metric.limit) * 100));
                             return (
                                 <div key={key} className={styles.usageRow}>
                                     <div className={styles.usageHeader}>
                                         <span>{label}</span>
                                         <span className={styles.usageCount}>
-                                            {metric.used} / {metric.limit} this {metric.period === 'daily' ? 'day' : 'month'}
+                                            {unlimited
+                                                ? 'Unlimited'
+                                                : `${metric.used} / ${metric.limit} this ${metric.period === 'daily' ? 'day' : 'month'}`}
                                         </span>
                                     </div>
-                                    <div className={styles.usageMeter}>
-                                        <div className={styles.usageMeterFill} style={{ width: `${pct}%` }} />
-                                    </div>
+                                    {!unlimited && (
+                                        <div className={styles.usageMeter}>
+                                            <div className={styles.usageMeterFill} style={{ width: `${pct}%` }} />
+                                        </div>
+                                    )}
                                 </div>
                             );
                         })}

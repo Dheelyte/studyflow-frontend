@@ -179,31 +179,31 @@ export default function HomeClient({ featuredCourses = [] }) {
                         {
                             icon: <SearchIcon size={28} />,
                             title: "Type what you want to learn",
-                            description: "One sentence , 'data analysis', 'Rust foundations', 'UI/UX design'. Primerly pulls the right YouTube videos and orders them into a focused, end-to-end course so you stop bouncing between random tutorials.",
+                            description: "Primerly pulls the right YouTube videos and orders them into a focused, end-to-end course so you stop bouncing between random tutorials.",
                             scene: "setYourGoal",
                         },
                         {
                             icon: <VideoIcon size={28} />,
                             title: "Learn with your AI tutor",
-                            description: "Every video has a tutor sitting next to it. Ask anything at any timestamp and it answers in context , grounded in what was just said on screen, not a generic web search.",
+                            description: "Your AI Tutor can see your screen and your current lesson. Ask anything at any time and it answers in context, grounded in what it sees, not a generic web search.",
                             scene: "learnWithAITutor",
                         },
                         {
                             icon: <CheckCircleIcon size={28} />,
-                            title: "Prove it with quizzes",
-                            description: "Each module ends with an AI-generated quiz tied to the videos you just watched. Move on only when you've actually got it , no more illusion of progress.",
+                            title: "Prove it with quizzes and projects",
+                            description: "Each module ends with a quiz and practice project tied to the videos you just watched. Move on only when you've actually got it.",
                             scene: "quiz",
                         },
                         {
                             icon: <ZapIcon size={28} />,
-                            title: "Earn a verifiable certificate",
+                            title: "Stay consistent",
                             description: "Streaks, XP, and a progress map keep you moving. Finish every topic and pass every quiz, and you walk away with a shareable Certificate of Completion anyone can verify.",
                             scene: "gamifiedMotivation",
                         },
                         {
                             icon: <MessageSquareIcon size={28} />,
                             title: "Stay accountable with community",
-                            description: "Drop questions in topic channels and compare paths with people learning the same thing on YouTube. Less of the lonely tab-hopping, more of the 'we figured it out together'.",
+                            description: "Drop questions in topic channels and compare paths with people learning the same thing.",
                             scene: "communityQuestion",
                         },
                     ].map((card, i) => (

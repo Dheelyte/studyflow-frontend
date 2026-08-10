@@ -604,6 +604,30 @@ input:checked+.slider:before {
     cursor: default;
 }
 
+.billingDates {
+    display: grid;
+    gap: 8px;
+    padding: 12px 0;
+    margin-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+}
+
+.billingDateRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    font-size: 0.85rem;
+    color: var(--secondary);
+}
+
+.billingDateValue {
+    color: var(--foreground);
+    font-weight: 600;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
 .usageList {
     display: grid;
     gap: 14px;
