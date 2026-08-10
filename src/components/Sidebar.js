@@ -6,10 +6,12 @@ import { useRouter } from 'next/navigation';
 import styles from './Sidebar.module.css';
 import { HomeIcon, LibraryIcon, ChevronLeft, ChevronRight, XIcon, LaptopIcon, UserIcon, SunIcon, MoonIcon, UsersIcon, SearchIcon, StarIcon } from './Icons';
 import { useAuth } from '@/context/AuthContext';
+import { planLabel } from './PlanBadge';
+import badgeStyles from './PlanBadge.module.css';
 
 export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse, isMobile }) {
     const router = useRouter();
-    const { user, logout } = useAuth();
+    const { user, logout, isPaid, plan } = useAuth();
 
 
     const handleNavClick = () => {
@@ -98,11 +100,23 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
                         <span>Profile</span>
                     </Link>
 
-                    {/* Pricing is public , no auth gate */}
-                    <Link href="/pricing" className={styles.navItem} onClick={handleNavClick} title="Pricing">
-                        <StarIcon />
-                        <span>Pricing</span>
-                    </Link>
+                    {/* Paid users see their plan as a badge (→ manage on profile);
+                        everyone else gets the Upgrade link. Public, no auth gate. */}
+                    {isPaid ? (
+                        <Link href="/profile" className={styles.navItem} onClick={handleNavClick} title="Your plan">
+                            <StarIcon />
+                            <span>
+                                <span className={`${badgeStyles.badge} ${plan === 'max' ? badgeStyles.max : badgeStyles.pro}`}>
+                                    {planLabel(plan)}
+                                </span>
+                            </span>
+                        </Link>
+                    ) : (
+                        <Link href="/pricing" className={styles.navItem} onClick={handleNavClick} title="Pricing">
+                            <StarIcon />
+                            <span>Upgrade</span>
+                        </Link>
+                    )}
 
                 </nav>
 

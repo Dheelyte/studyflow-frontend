@@ -1,0 +1,42 @@
+.badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 999px;
+    text-decoration: none;
+    line-height: 1.4;
+}
+
+.pro {
+    color: var(--primary);
+    background: rgba(99, 102, 241, 0.12);
+    border: 1px solid rgba(99, 102, 241, 0.35);
+}
+
+/* Max reads as the premium tier — a warmer, filled treatment. */
+.max {
+    color: #ffffff;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    border: 1px solid transparent;
+}
+
+.upgrade {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #ffffff;
+    background: var(--primary);
+    padding: 7px 16px;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.upgrade:hover {
+    background: var(--primary-hover);
+}

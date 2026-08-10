@@ -44,6 +44,7 @@ export default function ClientLayout({ children }) {
     pathname?.startsWith('/forgot-password') ||
     pathname?.startsWith('/reset-password') ||
     pathname === '/' ||
+    pathname === '/pricing' ||
     pathname === '/about' ||
     pathname === '/contact' ||
     pathname === '/privacy-policy' ||

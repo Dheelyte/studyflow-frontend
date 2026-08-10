@@ -57,11 +57,8 @@ export default function StatShareModal({ isOpen, onClose, stats, user }) {
                 {/* The rendering container - this is what gets captured */}
                 <div className={styles.previewContainer}>
                     <div className={styles.shareCard} ref={cardRef}>
-                        {/* Background abstract shapes */}
-                        <div className={styles.gradientBg}></div>
-                        <div className={styles.confetti1}></div>
-                        <div className={styles.confetti2}></div>
-                        <div className={styles.confetti3}></div>
+                        {/* Subtle brand dot-grid texture, same pattern as the landing CTA */}
+                        <div className={styles.gridTexture}></div>
 
                         <div className={styles.cardHeader}>
                             <div className={styles.funTagline}>

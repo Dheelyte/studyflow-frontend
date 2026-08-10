@@ -28,7 +28,7 @@ function getColorForAuthor(author) {
     return PASTEL_COLORS[index];
 }
 
-export default function PostCard({ id, author, time, content, likes: initialLikesProp, likes_count, comments: initialComments, liked: initialLikedProp, liked_by_user, commentsCount: initialCount }) {
+export default function PostCard({ id, author, time, content, likes: initialLikesProp, likes_count, comments: initialComments, liked: initialLikedProp, liked_by_user, commentsCount: initialCount, community_name, showCommunity = false }) {
     const { requireAuth } = useCommunity(); // Use auth helper
 
     // Fallback for backward compatibility or different API shapes
@@ -190,18 +190,19 @@ export default function PostCard({ id, author, time, content, likes: initialLike
             padding: '24px',
             marginBottom: '0px'
         }}>
-           <div style={{display:'flex', gap:'12px', marginBottom:'16px'}}>
+           <div style={{display:'flex', gap:'12px', marginBottom:'16px', alignItems:'center'}}>
                <div style={{
-                   width:'40px', 
-                   height:'40px', 
-                   borderRadius:'50%', 
+                   width:'40px',
+                   height:'40px',
+                   borderRadius:'50%',
                    background: getColorForAuthor(author),
                    display: 'flex',
                    alignItems: 'center',
                    justifyContent: 'center',
                    color: 'white',
                    fontWeight: 'bold',
-                   fontSize: '0.9rem'
+                   fontSize: '0.9rem',
+                   flexShrink: 0
                }}>
                    {author ? author.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : '?'}
                </div>
@@ -209,6 +210,21 @@ export default function PostCard({ id, author, time, content, likes: initialLike
                    <div style={{fontWeight:'700'}}>{author}</div>
                    <div style={{fontSize:'0.8rem', color:'var(--secondary)'}}>{time}</div>
                </div>
+               {/* Only on the general feed — inside a community the name is obvious. */}
+               {showCommunity && community_name && (
+                   <span style={{
+                       marginLeft: 'auto',
+                       fontSize: '0.75rem',
+                       fontWeight: '600',
+                       color: 'var(--primary)',
+                       background: 'var(--primary-soft, rgba(99,102,241,0.1))',
+                       padding: '4px 10px',
+                       borderRadius: '999px',
+                       whiteSpace: 'nowrap'
+                   }}>
+                       {community_name}
+                   </span>
+               )}
            </div>
 
            <div style={{fontSize:'1rem', lineHeight:'1.6', marginBottom:'24px', color:'var(--foreground)'}}>

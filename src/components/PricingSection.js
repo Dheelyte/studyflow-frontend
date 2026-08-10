@@ -74,11 +74,6 @@ export default function PricingSection() {
                     );
                 })}
             </div>
-
-            <p className={styles.honesty}>
-                Nothing you can learn is locked behind a paid plan , courses, certificates, and
-                community stay free. <Link href="/pricing">Compare plans →</Link>
-            </p>
         </section>
     );
 }

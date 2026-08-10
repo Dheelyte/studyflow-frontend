@@ -143,7 +143,7 @@ export default function CommunityClient() {
                         </div>
                     ) : (
                         posts.map(post => (
-                            <PostCard key={post.id} {...post} />
+                            <PostCard key={post.id} {...post} showCommunity />
                         ))
                     )}
                 </>

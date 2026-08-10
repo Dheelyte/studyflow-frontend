@@ -7,9 +7,21 @@ import styles from './IntegratedSearchBar.module.css';
 
 // Library-first: typing searches the public course gallery; generating a
 // custom course is the explicit fallback row at the bottom of the dropdown.
-export default function IntegratedSearchBar({ redirect = false, onSearch, shadow = true }) {
+// `value`/`onValueChange` are optional: pass them to drive the input from
+// outside (the landing hero's topic pills do). Omit them and the bar keeps its
+// own state, so existing usages are unchanged.
+export default function IntegratedSearchBar({
+    redirect = false,
+    onSearch,
+    shadow = true,
+    value,
+    onValueChange,
+    inputRef,
+}) {
     const router = useRouter();
-    const [themeQuery, setQuery] = useState('');
+    const [internalQuery, setInternalQuery] = useState('');
+    const isControlled = value !== undefined;
+    const themeQuery = isControlled ? value : internalQuery;
     const [results, setResults] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const [activeIndex, setActiveIndex] = useState(-1);
@@ -34,15 +46,25 @@ export default function IntegratedSearchBar({ redirect = false, onSearch, shadow
             });
     }, []);
 
-    const handleChange = (value) => {
-        setQuery(value);
+    const setQuery = useCallback((next) => {
+        if (!isControlled) setInternalQuery(next);
+        if (onValueChange) onValueChange(next);
+    }, [isControlled, onValueChange]);
+
+    const handleChange = (next) => {
+        setQuery(next);
         setActiveIndex(-1);
-        setIsOpen(!!value.trim());
-        clearTimeout(debounceRef.current);
-        debounceRef.current = setTimeout(() => searchLibrary(value), 300);
+        setIsOpen(!!next.trim());
     };
 
-    useEffect(() => () => clearTimeout(debounceRef.current), []);
+    // Debounce off the query itself rather than off the keystroke, so a value
+    // set from outside searches the library exactly like typing does.
+    useEffect(() => {
+        clearTimeout(debounceRef.current);
+        if (themeQuery.trim().length >= 2) setIsOpen(true);
+        debounceRef.current = setTimeout(() => searchLibrary(themeQuery), 300);
+        return () => clearTimeout(debounceRef.current);
+    }, [themeQuery, searchLibrary]);
 
     // Close the dropdown when clicking outside
     useEffect(() => {
@@ -115,6 +137,7 @@ export default function IntegratedSearchBar({ redirect = false, onSearch, shadow
                     </div>
 
                     <input
+                        ref={inputRef}
                         type="text"
                         className={styles.searchInput}
                         placeholder='Try "React", "SQL", or "UI/UX design"'

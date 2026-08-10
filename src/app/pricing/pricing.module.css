@@ -77,9 +77,8 @@
     margin: 0 0 24px;
 }
 
-/* Explicit 3-up rather than auto-fit: this page renders inside the 260px
-   sidebar, so the container is much narrower than the viewport and auto-fit
-   silently orphaned the third tier onto its own row. */
+/* Explicit 3-up rather than auto-fit, which silently orphaned the third tier
+   onto its own row. The three tiers only make sense compared side by side. */
 .plans {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -87,7 +86,9 @@
     align-items: start;
 }
 
-@media (max-width: 1100px) {
+/* Stacks only once three columns would genuinely be cramped. The page renders
+   full-width (no sidebar), so the container tracks the viewport closely. */
+@media (max-width: 860px) {
     .plans {
         grid-template-columns: 1fr;
         max-width: 420px;

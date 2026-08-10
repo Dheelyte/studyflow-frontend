@@ -91,69 +91,33 @@
     width: 500px;
     height: 500px;
     flex-shrink: 0;
-    /* Vibrant modern gradient */
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%);
+    /* Deep slate-indigo — a chosen neutral biased toward the brand accent — with
+       a single soft indigo glow from the top. Intentional, not a rainbow. */
+    background:
+        radial-gradient(115% 90% at 50% -10%, rgba(99, 102, 241, 0.32) 0%, transparent 55%),
+        #0e1424;
     border-radius: 24px;
     position: relative;
     overflow: hidden;
-    color: #fff;
-    font-family: 'Inter', sans-serif;
+    color: #f5f7fb;
+    font-family: "Google Sans", system-ui, -apple-system, sans-serif;
     display: flex;
     flex-direction: column;
     padding: 40px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
-    border: 4px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.35), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     align-items: center;
     text-align: center;
 }
 
-/* Background Effects */
-.gradientBg {
+/* Primerly's dot-grid texture (mirrors the landing CTA). No mask — html2canvas
+   rasterizes this card and mask-image doesn't capture reliably. */
+.gridTexture {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background:
-        radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.2) 0%, transparent 20%),
-        radial-gradient(circle at 90% 90%, rgba(255, 255, 255, 0.1) 0%, transparent 20%);
+    inset: 0;
+    background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.06) 1px, transparent 0);
+    background-size: 22px 22px;
     pointer-events: none;
-}
-
-.confetti1 {
-    position: absolute;
-    width: 15px;
-    height: 15px;
-    background: #facc15;
-    top: 20%;
-    left: 10%;
-    transform: rotate(15deg);
-    border-radius: 3px;
-    opacity: 0.6;
-}
-
-.confetti2 {
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    background: #34d399;
-    top: 15%;
-    right: 15%;
-    transform: rotate(-25deg);
-    border-radius: 50%;
-    opacity: 0.6;
-}
-
-.confetti3 {
-    position: absolute;
-    width: 10px;
-    height: 20px;
-    background: #60a5fa;
-    bottom: 20%;
-    left: 15%;
-    transform: rotate(45deg);
-    border-radius: 20px;
-    opacity: 0.5;
 }
 
 .cardHeader {
@@ -176,20 +140,20 @@
     position: relative;
     z-index: 10;
     margin-bottom: 24px;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(8px);
+    background: rgba(255, 255, 255, 0.05);
     border-radius: 20px;
     padding: 24px 48px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
 }
 
 .mainStatValue {
     font-size: 5rem;
     font-weight: 900;
     line-height: 0.9;
-    color: #fff;
-    text-shadow: 0 4px 0 rgba(79, 70, 229, 0.4);
+    /* Warm gold ties the headline number to the "on fire" streak theme. */
+    color: #fbbf24;
+    text-shadow: 0 0 24px rgba(251, 191, 36, 0.35);
 }
 
 .mainStatLabel {
@@ -245,7 +209,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.06);
     padding: 8px 16px 8px 8px;
     border-radius: 50px;
     position: relative;
@@ -298,7 +262,7 @@
     z-index: 10;
     font-size: 0.9rem;
     color: rgba(255, 255, 255, 0.9);
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.06);
     padding: 8px 16px;
     border-radius: 12px;
     width: 100%;

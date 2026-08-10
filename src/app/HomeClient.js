@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -17,6 +17,14 @@ const HowItWorksAnimation = dynamic(() => import('@/components/HowItWorksAnimati
 export default function HomeClient({ featuredCourses = [] }) {
     const router = useRouter();
     const [scrolled, setScrolled] = useState(false);
+    // Owned here so the scrolling skill pills can fill the hero search box.
+    const [heroQuery, setHeroQuery] = useState('');
+    const heroInputRef = useRef(null);
+
+    const pickExample = (example) => {
+        setHeroQuery(example);
+        heroInputRef.current?.focus();
+    };
 
     useEffect(() => {
         const scroller = document.querySelector('main');
@@ -121,15 +129,27 @@ export default function HomeClient({ featuredCourses = [] }) {
                     <div className={styles.marqueeContainer} style={{ maxWidth: '900px', margin: '0 auto', maskImage: 'linear-gradient(to right, transparent, black 20%, black 80%, transparent)' }}>
                         <div className={styles.marqueeTrack} style={{ animationDuration: '60s' }}>
                             {marqueeExamples.map((ex, i) => (
-                                <span key={`${ex}-${i}`} className={styles.examplePill} style={{ whiteSpace: 'nowrap' }}>
+                                <button
+                                    key={`${ex}-${i}`}
+                                    type="button"
+                                    className={styles.examplePill}
+                                    style={{ whiteSpace: 'nowrap' }}
+                                    onClick={() => pickExample(ex)}
+                                    aria-label={`Search for ${ex}`}
+                                >
                                     {ex}
-                                </span>
+                                </button>
                             ))}
                         </div>
                     </div>
                 </FadeIn>
 
-                <IntegratedSearchBar onSearch={handleSearch} />
+                <IntegratedSearchBar
+                    onSearch={handleSearch}
+                    value={heroQuery}
+                    onValueChange={setHeroQuery}
+                    inputRef={heroInputRef}
+                />
             </section>
 
             {/* 2. PUBLISHED COURSES , only rendered when real published courses exist */}

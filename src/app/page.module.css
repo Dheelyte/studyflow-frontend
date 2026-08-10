@@ -1138,12 +1138,19 @@
     border: 2px solid var(--foreground);
     padding: 6px 14px;
     border-radius: 99px;
+    /* Buttons don't inherit the page font — these are <button> so clicking one
+       fills the hero search box. */
+    font-family: inherit;
     font-size: 0.85rem;
     font-weight: 600;
     color: var(--foreground);
     box-shadow: 2px 2px 0 var(--foreground);
     transition: transform 0.12s ease, box-shadow 0.12s ease;
-    cursor: default;
+}
+
+.examplePill:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
 }
 
 .examplePill:nth-child(6n+1) { background: #fef3c7; }
