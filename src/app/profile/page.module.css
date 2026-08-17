@@ -243,32 +243,31 @@
     min-width: max-content;
 }
 
+/* Same column track as the grid below (set inline, since the week count comes
+   from the data), so each label sits over the week its month starts in. */
 .monthLabels {
     height: 16px;
     line-height: 16px;
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-auto-rows: 16px;
+    gap: 4px;
     font-size: 0.75rem;
     color: var(--secondary);
-    padding: 0 4px;
-    margin-left: -10px;
-    /* Slight offset adjustment */
+}
+
+/* A label is wider than its 14px column , let it run over the columns to its
+   right rather than wrap or stretch them. */
+.monthLabels span {
+    grid-row: 1;
+    white-space: nowrap;
 }
 
 .heatmapGrid {
     display: grid;
-    /* Use auto-fill or just large number of columns */
-    grid-template-columns: repeat(auto-fill, minmax(14px, 1fr));
-    /* Force specific flow */
+    /* Columns are set inline: one per week of data. */
     grid-template-rows: repeat(7, 14px);
     grid-auto-flow: column;
     gap: 4px;
-}
-
-/* Override grid columns to be dynamic based on content length or large enough fixed */
-.heatmapGrid {
-    grid-template-columns: repeat(54, 14px);
-    /* 54 weeks cover a year + padding */
 }
 
 

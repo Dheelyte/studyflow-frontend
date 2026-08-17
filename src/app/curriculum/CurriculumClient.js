@@ -8,6 +8,7 @@ import styles from "./page.module.css";
 import { useAuth } from "@/context/AuthContext";
 import { useRedirectState } from "@/hooks/useRedirectState";
 import ShareModal from "@/components/ShareModal";
+import { ProjectTeaser } from "@/components/ProjectPanel";
 import Link from "next/link";
 import { PlayIcon, ClockIcon, ChevronDown, ChevronUp, ZapIcon, ShareIcon, CheckCircleIcon, VideoIcon, TrophyIconSimple, TrendingUpIcon } from "@/components/Icons";
 
@@ -362,15 +363,22 @@ export default function CurriculumClient() {
                                                 </div>
                                             </div>
                                         ))}
+                                        {/* Nothing here is playable until the course exists, so every
+                                            card points back at "Start Learning" like the topics do. */}
                                         <div style={{ marginTop: '1.5rem' }}>
-                                            <button className={styles.resourceCard} style={{
-                                                width: '100%',
-                                                background: 'linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,165,0,0.05))',
-                                                border: '1px solid rgba(255,215,0,0.3)',
-                                                justifyContent: 'flex-start',
-                                                gap: '12px',
-                                                cursor: 'pointer', textAlign: 'left', padding: '16px'
-                                            }} onClick={() => alert("Quiz feature coming soon!")}>
+                                            <button
+                                                className={styles.resourceCard}
+                                                style={{
+                                                    width: '100%',
+                                                    background: 'linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,165,0,0.05))',
+                                                    border: '1px solid rgba(255,215,0,0.3)',
+                                                    justifyContent: 'flex-start',
+                                                    gap: '12px',
+                                                    cursor: 'pointer', textAlign: 'left', padding: '16px'
+                                                }}
+                                                onClick={handleTopicClick}
+                                                title="Click 'Start Learning' to create your course first"
+                                            >
                                                 <div className={styles.resourceIcon} style={{ background: 'rgba(255,215,0,0.2)', color: '#ffd700' }}>
                                                     <TrophyIconSimple size={20} />
                                                 </div>
@@ -379,6 +387,13 @@ export default function CurriculumClient() {
                                                     <span style={{ fontSize: '0.85rem', color: 'var(--secondary)' }}>Take the {module.module_title} Quiz</span>
                                                 </div>
                                             </button>
+                                        </div>
+
+                                        <div className={styles.moduleProject}>
+                                            <ProjectTeaser
+                                                kind="practice"
+                                                onClick={handleTopicClick}
+                                            />
                                         </div>
                                     </div>
                                 )}

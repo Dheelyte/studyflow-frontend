@@ -239,6 +239,22 @@ export function SendIcon({ size = 24, fill = "currentColor", ...props }) {
   );
 }
 
+export const SlidersIcon = ({ size = 24, className }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <line x1="3" y1="7" x2="21" y2="7"></line>
+    <line x1="3" y1="17" x2="21" y2="17"></line>
+    <circle cx="9" cy="7" r="2.5"></circle>
+    <circle cx="16" cy="17" r="2.5"></circle>
+  </svg>
+);
+
+export const LockIcon = ({ size = 24, className }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+  </svg>
+);
+
 export const TerminalIcon = ({ size = 24, className }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
     <polyline points="4 17 10 11 4 5"></polyline>

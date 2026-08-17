@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import styles from './page.module.css';
 import { ZapIcon, StarIcon, TrophyIconSimple, ShareIcon } from '@/components/Icons';
 import { useAuth } from '@/context/AuthContext';
@@ -35,19 +35,6 @@ export default function ProfileClient() {
         totalXp: user?.total_xp || 0,
         title: user?.level_name || "Novice"
     };
-
-    const getLast12Months = () => {
-        const months = [];
-        const date = new Date();
-        date.setDate(1);
-        for (let i = 0; i < 12; i++) {
-            months.unshift(date.toLocaleString('default', { month: 'short' }));
-            date.setMonth(date.getMonth() - 1);
-        }
-        return months;
-    };
-
-    const monthLabels = getLast12Months();
 
     const [heatmapData, setHeatmapData] = useState([]);
     const [tooltipData, setTooltipData] = useState({ visible: false, x: 0, y: 0, count: 0, date: "" });
@@ -170,6 +157,43 @@ export default function ProfileClient() {
         }
     }, [heatmapData]);
 
+    // The grid runs a week per column, Sunday-first, so a month label belongs
+    // over the column whose first day is in that month , not spread evenly
+    // across the year, which drifts because months are 4 or 5 columns wide.
+    const { weekCount, monthMarkers } = useMemo(() => {
+        if (!heatmapData.length) return { weekCount: 0, monthMarkers: [] };
+
+        const weeks = Math.ceil(heatmapData.length / 7);
+        const markers = [];
+        let lastMonth = null;
+
+        for (let week = 0; week < weeks; week += 1) {
+            const firstOfWeek = heatmapData[week * 7];
+            if (!firstOfWeek) break;
+            // Parse as local time: `new Date('2026-08-17')` would be UTC and
+            // could land on the previous day west of Greenwich.
+            const date = new Date(`${firstOfWeek.date}T00:00:00`);
+            const month = date.getMonth();
+            if (month === lastMonth) continue;
+            lastMonth = month;
+
+            const previous = markers[markers.length - 1];
+            // Skip labels that would collide with the previous one, and the
+            // last stub column that has no room to render the text.
+            if ((!previous || week - previous.week >= 3) && week <= weeks - 2) {
+                markers.push({
+                    week,
+                    label: date.toLocaleString('default', { month: 'short' }),
+                });
+            }
+        }
+
+        return { weekCount: weeks, monthMarkers: markers };
+    }, [heatmapData]);
+
+    // Both rows are laid out on these columns, which is what keeps them aligned.
+    const heatmapColumns = { gridTemplateColumns: `repeat(${weekCount}, 14px)` };
+
     const defaultName = "Learner";
     const defaultHandle = "@learner";
     const defaultBio = "Learning every day.";
@@ -280,14 +304,16 @@ export default function ProfileClient() {
                     <div className={styles.heatmapScrollWrapper} ref={scrollRef}>
                         <div className={styles.heatmapInnerContent}>
                             {/* Month Labels */}
-                            <div className={styles.monthLabels}>
-                                {monthLabels.map((month, i) => (
-                                    <span key={i}>{month}</span>
+                            <div className={styles.monthLabels} style={heatmapColumns}>
+                                {monthMarkers.map((marker) => (
+                                    <span key={marker.week} style={{ gridColumnStart: marker.week + 1 }}>
+                                        {marker.label}
+                                    </span>
                                 ))}
                             </div>
 
                             {/* Grid */}
-                            <div className={styles.heatmapGrid}>
+                            <div className={styles.heatmapGrid} style={heatmapColumns}>
                                 {heatmapData.map((dayData, i) => (
                                     <div
                                         key={i}

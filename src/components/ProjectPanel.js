@@ -2,8 +2,70 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { projects, communities, posts } from '@/services/api';
-import { CodeIcon, StarIcon } from '@/components/Icons';
+import { CodeIcon, StarIcon, LockIcon } from '@/components/Icons';
 import styles from './ProjectPanel.module.css';
+
+const LABELS = {
+    practice: 'Practice project',
+    capstone: 'Capstone project',
+};
+
+const HINTS = {
+    practice: 'Apply what you just learned →',
+    capstone: 'Build something you can show →',
+};
+
+const LOCKED_HINTS = {
+    practice: 'Finish this module to unlock',
+    capstone: 'Finish every module to unlock',
+};
+
+// The card in its unopened state. Shared so the curriculum preview shows the
+// same project card the course page does, and so a locked project reads as the
+// same thing waiting to be earned.
+export function ProjectTeaser({ kind = 'practice', onClick, locked = false, hint }) {
+    const isCapstone = kind === 'capstone';
+    const text = hint || (locked ? LOCKED_HINTS[kind] : HINTS[kind]);
+
+    return (
+        <button
+            type="button"
+            className={[
+                styles.openButton,
+                isCapstone ? styles.openCapstone : styles.openPractice,
+                locked ? styles.openLocked : '',
+            ].join(' ')}
+            onClick={locked ? undefined : onClick}
+            aria-disabled={locked}
+            title={locked ? text : undefined}
+        >
+            <span className={styles.openIcon}>
+                {locked ? (
+                    <LockIcon size={18} />
+                ) : isCapstone ? (
+                    <StarIcon size={20} fill="currentColor" />
+                ) : (
+                    <CodeIcon size={20} />
+                )}
+            </span>
+            <span className={styles.openText}>
+                <span className={styles.openLabel}>{LABELS[kind]}</span>
+                <span className={styles.openHint}>{text}</span>
+            </span>
+        </button>
+    );
+}
+
+// Three dots that cycle while a project is being designed.
+function EllipsisLoader() {
+    return (
+        <span className={styles.ellipsis} aria-hidden>
+            <span />
+            <span />
+            <span />
+        </span>
+    );
+}
 
 function ShareToCommunity({ project }) {
     const [open, setOpen] = useState(false);
@@ -84,7 +146,7 @@ function ShareToCommunity({ project }) {
     );
 }
 
-export default function ProjectPanel({ kind = 'practice', load }) {
+export default function ProjectPanel({ kind = 'practice', load, locked = false, lockedHint }) {
     const isCapstone = kind === 'capstone';
     const [project, setProject] = useState(null);
     const [open, setOpen] = useState(false);
@@ -137,25 +199,15 @@ export default function ProjectPanel({ kind = 'practice', load }) {
 
     const saveSubmission = () => persist({ submission_url: url, notes });
 
-    const label = isCapstone ? 'Capstone project' : 'Practice project';
+    const label = LABELS[kind];
+
+    // Nothing is fetched while locked: the brief is the reward for finishing.
+    if (locked) {
+        return <ProjectTeaser kind={kind} locked hint={lockedHint} />;
+    }
 
     if (!open) {
-        return (
-            <button
-                className={`${styles.openButton} ${isCapstone ? styles.openCapstone : styles.openPractice}`}
-                onClick={openPanel}
-            >
-                <span className={styles.openIcon}>
-                    {isCapstone ? <StarIcon size={20} fill="currentColor" /> : <CodeIcon size={20} />}
-                </span>
-                <span className={styles.openText}>
-                    <span className={styles.openLabel}>{label}</span>
-                    <span className={styles.openHint}>
-                        {isCapstone ? 'Build something you can show →' : 'Apply what you just learned →'}
-                    </span>
-                </span>
-            </button>
-        );
+        return <ProjectTeaser kind={kind} onClick={openPanel} />;
     }
 
     if (loading) {
@@ -163,7 +215,10 @@ export default function ProjectPanel({ kind = 'practice', load }) {
             <div className={styles.panel}>
                 <div className={styles.kicker}>{label}</div>
                 <p className={styles.generating}>
-                    Designing your project… this takes a few seconds the first time.
+                    Designing your project<EllipsisLoader />
+                    <span className={styles.generatingNote}>
+                        This takes a few seconds the first time.
+                    </span>
                 </p>
             </div>
         );

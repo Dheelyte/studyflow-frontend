@@ -18,6 +18,10 @@
        nothing else needs the hero to hide overflow. */
     overflow: visible;
     isolation: isolate;
+    /* Above the sections below it: each feature card is transformed by FadeIn,
+       which makes it a stacking context that would otherwise paint over the
+       search bar's Customize panel where it hangs past the hero. */
+    z-index: 2;
     background-color: var(--background);
     gap: 32px;
 }
@@ -703,6 +707,74 @@
     font-style: italic;
 }
 
+/* --- Review cards: only rendered once real learner reviews exist --- */
+
+.reviewStars {
+    color: #f59e0b;
+    font-size: 1rem;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+}
+
+/* Marks an illustrative card, matching the "example post" convention used by
+   the community section further down the page. */
+.exampleTag {
+    display: inline-block;
+    margin-bottom: 16px;
+    padding: 3px 10px;
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--secondary);
+}
+
+.reviewRule {
+    display: block;
+    width: 44px;
+    height: 3px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.reviewAuthor {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.reviewAvatar {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 800;
+    font-size: 1rem;
+}
+
+.reviewAuthorText {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.reviewName {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--foreground);
+}
+
+.reviewRole {
+    font-size: 0.82rem;
+    color: var(--secondary);
+}
+
 /* Hero Footer Fix */
 .heroFooter {
     margin-top: 24px;
@@ -768,6 +840,26 @@
     background: var(--card);
     border-top: 1px solid var(--border);
     padding: 80px 24px 40px;
+    /* The wordmark is sized to the viewport, so clip rather than let a
+       rounding difference give the page a horizontal scrollbar. */
+    overflow: hidden;
+}
+
+/* Full-bleed wordmark across the top of the footer. Sized in vw so it spans
+   the page at every width; it sits behind the footer's own branding, so it is
+   aria-hidden and deliberately low-contrast. */
+.footerWordmark {
+    margin: -28px -24px 28px;
+    font-size: 27.5vw;
+    line-height: 0.86;
+    font-weight: 900;
+    letter-spacing: -0.045em;
+    text-align: center;
+    white-space: nowrap;
+    color: var(--foreground);
+    opacity: 0.07;
+    user-select: none;
+    pointer-events: none;
 }
 
 .footerGrid {

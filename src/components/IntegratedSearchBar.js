@@ -1,7 +1,7 @@
 "use client";
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { SearchIcon, ZapIcon } from "@/components/Icons";
+import { SearchIcon, ZapIcon, SlidersIcon } from "@/components/Icons";
 import CustomDropdown from '@/components/CustomDropdown';
 import styles from './IntegratedSearchBar.module.css';
 
@@ -41,6 +41,37 @@ export default function IntegratedSearchBar({
     const themeQuery = isControlled ? value : internalQuery;
     const [durationWeeks, setDurationWeeks] = useState('');
     const [level, setLevel] = useState('');
+    // Collapsed by default: the point of the button is to say these exist and
+    // are optional, rather than putting two more controls in everyone's way.
+    const [customizeOpen, setCustomizeOpen] = useState(false);
+    // Opens upward when the window is too short for it to sit below the bar,
+    // which is common on laptop heights and would otherwise leave the last
+    // field under the fold.
+    const [dropUp, setDropUp] = useState(false);
+    const customizeRef = useRef(null);
+    const customizeButtonRef = useRef(null);
+
+    const customCount = (durationWeeks ? 1 : 0) + (level ? 1 : 0);
+
+    useEffect(() => {
+        if (!customizeOpen) return;
+
+        const onPointerDown = (e) => {
+            if (customizeRef.current && !customizeRef.current.contains(e.target)) {
+                setCustomizeOpen(false);
+            }
+        };
+        const onKeyDown = (e) => {
+            if (e.key === 'Escape') setCustomizeOpen(false);
+        };
+
+        document.addEventListener('mousedown', onPointerDown);
+        document.addEventListener('keydown', onKeyDown);
+        return () => {
+            document.removeEventListener('mousedown', onPointerDown);
+            document.removeEventListener('keydown', onKeyDown);
+        };
+    }, [customizeOpen]);
 
     const setQuery = useCallback((next) => {
         if (!isControlled) setInternalQuery(next);
@@ -80,32 +111,83 @@ export default function IntegratedSearchBar({
                         ref={inputRef}
                         type="text"
                         className={styles.searchInput}
-                        placeholder='Try "React", "SQL", or "UI/UX design"'
+                        placeholder='Try Cloud computing, Video Editing, or UI/UX design'
                         value={themeQuery}
                         onChange={(e) => setQuery(e.target.value)}
                         onKeyDown={handleKeyDown}
                     />
                 </div>
 
-                <div className={styles.filters}>
+                <div className={styles.filters} ref={customizeRef}>
                     <span className={styles.filterDivider} aria-hidden />
-                    <CustomDropdown
-                        className={styles.filterDropdown}
-                        ariaLabel="Course duration"
-                        options={DURATION_OPTIONS}
-                        value={durationWeeks}
-                        onChange={setDurationWeeks}
-                        placeholder="Any duration"
-                    />
-                    <span className={styles.filterDivider} aria-hidden />
-                    <CustomDropdown
-                        className={styles.filterDropdown}
-                        ariaLabel="Experience level"
-                        options={LEVEL_OPTIONS}
-                        value={level}
-                        onChange={setLevel}
-                        placeholder="Beginner"
-                    />
+                    <button
+                        type="button"
+                        ref={customizeButtonRef}
+                        className={`${styles.customizeButton} ${customizeOpen || customCount ? styles.customizeActive : ''}`}
+                        onClick={() => {
+                            setCustomizeOpen((open) => {
+                                if (!open) {
+                                    const rect = customizeButtonRef.current?.getBoundingClientRect();
+                                    // Panel is ~215px tall plus its 14px offset.
+                                    setDropUp(!!rect && window.innerHeight - rect.bottom < 250);
+                                }
+                                return !open;
+                            });
+                        }}
+                        aria-expanded={customizeOpen}
+                        aria-haspopup="true"
+                    >
+                        <SlidersIcon size={18} />
+                        <span>Customize</span>
+                        {customCount > 0 && <span className={styles.customizeCount}>{customCount}</span>}
+                    </button>
+
+                    {customizeOpen && (
+                        <div className={`${styles.customizePanel} ${dropUp ? styles.customizePanelAbove : ''}`}>
+                            <div className={styles.customizeHeader}>
+                                <span className={styles.customizeTitle}>Customize your course</span>
+                                <span className={styles.customizeOptional}>Optional</span>
+                            </div>
+
+                            {/* Plain divs, not <label>: the dropdown is a button, and a
+                                label forwards clicks on its children to that button ,
+                                which would reopen the menu the moment an option closed
+                                it. The accessible name comes from ariaLabel instead. */}
+                            <div className={styles.customizeField}>
+                                <span className={styles.customizeLabel}>Learning duration</span>
+                                <CustomDropdown
+                                    className={styles.panelDropdown}
+                                    ariaLabel="Learning duration"
+                                    options={DURATION_OPTIONS}
+                                    value={durationWeeks}
+                                    onChange={setDurationWeeks}
+                                    placeholder="Standard Duration"
+                                />
+                            </div>
+
+                            <div className={styles.customizeField}>
+                                <span className={styles.customizeLabel}>Experience level</span>
+                                <CustomDropdown
+                                    className={styles.panelDropdown}
+                                    ariaLabel="Experience level"
+                                    options={LEVEL_OPTIONS}
+                                    value={level}
+                                    onChange={setLevel}
+                                    placeholder="Beginner"
+                                />
+                            </div>
+
+                            {customCount > 0 && (
+                                <button
+                                    type="button"
+                                    className={styles.customizeReset}
+                                    onClick={() => { setDurationWeeks(''); setLevel(''); }}
+                                >
+                                    Reset to default
+                                </button>
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 <button className={styles.searchButton} onClick={startCustomCourse}>

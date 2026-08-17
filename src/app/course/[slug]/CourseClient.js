@@ -406,6 +406,11 @@ export default function CourseClient({ params, publicCourse = null }) {
     // Stored capitalized on the playlist ("Beginner"); public payloads match.
     const courseLevel = curriculumData.level || null;
 
+    // The capstone is the last thing in the course, so it waits on every module.
+    const allModulesComplete =
+        (curriculumData.modules || []).length > 0 &&
+        curriculumData.modules.every((m) => m.is_module_completed);
+
     // The lesson the learner is up to , what the screen tutor assumes they're working on.
     const activeTopicId = (() => {
         for (const m of curriculumData.modules || []) {
@@ -687,8 +692,13 @@ export default function CourseClient({ params, publicCourse = null }) {
 
                                         {!isPreview && module.module_id !== undefined && (
                                             <div className={styles.moduleProject}>
+                                                {/* The project comes after everything else in the
+                                                    module, so it stays locked until the lessons and
+                                                    the quiz are done. */}
                                                 <ProjectPanel
                                                     kind="practice"
+                                                    locked={!module.is_module_completed}
+                                                    lockedHint="Finish this module's lessons and quiz to unlock"
                                                     load={() => projects.getModuleProject(module.module_id)}
                                                 />
                                             </div>
@@ -720,6 +730,8 @@ export default function CourseClient({ params, publicCourse = null }) {
                     ) : (
                         <ProjectPanel
                             kind="capstone"
+                            locked={!allModulesComplete}
+                            lockedHint="Finish every module to unlock"
                             load={() => projects.getCapstone(courseId)}
                         />
                     )}

@@ -105,6 +105,11 @@
     border-radius: 20px;
 }
 
+/* Matches the course page, so the preview lays the project card out the same. */
+.moduleProject {
+    margin-top: 16px;
+}
+
 /* Long single words have to break rather than spill out of the tile. */
 .courseImageTitle {
     font-size: 1.4rem;

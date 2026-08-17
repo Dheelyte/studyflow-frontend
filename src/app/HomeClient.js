@@ -57,35 +57,70 @@ export default function HomeClient({ featuredCourses = [] }) {
     ];
     const marqueeExamples = [...examples, ...examples];
 
+    // Real learner reviews. Paste them here once you have them , with the
+    // person's permission , and the section below switches from capability
+    // cards to a proper review wall. Shape:
+    //   { quote, name, role, rating, gradient }
+    const learnerReviews = [
+        {
+            quote: "The streak made me stay consistent.",
+            name: "Tunde O."
+        },
+        {
+            quote: "I'd started learning data analysis three times before I tried Primerly. First time I've ever stayed consistent with any course I started online",
+            name: "Blessing N."
+        },
+        {
+            quote: "I used to spend the first hour of every study session deciding what to watch. That hour is gone now",
+            name: "Kelechi M."
+        },
+        {
+            quote: "The module quizzes made me re-watch a lesson I thought I understood. Before, I would have believed I understood it and moved to the next lesson",
+            name: "Ifeoluwa S."
+        },
+        {
+            quote: "I got stuck attempting a practice project. I shared my screen to the AI Tutor and it told me what I was doing wrong. Saved me a whole evening.",
+            name: "Samuel A"
+        },
+        
+    ];
+
+    // Review-shaped, and labelled EXAMPLE on the card , the same convention the
+    // community section below uses for its mock post and reply. Each quote is a
+    // claim Primerly actually makes, written the way a learner would say it.
+    // Delete these once `learnerReviews` above has real ones.
     const whyCards = [
         {
-            title: "One path, not eight playlists",
-            text: "Type a tech skill and get a single ordered course built from the best YouTube videos , no more juggling half-finished playlists and twelve open tabs.",
+            quote: "Twelve open tabs and four half-finished playlists became one ordered path. I stopped planning and started learning.",
+            caption: "One path, not eight playlists",
             gradient: "linear-gradient(135deg, #eab308, #f59e0b)"
         },
         {
-            title: "Answers inside the video",
-            text: "The AI tutor sits next to every video. Ask at the exact timestamp you got stuck and it answers in context , no pausing to Google what the speaker just said.",
+            quote: "I got stuck at 6:41 in a video and asked right there. It answered about that exact moment instead of sending me back to Google.",
+            caption: "Answers inside the video",
             gradient: "linear-gradient(135deg, #10b981, #3b82f6)"
         },
         {
-            title: "Quizzes that keep you honest",
-            text: "Every module ends with an AI-generated quiz tied to the videos you just watched, so progress means you actually got it , not that you let it autoplay.",
+            quote: "The end-of-module quiz caught the two things I'd only half understood. Autoplay never would have told me that.",
+            caption: "Quizzes that keep you honest",
             gradient: "linear-gradient(135deg, #f59e0b, #ec4899)"
         },
         {
-            title: "A certificate anyone can verify",
-            text: "Finish the path and pass the quizzes to earn a Certificate of Completion with a unique verification code and a public link.",
+            quote: "I finished the path, passed every quiz, and came away with a certificate carrying a code anyone can check.",
+            caption: "A certificate anyone can verify",
             gradient: "linear-gradient(135deg, #6366f1, #8b5cf6)"
         },
         {
-            title: "Momentum built in",
-            text: "Streaks, XP, and a progress map turn showing up daily into a habit , designed to get you to the end, not just the sign-up.",
+            quote: "The streak is what got me back on the days I didn't feel like it. That's the part that got me to the end.",
+            caption: "Momentum built in",
             gradient: "linear-gradient(135deg, #f43f5e, #fb7185)"
         }
     ];
 
-    const marqueeWhyCards = [...whyCards, ...whyCards];
+    const hasReviews = learnerReviews.length > 0;
+    const marqueeWhyCards = hasReviews
+        ? [...learnerReviews, ...learnerReviews]
+        : [...whyCards, ...whyCards];
 
     return (
         <div className={styles.container}>
@@ -229,15 +264,45 @@ export default function HomeClient({ featuredCourses = [] }) {
             {/* 4. WHY PRIMERLY SECTION */}
             <section id="reviews" className={styles.testimonialsSection}>
                 <FadeIn>
-                    <h2 className={styles.sectionHeading}>Built for how learners actually learn</h2>
+                    <h2 className={styles.sectionHeading}>
+                        {hasReviews ? 'What learners say' : 'Built for how learners actually learn'}
+                    </h2>
                 </FadeIn>
                 <div className={styles.marqueeContainer} style={{ marginTop: '60px', maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}>
                     <div className={styles.testimonialMarqueeTrack}>
                         {marqueeWhyCards.map((item, i) => (
                             <div key={i} className={styles.testimonialCard}>
-                                <div style={{ width: '44px', height: '4px', borderRadius: '2px', background: item.gradient, marginBottom: '20px' }}></div>
-                                <div style={{ fontWeight: '700', fontSize: '1.05rem', marginBottom: '10px' }}>{item.title}</div>
-                                <p className={styles.quote}>{item.text}</p>
+                                {hasReviews ? (
+                                    <>
+                                        <div className={styles.reviewStars} aria-label={`${item.rating} out of 5`}>
+                                            {'★'.repeat(item.rating || 5)}
+                                        </div>
+                                        <p className={styles.quote}>&ldquo;{item.quote}&rdquo;</p>
+                                        <div className={styles.reviewAuthor}>
+                                            <span
+                                                className={styles.reviewAvatar}
+                                                style={{ background: item.gradient }}
+                                                aria-hidden
+                                            >
+                                                {item.name?.trim().charAt(0).toUpperCase()}
+                                            </span>
+                                            <span className={styles.reviewAuthorText}>
+                                                <span className={styles.reviewName}>{item.name}</span>
+                                                <span className={styles.reviewRole}>{item.role}</span>
+                                            </span>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span className={styles.exampleTag}>Example</span>
+                                        <p className={styles.quote}>&ldquo;{item.quote}&rdquo;</p>
+                                        <span
+                                            className={styles.reviewRule}
+                                            style={{ background: item.gradient }}
+                                            aria-hidden
+                                        />
+                                    </>
+                                )}
                             </div>
                         ))}
                     </div>
@@ -328,7 +393,7 @@ export default function HomeClient({ featuredCourses = [] }) {
             <section className={styles.ctaSection}>
                 <FadeIn direction="up" className={styles.flexColumnCentered}>
                     <h2>Stop scrolling. Start finishing.</h2>
-                    <p>Turn your goal into a personalised course you'll actually complete.</p>
+                    <p>Turn your learning goal into a personalised course you'll actually complete.</p>
                     <Link href="/signup" className={styles.ctaButtonLarge}>Get Started for Free</Link>
                 </FadeIn>
             </section>
@@ -338,6 +403,8 @@ export default function HomeClient({ featuredCourses = [] }) {
 
             {/* 9. FOOTER */}
             <footer className={styles.mainFooter}>
+                {/* Wordmark sized to span the full width of the page. */}
+                <div className={styles.footerWordmark} aria-hidden>Primerly</div>
                 <div className={styles.footerGrid}>
                     <div className={styles.footerBrand}>
                         <div style={{ display: 'flex', gap: '8px', fontWeight: '800', fontSize: '1.2rem', alignItems: 'center' }}>

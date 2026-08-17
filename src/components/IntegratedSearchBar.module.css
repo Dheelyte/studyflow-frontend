@@ -59,12 +59,13 @@
     margin: 0 8px;
 }
 
-/* --- Duration / experience pickers, inline in the bar --- */
+/* --- Customize: duration and level, folded behind one button --- */
 
 .filters {
     display: flex;
     align-items: center;
     flex-shrink: 0;
+    position: relative;
 }
 
 .filterDivider {
@@ -74,27 +75,153 @@
     flex-shrink: 0;
 }
 
-/* Extra specificity so these win over CustomDropdown's own .container/.trigger */
-.integratedSearchBar .filterDropdown {
-    width: auto;
+.customizeButton {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 8px;
+    padding: 10px 16px;
+    border: 1px solid transparent;
+    border-radius: 99px;
+    background: transparent;
+    color: var(--secondary);
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color 0.2s, background 0.2s, border-color 0.2s;
 }
 
-.integratedSearchBar .filterDropdown button {
-    padding: 10px 12px;
+.customizeButton:hover {
+    color: var(--primary);
+    background: rgba(99, 102, 241, 0.08);
+}
+
+.customizeActive {
+    color: var(--primary);
+    border-color: rgba(99, 102, 241, 0.35);
+    background: rgba(99, 102, 241, 0.08);
+}
+
+/* How many preferences are set, so a collapsed panel still shows its state. */
+.customizeCount {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 99px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.customizePanel {
+    position: absolute;
+    top: calc(100% + 14px);
+    right: 0;
+    width: 300px;
+    padding: 18px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 20px 40px -12px rgba(15, 23, 42, 0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    z-index: 70;
+    text-align: left;
+    animation: customizeIn 0.15s ease;
+}
+
+/* Flipped above the bar when the window is too short below it. */
+.customizePanelAbove {
+    top: auto;
+    bottom: calc(100% + 14px);
+    animation-name: customizeInUp;
+}
+
+@keyframes customizeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes customizeInUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.customizeHeader {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.customizeTitle {
     font-size: 0.95rem;
-    gap: 6px;
-    white-space: nowrap;
+    font-weight: 700;
+    color: var(--foreground);
+}
+
+.customizeOptional {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
     color: var(--secondary);
 }
 
-.integratedSearchBar .filterDropdown button:hover {
-    color: var(--primary);
+.customizeField {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
-/* Right-align the menus so the rightmost picker can't overflow the bar */
-.integratedSearchBar .filterDropdown > div {
-    left: auto;
-    right: 0;
+.customizeLabel {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--secondary);
+}
+
+/* Full-width fields inside the panel, rather than the bar's inline sizing. */
+.customizePanel .panelDropdown {
+    width: 100%;
+}
+
+.customizePanel .panelDropdown button {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-size: 0.95rem;
+    background: var(--background);
+}
+
+.customizePanel .panelDropdown button:hover {
+    border-color: var(--primary);
+}
+
+.customizePanel .panelDropdown > div {
+    width: 100%;
+}
+
+.customizeReset {
+    align-self: flex-start;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--primary);
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.customizeReset:hover {
+    text-decoration: underline;
 }
 
 .searchButton {
@@ -152,31 +279,26 @@
 
   .filters {
       width: 100%;
-      gap: 8px;
   }
 
   .filterDivider {
       display: none;
   }
 
-  .integratedSearchBar .filterDropdown {
-      flex: 1;
-      min-width: 0;
-  }
-
-  .integratedSearchBar .filterDropdown button {
-      background: var(--background);
+  .customizeButton {
+      width: 100%;
+      justify-content: center;
+      margin-left: 0;
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 12px 14px;
-      width: 100%;
   }
 
-  .integratedSearchBar .filterDropdown > div {
-      left: 0;
-      right: auto;
+  /* Full width under the bar rather than a 300px popover off one edge. */
+  .customizePanel {
       width: 100%;
-      min-width: 200px;
+      right: 0;
+      left: 0;
   }
 }
 
