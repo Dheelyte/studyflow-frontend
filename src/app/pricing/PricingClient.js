@@ -55,8 +55,7 @@ export default function PricingClient() {
     return (
         <div className={styles.page}>
             <header className={styles.header}>
-                <span className={styles.eyebrow}>Pricing</span>
-                <h1 className={styles.title}>Our Pricing Plans</h1>
+                <h1 className={styles.title}>Pricing Plans</h1>
                 <p className={styles.subtitle}>
                     Invest in your learning journey. Choose the plan that fits your learning pace
                 </p>
@@ -85,7 +84,7 @@ export default function PricingClient() {
             <div className={styles.plans}>
                 {PLANS.map((plan) => {
                     const price = interval === 'annual' ? plan.priceAnnual : plan.priceMonthly;
-                    const per = plan.priceMonthly === 0 ? 'forever' : interval === 'annual' ? '/ year' : '/ month';
+                    const per = interval === 'annual' ? '/ year' : '/ month';
                     const isCurrent = plan.id === currentPlan;
 
                     return (

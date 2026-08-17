@@ -355,7 +355,7 @@ export default function ProfileClient() {
                         <span className={styles.settingDesc}>
                             {billingStatus?.plan && billingStatus.plan !== 'free'
                                 ? `Your ${billingStatus.plan.charAt(0).toUpperCase()}${billingStatus.plan.slice(1)} plan`
-                                : 'Library courses, certificates & community are always free'}
+                                : 'Courses, certificates & community are always free'}
                         </span>
                     </div>
                     {billingStatus?.plan && billingStatus.plan !== 'free' ? (

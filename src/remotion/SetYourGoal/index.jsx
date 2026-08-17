@@ -9,16 +9,23 @@ import {
 import { Backdrop } from "./Backdrop";
 import { SearchBar, BAR_WIDTH, BAR_HEIGHT } from "./SearchBar";
 import { Cursor } from "./Cursor";
-import { ArrowLabel } from "./ArrowLabel";
 import { LightningBurst } from "./LightningBurst";
 import {
   CourseDetail,
   DETAIL_BUTTON_CENTER_X,
   DETAIL_BUTTON_CENTER_Y,
-  DETAIL_IMAGE_CENTER_Y,
-  DETAIL_TITLE_CENTER_Y,
 } from "./CourseDetail";
-import { CurriculumList } from "../LearnWithAITutor/CurriculumList";
+import {
+  CurriculumList,
+  PANEL_WIDTH,
+  TOPIC_HEIGHT,
+  FIRST_TOPIC_Y_OFFSET,
+} from "../LearnWithAITutor/CurriculumList";
+import {
+  VideoPlayer,
+  VIDEO_WIDTH,
+  VIDEO_HEIGHT,
+} from "../LearnWithAITutor/VideoPlayer";
 import { Camera, useCameraPath } from "../Camera";
 
 const BAR_CENTER_Y = 340;
@@ -32,15 +39,38 @@ const arcPath = (from, to, t, lift = 80) => {
   return { x, y: yLinear + arc };
 };
 
-const PHASE_SWITCH = 190;
-const DETAIL_CURSOR_START = 220;
-const DETAIL_CURSOR_END = 272;
-const DETAIL_BUTTON_PRESS_START = 272;
-const DETAIL_BUTTON_PRESS_END = 290;
-const MODULE_PHASE_START = 295;
-const MODULE_HEADER_START = 310;
-const MODULE_FULLY_SHOWN = 362;
-const SCENE_END = MODULE_FULLY_SHOWN + 150;
+// Search phase
+const CURSOR_IN_END = 22;
+const TYPE_START = 24;
+const FRAMES_PER_CHAR = 2;
+const CURSOR_TO_BUTTON_START = 54;
+const CURSOR_TO_BUTTON_END = 70;
+const BUTTON_PRESS_START = 70;
+const BUTTON_PRESS_END = 82;
+const PHASE_SWITCH = 100;
+
+// Course detail phase
+const DETAIL_CURSOR_START = 112;
+const DETAIL_CURSOR_END = 140;
+const DETAIL_BUTTON_PRESS_START = 140;
+const DETAIL_BUTTON_PRESS_END = 155;
+
+// Module phase
+const MODULE_PHASE_START = 160;
+const MODULE_HEADER_START = 172;
+const MODULE_FULLY_SHOWN = 218;
+
+// Opening the first lesson — the scene pays off on the video actually playing.
+const LESSON_CURSOR_IN = 222;
+const LESSON_CLICK = 248;
+const LESSON_TRANSITION = 258;
+const VIDEO_IN = 266;
+const VIDEO_PLAY_START = 280;
+const SCENE_END = 400;
+
+// Exported so Root, Combined and the landing-page Player can't drift out of
+// sync with the timeline when it gets retimed again.
+export const SET_YOUR_GOAL_DURATION = SCENE_END;
 
 export const SetYourGoal = () => {
   const frame = useCurrentFrame();
@@ -54,14 +84,20 @@ export const SetYourGoal = () => {
 
   const cursorStart = { x: width + 40, y: height - 20 };
 
+  // The module panel is centred with a marginTop of 80, so the first topic card
+  // sits at a position we can compute rather than guess. Declared up here
+  // because the cursor path below reads it.
+  const lessonClickX = (width - PANEL_WIDTH) / 2 + PANEL_WIDTH / 2;
+  const lessonClickY = 80 + FIRST_TOPIC_Y_OFFSET + TOPIC_HEIGHT / 2;
+
   const barSpring = spring({
-    frame: frame - 10,
+    frame,
     fps,
     config: { damping: 12, mass: 0.6 },
-    durationInFrames: 25,
+    durationInFrames: 16,
   });
   const barScale = interpolate(barSpring, [0, 1], [0.92, 1]);
-  const barPhaseOpacity = interpolate(frame, [10, 24], [0, 1], {
+  const barPhaseOpacity = interpolate(frame, [0, 10], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -72,41 +108,35 @@ export const SetYourGoal = () => {
   const barOpacity = barPhaseOpacity * barFadeOut;
   const barLift = interpolate(barSpring, [0, 1], [30, 0]);
 
-  const prefix = "I want to learn ";
-  const topic = "Data Analysis";
-  const full = prefix + topic;
-  const typeStart = 60;
-  const prefixEnd = typeStart + 10;
+  const full = "Data Analysis";
   const charsTyped =
-    frame < typeStart
+    frame < TYPE_START
       ? 0
-      : frame < prefixEnd
-      ? prefix.length
       : Math.min(
           full.length,
-          prefix.length + Math.floor((frame - prefixEnd) / 3)
+          Math.floor((frame - TYPE_START) / FRAMES_PER_CHAR)
         );
   const typed = full.slice(0, charsTyped);
-  const caretVisible = Math.floor((frame - typeStart) / 12) % 2 === 0;
+  const caretVisible = Math.floor((frame - TYPE_START) / 12) % 2 === 0;
 
   // Phase 1 cursor (search bar)
   let cursorX;
   let cursorY;
 
-  if (frame < 25) {
-    cursorX = cursorStart.x;
-    cursorY = cursorStart.y;
-  } else if (frame < 55) {
-    const t = easeInOut((frame - 25) / 30);
+  if (frame < CURSOR_IN_END) {
+    const t = easeInOut(frame / CURSOR_IN_END);
     const p = arcPath(cursorStart, inputTarget, t, 40);
     cursorX = p.x;
     cursorY = p.y;
-  } else if (frame < 125) {
+  } else if (frame < CURSOR_TO_BUTTON_START) {
     cursorX = inputTarget.x;
     cursorY = inputTarget.y;
-  } else if (frame < 150) {
-    const t = easeInOut((frame - 125) / 25);
-    const p = arcPath(inputTarget, buttonTarget, t, 60);
+  } else if (frame < CURSOR_TO_BUTTON_END) {
+    const t = easeInOut(
+      (frame - CURSOR_TO_BUTTON_START) /
+        (CURSOR_TO_BUTTON_END - CURSOR_TO_BUTTON_START)
+    );
+    const p = arcPath(inputTarget, buttonTarget, t, 50);
     cursorX = p.x;
     cursorY = p.y;
   } else if (frame < PHASE_SWITCH) {
@@ -125,19 +155,46 @@ export const SetYourGoal = () => {
   } else if (frame < MODULE_PHASE_START) {
     cursorX = DETAIL_BUTTON_CENTER_X;
     cursorY = DETAIL_BUTTON_CENTER_Y;
-  } else {
+  } else if (frame < LESSON_CURSOR_IN - 20) {
     const t = Math.min(1, (frame - MODULE_PHASE_START) / 18);
     cursorX = interpolate(t, [0, 1], [DETAIL_BUTTON_CENTER_X, width + 80]);
     cursorY = interpolate(t, [0, 1], [DETAIL_BUTTON_CENTER_Y, height + 80]);
+  } else if (frame < LESSON_CLICK) {
+    const t = easeInOut(
+      interpolate(frame, [LESSON_CURSOR_IN - 20, LESSON_CLICK], [0, 1], {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+      })
+    );
+    const p = arcPath(
+      { x: width + 80, y: height + 40 },
+      { x: lessonClickX, y: lessonClickY },
+      t,
+      60
+    );
+    cursorX = p.x;
+    cursorY = p.y;
+  } else if (frame < LESSON_TRANSITION) {
+    cursorX = lessonClickX;
+    cursorY = lessonClickY;
+  } else {
+    const t = easeInOut(
+      interpolate(frame, [LESSON_TRANSITION, LESSON_TRANSITION + 20], [0, 1], {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+      })
+    );
+    cursorX = interpolate(t, [0, 1], [lessonClickX, width + 80]);
+    cursorY = interpolate(t, [0, 1], [lessonClickY, height + 80]);
   }
 
   let cursorScale = 1;
-  if (frame >= 55 && frame < 62) {
-    const t = (frame - 55) / 7;
+  if (frame >= CURSOR_IN_END && frame < CURSOR_IN_END + 7) {
+    const t = (frame - CURSOR_IN_END) / 7;
     cursorScale = 1 - 0.2 * Math.sin(Math.PI * t);
   }
-  if (frame >= 150 && frame < 160) {
-    const t = (frame - 150) / 10;
+  if (frame >= BUTTON_PRESS_START && frame < BUTTON_PRESS_START + 10) {
+    const t = (frame - BUTTON_PRESS_START) / 10;
     cursorScale = 1 - 0.18 * Math.sin(Math.PI * t);
   }
   if (
@@ -147,11 +204,15 @@ export const SetYourGoal = () => {
     const t = (frame - DETAIL_BUTTON_PRESS_START) / 12;
     cursorScale = 1 - 0.2 * Math.sin(Math.PI * t);
   }
+  if (frame >= LESSON_CLICK && frame < LESSON_CLICK + 10) {
+    const t = (frame - LESSON_CLICK) / 10;
+    cursorScale = 1 - 0.18 * Math.sin(Math.PI * t);
+  }
 
   let rippleScale = 0;
   let rippleOpacity = 0;
-  if (frame >= 55 && frame < 75) {
-    const t = (frame - 55) / 20;
+  if (frame >= CURSOR_IN_END && frame < CURSOR_IN_END + 18) {
+    const t = (frame - CURSOR_IN_END) / 18;
     rippleScale = interpolate(t, [0, 1], [0.3, 1.4]);
     rippleOpacity = interpolate(t, [0, 1], [0.7, 0]);
   }
@@ -160,11 +221,16 @@ export const SetYourGoal = () => {
     rippleScale = interpolate(t, [0, 1], [0.3, 1.4]);
     rippleOpacity = interpolate(t, [0, 1], [0.7, 0]);
   }
+  if (frame >= LESSON_CLICK && frame < LESSON_CLICK + 20) {
+    const t = (frame - LESSON_CLICK) / 20;
+    rippleScale = interpolate(t, [0, 1], [0.3, 1.5]);
+    rippleOpacity = interpolate(t, [0, 1], [0.8, 0]);
+  }
 
   let buttonScale = 1;
   let buttonFlash = 0;
-  if (frame >= 150 && frame < 165) {
-    const t = (frame - 150) / 15;
+  if (frame >= BUTTON_PRESS_START && frame < BUTTON_PRESS_END) {
+    const t = (frame - BUTTON_PRESS_START) / (BUTTON_PRESS_END - BUTTON_PRESS_START);
     if (t < 0.35) {
       buttonScale = interpolate(t, [0, 0.35], [1, 0.94]);
     } else if (t < 0.7) {
@@ -192,47 +258,17 @@ export const SetYourGoal = () => {
     detailButtonFlash = Math.sin(t * Math.PI);
   }
 
-  const arrowOpacity = interpolate(frame, [128, 145, 165, 172], [0, 1, 1, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const arrowDraw = interpolate(frame, [130, 148], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const arrowBob = Math.sin((frame - 130) / 6) * 3;
-
+  const BURST_START = BUTTON_PRESS_START + 4;
+  const BURST_END = PHASE_SWITCH + 4;
   let burstProgress = 0;
-  if (frame >= 155 && frame < 190) {
-    burstProgress = (frame - 155) / 35;
+  if (frame >= BURST_START && frame < BURST_END) {
+    burstProgress = (frame - BURST_START) / (BURST_END - BURST_START);
   }
 
   // Course detail enter animations
-  const detailAppear = interpolate(frame, [PHASE_SWITCH - 5, PHASE_SWITCH + 20], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const detailImageEnter = spring({
-    frame: frame - PHASE_SWITCH,
-    fps,
-    config: { damping: 13, mass: 0.7 },
-    durationInFrames: 28,
-  });
-  const detailTitleEnter = interpolate(
+  const detailAppear = interpolate(
     frame,
-    [PHASE_SWITCH + 10, PHASE_SWITCH + 35],
-    [0, 1],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
-  );
-  const detailDescEnter = interpolate(
-    frame,
-    [PHASE_SWITCH + 22, PHASE_SWITCH + 48],
-    [0, 1],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
-  );
-  const detailCtaEnter = interpolate(
-    frame,
-    [PHASE_SWITCH + 35, PHASE_SWITCH + 60],
+    [PHASE_SWITCH - 4, PHASE_SWITCH + 12],
     [0, 1],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
@@ -242,7 +278,7 @@ export const SetYourGoal = () => {
   // Detail fades out as module appears
   const detailFadeOut = interpolate(
     frame,
-    [MODULE_PHASE_START, MODULE_PHASE_START + 18],
+    [MODULE_PHASE_START, MODULE_PHASE_START + 12],
     [1, 0],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
@@ -251,51 +287,71 @@ export const SetYourGoal = () => {
   // Fade/slide in from the bottom (not the side)
   const moduleRise = interpolate(
     frame,
-    [MODULE_PHASE_START + 6, MODULE_PHASE_START + 36],
+    [MODULE_PHASE_START + 4, MODULE_PHASE_START + 26],
     [0, 1],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
   const moduleRiseEased = easeInOut(moduleRise);
   const moduleTranslateY = (1 - moduleRiseEased) * 120;
   const moduleOpacity = moduleRise;
+  const lessonHighlightPulse =
+    frame >= LESSON_CLICK && frame < LESSON_TRANSITION
+      ? Math.abs(Math.sin((frame - LESSON_CLICK) / 4)) *
+        (1 - (frame - LESSON_CLICK) / (LESSON_TRANSITION - LESSON_CLICK))
+      : 0;
+
+  const moduleFadeOut = interpolate(
+    frame,
+    [LESSON_TRANSITION, LESSON_TRANSITION + 12],
+    [1, 0],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+  );
+
+  const videoEnter = interpolate(frame, [VIDEO_IN, VIDEO_IN + 18], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const videoPlayProgress = interpolate(
+    frame,
+    [VIDEO_PLAY_START, VIDEO_PLAY_START + 12],
+    [0, 1],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+  );
+  const videoPlaybackTime = Math.max(0, frame - VIDEO_PLAY_START);
+  const videoLeft = (width - VIDEO_WIDTH) / 2;
+  const videoTop = (height - VIDEO_HEIGHT) / 2;
+
   const moduleTopicReveals = [0, 1, 2, 3].map((i) =>
     interpolate(
       frame,
-      [MODULE_HEADER_START + i * 10, MODULE_HEADER_START + 22 + i * 10],
+      [MODULE_HEADER_START + i * 7, MODULE_HEADER_START + 18 + i * 7],
       [0, 1],
       { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
     )
   );
 
-  // Follow caret x during typing
-  const caretStartX = barLeft + 300;
-  const caretEndX = barLeft + 490;
-  const typingProgress = interpolate(frame, [70, 109], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const caretFollowX = interpolate(typingProgress, [0, 1], [caretStartX, caretEndX]);
-
+  // One push-in onto the whole bar, then hold. At 640px wide the text field and
+  // the Start button are both in frame at this zoom, so there is no pan to pay
+  // for and no mid-phase pull-back — the only zoom-out is the 18-frame handoff
+  // to the course detail.
   const cam = useCameraPath(
     frame,
     [
-      { frame: 0, x: 640, y: BAR_CENTER_Y, scale: 1.0 },
-      { frame: 25, x: 640, y: BAR_CENTER_Y, scale: 1.1 },
-      { frame: 55, x: inputTarget.x + 30, y: BAR_CENTER_Y, scale: 1.75 },
-      { frame: 70, x: caretStartX, y: BAR_CENTER_Y, scale: 1.85 },
-      { frame: 109, x: caretEndX, y: BAR_CENTER_Y, scale: 1.85 },
-      { frame: 125, x: caretEndX + 30, y: BAR_CENTER_Y, scale: 1.7 },
-      { frame: 148, x: buttonTarget.x, y: BAR_CENTER_Y, scale: 1.55 },
-      { frame: 165, x: buttonTarget.x, y: BAR_CENTER_Y, scale: 1.45 },
-      { frame: 180, x: 640, y: BAR_CENTER_Y, scale: 1.1 },
+      { frame: 0, x: 640, y: BAR_CENTER_Y, scale: 1.12 },
+      { frame: 14, x: 640, y: BAR_CENTER_Y, scale: 1.75 },
+      { frame: BUTTON_PRESS_END, x: 640, y: BAR_CENTER_Y, scale: 1.78 },
       { frame: PHASE_SWITCH, x: 640, y: 360, scale: 1.0 },
-      { frame: MODULE_PHASE_START, x: 640, y: 360, scale: 1.0 },
-      { frame: SCENE_END, x: 640, y: 360, scale: 1.0 },
+      { frame: MODULE_FULLY_SHOWN, x: 640, y: 360, scale: 1.0 },
+      // In on the lesson being clicked, then back out to frame the video.
+      { frame: LESSON_CURSOR_IN + 6, x: lessonClickX, y: lessonClickY, scale: 1.38 },
+      { frame: LESSON_CLICK + 6, x: lessonClickX, y: lessonClickY, scale: 1.42 },
+      { frame: VIDEO_IN, x: 640, y: 360, scale: 1.0 },
+      { frame: SCENE_END, x: 640, y: 360, scale: 1.08 },
     ],
     { x: 640, y: 360, scale: 1 }
   );
 
-  const showSearchPhase = frame < PHASE_SWITCH + 30;
+  const showSearchPhase = frame < PHASE_SWITCH + 20;
 
   return (
     <AbsoluteFill style={{ opacity: finalFade }}>
@@ -322,16 +378,6 @@ export const SetYourGoal = () => {
             </div>
           )}
 
-          {showSearchPhase && arrowOpacity > 0 && (
-            <ArrowLabel
-              x={buttonTarget.x - 170}
-              y={buttonTarget.y - 170}
-              opacity={arrowOpacity}
-              drawProgress={arrowDraw}
-              bob={arrowBob}
-            />
-          )}
-
           {showSearchPhase && (
             <LightningBurst
               x={buttonTarget.x}
@@ -352,7 +398,7 @@ export const SetYourGoal = () => {
             />
           )}
 
-          {moduleRise > 0 && (
+          {moduleRise > 0 && moduleFadeOut > 0 && (
             <AbsoluteFill
               style={{ alignItems: "center", justifyContent: "flex-start" }}
             >
@@ -360,15 +406,44 @@ export const SetYourGoal = () => {
                 style={{
                   marginTop: 80,
                   transform: `translateY(${moduleTranslateY}px)`,
-                  opacity: moduleOpacity,
+                  opacity: moduleOpacity * moduleFadeOut,
                 }}
               >
                 <CurriculumList
                   slideProgress={1}
                   topicReveals={moduleTopicReveals}
-                  highlightIndex={-1}
-                  highlightPulse={0}
+                  highlightIndex={frame >= LESSON_CLICK ? 0 : -1}
+                  highlightPulse={lessonHighlightPulse}
                   panelOpacity={1}
+                />
+              </div>
+            </AbsoluteFill>
+          )}
+
+          {videoEnter > 0 && (
+            <AbsoluteFill>
+              <div
+                style={{
+                  position: "absolute",
+                  left: videoLeft,
+                  top: videoTop - 42,
+                  fontFamily: '"Google Sans", "Inter", sans-serif',
+                  fontSize: 15,
+                  color: "#6b7280",
+                  fontWeight: 500,
+                  opacity: videoEnter,
+                }}
+              >
+                <span style={{ color: "#6366f1", fontWeight: 700 }}>Data Analysis</span>
+                <span style={{ margin: "0 10px" }}>/</span>
+                <span>What is Data Analysis?</span>
+              </div>
+
+              <div style={{ position: "absolute", left: videoLeft, top: videoTop }}>
+                <VideoPlayer
+                  enter={videoEnter}
+                  playProgress={videoPlayProgress}
+                  playbackTime={videoPlaybackTime}
                 />
               </div>
             </AbsoluteFill>

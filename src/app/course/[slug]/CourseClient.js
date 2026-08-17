@@ -2,10 +2,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import CourseSkeleton from '@/components/CourseSkeleton';
-import { curriculum, gallery, projects } from "@/services/api";
+import { curriculum, projects } from "@/services/api";
 import { useAuth } from "@/context/AuthContext";
 import styles from "./page.module.css";
-import { PlayIcon, ClockIcon, ChevronDown, ChevronUp, ZapIcon, ShareIcon, CheckCircleIcon, VideoIcon, TrophyIconSimple } from "@/components/Icons";
+import { PlayIcon, ClockIcon, ChevronDown, ChevronUp, ShareIcon, CheckCircleIcon, VideoIcon, TrophyIconSimple, TrendingUpIcon } from "@/components/Icons";
 import ShareModal from "@/components/ShareModal";
 import QuizModal from "@/components/QuizModal";
 import EnrollButton from "@/components/EnrollButton";
@@ -100,6 +100,7 @@ const normalizeCourseData = (apiData) => {
         _raw: apiData,
         curriculum_title: apiData.title,
         overview: apiData.description || "No description available.",
+        level: apiData.level || null,
         modules: modules,
         learning_objectives: apiData.objectives || [],
         completionPercentage,
@@ -139,6 +140,7 @@ const normalizePublicCourseData = (course) => {
         _raw: course,
         curriculum_title: course.title,
         overview: course.description || "No description available.",
+        level: course.level || null,
         modules,
         learning_objectives: course.objectives || [],
         completionPercentage: 0,
@@ -166,9 +168,6 @@ export default function CourseClient({ params, publicCourse = null }) {
     const [certStatus, setCertStatus] = useState(null);
     const [issuingCertificate, setIssuingCertificate] = useState(false);
     const [certError, setCertError] = useState(null);
-    const [publishState, setPublishState] = useState({ isPublic: false, slug: null });
-    const [publishing, setPublishing] = useState(false);
-    const [publishError, setPublishError] = useState(null);
     const { user, loading: authLoading } = useAuth();
     // Logged out on a published course: same layout, interactions swapped for sign-up prompts.
     const isPreview = !authLoading && !user && !!publicCourse;
@@ -220,10 +219,6 @@ export default function CourseClient({ params, publicCourse = null }) {
                 }
 
                 setCurriculumData(data);
-                setPublishState({
-                    isPublic: !!response?.is_public,
-                    slug: response?.slug || null,
-                });
                 document.title = `${data.curriculum_title} | Primerly`;
 
                 if (data.completionPercentage !== undefined) {
@@ -324,20 +319,6 @@ export default function CourseClient({ params, publicCourse = null }) {
         setExpandedModules(prev => ({ ...prev, [id]: !prev[id] }));
     };
 
-    const handleTogglePublish = async () => {
-        const nextIsPublic = !publishState.isPublic;
-        setPublishError(null);
-        setPublishing(true);
-        try {
-            const result = await gallery.setPublishState(courseId, nextIsPublic);
-            setPublishState({ isPublic: result.is_public, slug: result.slug });
-        } catch (err) {
-            setPublishError(err.message || "Could not update publish setting.");
-        } finally {
-            setPublishing(false);
-        }
-    };
-
     const handlePlay = () => {
         if (!isStarted) {
             setIsStarted(true);
@@ -422,6 +403,9 @@ export default function CourseClient({ params, publicCourse = null }) {
         );
     }
 
+    // Stored capitalized on the playlist ("Beginner"); public payloads match.
+    const courseLevel = curriculumData.level || null;
+
     // The lesson the learner is up to , what the screen tutor assumes they're working on.
     const activeTopicId = (() => {
         for (const m of curriculumData.modules || []) {
@@ -439,10 +423,20 @@ export default function CourseClient({ params, publicCourse = null }) {
             <div className={styles.headerBg}></div>
             <div className={styles.header}>
                 <div className={styles.courseImage}>
-                    <ZapIcon size={64} fill="white" />
+                    <span className={styles.courseImageTitle}>
+                        {curriculumData.curriculum_title}
+                    </span>
                 </div>
                 <div className={styles.courseInfo}>
                     <h1 className={styles.title}>{curriculumData.curriculum_title}</h1>
+                    {courseLevel && (
+                        <div className={styles.metaRow}>
+                            <span className={styles.levelBadge}>
+                                <TrendingUpIcon size={14} />
+                                {courseLevel}
+                            </span>
+                        </div>
+                    )}
                     <p className={styles.description}>
                         {isDescriptionExpanded ? curriculumData.overview : (curriculumData.overview?.slice(0, 200) + (curriculumData.overview?.length > 200 ? "..." : ""))}
                         {curriculumData.overview?.length > 200 && (
@@ -471,49 +465,6 @@ export default function CourseClient({ params, publicCourse = null }) {
                     <ShareIcon />
                 </button>
             </div>
-
-            {user?.id && curriculumData._raw?.user_id === user.id && (
-                /* Same .content wrapper as the sections below, so the panel lines up with
-                   them instead of spanning the full width of the page. */
-                <div className={styles.content}>
-                    <div className={styles.publishPanel}>
-                        <div className={styles.publishText}>
-                            <div className={styles.publishTitle}>
-                                {publishState.isPublic ? "Published to the gallery" : "Publish to the gallery"}
-                            </div>
-                            <p className={styles.publishDescription}>
-                                {publishState.isPublic
-                                    ? "Anyone can find and start this course. Your progress stays private , learners get their own."
-                                    : "Share this course publicly so other learners can find and start it. Your progress stays private."}
-                            </p>
-                            {publishState.isPublic && publishState.slug && (
-                                /* The public URL is this same page, so link to the gallery
-                                   listing instead of back to where they already are. */
-                                <a
-                                    className={styles.publishLink}
-                                    href="/explore"
-                                    target="_blank"
-                                    rel="noreferrer"
-                                >
-                                    See it in the gallery →
-                                </a>
-                            )}
-                            {publishError && <p className={styles.publishError}>{publishError}</p>}
-                        </div>
-                        <button
-                            className={styles.publishButton}
-                            onClick={handleTogglePublish}
-                            disabled={publishing}
-                        >
-                            {publishing
-                                ? "Saving…"
-                                : publishState.isPublic
-                                    ? "Unpublish"
-                                    : "Publish"}
-                        </button>
-                    </div>
-                </div>
-            )}
 
             {showShareModal && (
                 <ShareModal

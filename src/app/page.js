@@ -6,9 +6,9 @@ import { fetchPublicCourses } from '@/lib/gallery-server';
 export const revalidate = 300;
 
 export const metadata = {
-    title: 'Primerly | The structured way to learn tech skills from YouTube',
+    title: 'Primerly | Learn in-demand tech skills with your personal AI Tutor',
     description:
-        'Type the tech skill you want to learn. Primerly builds a structured course from the best YouTube videos, with an AI tutor, quizzes, and a verifiable certificate.',
+        'Primerly builds a personalised & structured course from the best YouTube videos, with an AI tutor, quizzes, practice projects, and a community to keep you consistent.',
 };
 
 const organizationJsonLd = {

@@ -1,14 +1,17 @@
 import { Series } from "remotion";
-import { SetYourGoal } from "./SetYourGoal";
-import { LearnWithAITutor } from "./LearnWithAITutor";
-import { QuizScene } from "./QuizScene";
+import { SetYourGoal, SET_YOUR_GOAL_DURATION } from "./SetYourGoal";
+import {
+  LearnWithAITutor,
+  LEARN_WITH_AI_TUTOR_DURATION,
+} from "./LearnWithAITutor";
+import { QuizScene, QUIZ_SCENE_DURATION } from "./QuizScene";
 import { GamifiedMotivation } from "./GamifiedMotivation";
 import { CommunityQuestion } from "./CommunityQuestion";
 
 export const SCENE_DURATIONS = {
-  SetYourGoal: 512,
-  LearnWithAITutor: 390,
-  QuizScene: 450,
+  SetYourGoal: SET_YOUR_GOAL_DURATION,
+  LearnWithAITutor: LEARN_WITH_AI_TUTOR_DURATION,
+  QuizScene: QUIZ_SCENE_DURATION,
   GamifiedMotivation: 390,
   CommunityQuestion: 430,
 };

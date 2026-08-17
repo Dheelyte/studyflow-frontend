@@ -1,7 +1,7 @@
 .launcher {
     position: fixed;
-    right: 24px;
-    bottom: 24px;
+    right: 14px;
+    bottom: 64px;
     z-index: 60;
     display: flex;
     align-items: center;

@@ -45,7 +45,7 @@ export default function CookiePolicy() {
         <section>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '16px' }}>5. Contact Us</h2>
           <p style={{ color: 'var(--secondary)' }}>
-            If you have any questions about this Cookie Policy, please contact us at: primerly.app@gmail.com
+            If you have any questions about this Cookie Policy, please contact us at: hello@primerly.app
           </p>
         </section>
       </div>

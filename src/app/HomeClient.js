@@ -37,8 +37,8 @@ export default function HomeClient({ featuredCourses = [] }) {
     }, []);
 
     const handleSearch = (params) => {
-        const query = { topic: params.topic };
-        const queryString = new URLSearchParams(query).toString();
+        // params carries the topic plus any duration / level picked on the bar.
+        const queryString = new URLSearchParams(params).toString();
         router.push(`/curriculum?${queryString}`);
     };
 
@@ -98,7 +98,7 @@ export default function HomeClient({ featuredCourses = [] }) {
                     </div>
                     <nav className={styles.headerNav} aria-label="Primary">
                         <a href="#how-it-works" className={styles.headerNavLink}>How it works</a>
-                        <Link href="/explore" className={styles.headerNavLink}>Explore</Link>
+                        {/* <Link href="/explore" className={styles.headerNavLink}>Explore</Link> */}
                         <a href="#reviews" className={styles.headerNavLink}>Why Primerly</a>
                         <a href="#community" className={styles.headerNavLink}>Community</a>
                         <a href="#topics" className={styles.headerNavLink}>Topics</a>
@@ -121,7 +121,7 @@ export default function HomeClient({ featuredCourses = [] }) {
                 </FadeIn>
                 <FadeIn direction="up" delay={0.1}>
                     <p className={styles.subtitle}>
-                        Type the tech skill you want to learn , coding, data, design, cloud. Primerly turns YouTube into a structured path, an AI tutor explains anything that's fuzzy right inside the video, and you walk away with a verifiable certificate.
+                        Primerly builds a personalised & structured course from the best YouTube videos. You get an AI tutor, quizzes, practice projects, and a community to keep you consistent.
                     </p>
                 </FadeIn>
 
@@ -179,7 +179,7 @@ export default function HomeClient({ featuredCourses = [] }) {
                         {
                             icon: <SearchIcon size={28} />,
                             title: "Type what you want to learn",
-                            description: "Primerly pulls the right YouTube videos and orders them into a focused, end-to-end course so you stop bouncing between random tutorials.",
+                            description: "Primerly pulls the right YouTube videos, articles, and orders them into a focused course so you stop bouncing between random tutorials.",
                             scene: "setYourGoal",
                         },
                         {
@@ -229,7 +229,7 @@ export default function HomeClient({ featuredCourses = [] }) {
             {/* 4. WHY PRIMERLY SECTION */}
             <section id="reviews" className={styles.testimonialsSection}>
                 <FadeIn>
-                    <h2 className={styles.sectionHeading}>Built for how self-taught devs actually learn</h2>
+                    <h2 className={styles.sectionHeading}>Built for how learners actually learn</h2>
                 </FadeIn>
                 <div className={styles.marqueeContainer} style={{ marginTop: '60px', maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}>
                     <div className={styles.testimonialMarqueeTrack}>
@@ -249,10 +249,10 @@ export default function HomeClient({ featuredCourses = [] }) {
                 <div className={styles.communityContent}>
                     <FadeIn direction="right">
                         <h2 className={styles.communityTitle}>Learn better, together.</h2>
-                        <p className={styles.communityText}>Compare paths, swap tips, and stay accountable with people learning the same things on YouTube. Topic channels, threaded replies, and reactions , without the algorithm-driven distractions.</p>
+                        <p className={styles.communityText}>Join communities, share your progress, and stay accountable with people learning the same thing.</p>
                         <div className={styles.communityTags}>
-                            <span className={styles.communityTag}>#ReactJs</span>
-                            <span className={styles.communityTag}>#Python</span>
+                            <span className={styles.communityTag}>#DataScience</span>
+                            <span className={styles.communityTag}>#VideoEditing</span>
                             <span className={styles.communityTag}>#MachineLearning</span>
                             <span className={styles.communityTag}>#Web3</span>
                             <span className={styles.communityTag}>#Design</span>
@@ -293,7 +293,7 @@ export default function HomeClient({ featuredCourses = [] }) {
             {/* 6. POPULAR TOPICS SECTION */}
             <section id="topics" className={styles.topicsSection}>
                 <FadeIn>
-                    <h2 className={styles.sectionHeading}>If it's tech and it's on YouTube, you can master it here</h2>
+                    <h2 className={styles.sectionHeading}>Endless Learning Possibilities</h2>
                 </FadeIn>
                 <div className={styles.marqueeContainer} style={{ marginBottom: '24px' }}>
                     <div className={styles.marqueeTrack}>
@@ -328,7 +328,7 @@ export default function HomeClient({ featuredCourses = [] }) {
             <section className={styles.ctaSection}>
                 <FadeIn direction="up" className={styles.flexColumnCentered}>
                     <h2>Stop scrolling. Start finishing.</h2>
-                    <p>Turn YouTube into a structured tech course you'll actually complete , free.</p>
+                    <p>Turn your goal into a personalised course you'll actually complete.</p>
                     <Link href="/signup" className={styles.ctaButtonLarge}>Get Started for Free</Link>
                 </FadeIn>
             </section>
@@ -344,14 +344,14 @@ export default function HomeClient({ featuredCourses = [] }) {
                             <Image src="/Primerly Logo.png" alt="Primerly" width={24} height={24} />
                             Primerly
                         </div>
-                        <p>Turn YouTube into structured tech-skill paths. Earn a real certificate.</p>
+                        <p>Personalised learning roadmap + AI Tutor + Community.</p>
                     </div>
                     <div className={styles.footerColumn}>
-                        <h4>Product</h4>
+                        <h4>Contact</h4>
                         <div className={styles.footerLinks}>
-                            <Link href="/explore">Explore Courses</Link>
-                            <Link href="/pricing">Pricing</Link>
-                            <Link href="/community">Community</Link>
+                            <a href="https://x.com/primerlyapp" aria-label="Twitter">Twitter / X</a>
+                            <a href="https://www.linkedin.com/company/primerly/" aria-label="LinkedIn">LinkedIn</a>
+                            <a href="mailto:hello@primerly.app">Email</a>
                         </div>
                     </div>
                     <div className={styles.footerColumn}>
@@ -371,12 +371,7 @@ export default function HomeClient({ featuredCourses = [] }) {
                     </div>
                 </div>
                 <div className={styles.footerBottom}>
-                    <div>&copy; {new Date().getFullYear()} Primerly.</div>
-                    <div style={{ display: 'flex', gap: '16px' }}>
-                        <a href="https://x.com/primerlyapp" aria-label="Twitter">Twitter</a>
-                        {/* <a href="#" aria-label="GitHub">GitHub</a> */}
-                        <a href="https://www.linkedin.com/company/primerly/" aria-label="LinkedIn">LinkedIn</a>
-                    </div>
+                    <div>&copy; {new Date().getFullYear()} Primerly All Rights Reserved.</div>
                 </div>
             </footer>
         </div>

@@ -84,10 +84,10 @@ export default function Sidebar({ isCollapsed, isOpen, onClose, onToggleCollapse
                     </Link>
 
                     {/* Explore is public , no auth gate */}
-                    <Link href="/explore" className={styles.navItem} onClick={handleNavClick} title="Explore">
+                    {/* <Link href="/explore" className={styles.navItem} onClick={handleNavClick} title="Explore">
                         <SearchIcon />
                         <span>Explore</span>
-                    </Link>
+                    </Link> */}
 
                     {/* Community Link (Simplified) */}
                     <Link href="/community" className={styles.navItem} onClick={handleProtectedNav} title="Community">

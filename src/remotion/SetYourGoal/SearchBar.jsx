@@ -1,6 +1,9 @@
 import { SearchIcon, ZapIcon } from "../icons";
 
-export const BAR_WIDTH = 900;
+// Narrow enough that the whole bar — text field and Start button — sits inside
+// the frame at the search-phase zoom, so the camera never has to pan to reach
+// the button.
+export const BAR_WIDTH = 640;
 export const BAR_HEIGHT = 72;
 
 export const INPUT_CLICK_X = 260;
@@ -17,7 +20,7 @@ export const SearchBar = ({
   barOpacity = 1,
   barLift = 0,
 }) => {
-  const prefix = "I want to learn ";
+  const prefix = "";
   const hasTyped = typed.length > 0;
 
   return (

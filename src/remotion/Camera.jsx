@@ -1,6 +1,8 @@
 import { AbsoluteFill, interpolate, Easing } from "remotion";
 
-const easeInOut = Easing.bezier(0.65, 0, 0.35, 1);
+// Must stay symmetric (zero velocity at both ends) — camera keyframes run
+// back-to-back, and an ease-out curve would jerk at every junction.
+const easeInOut = Easing.bezier(0.83, 0, 0.17, 1);
 
 const SCREEN_CENTER_X = 640;
 const SCREEN_CENTER_Y = 360;

@@ -1,21 +1,57 @@
 .openButton {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
+    align-items: center;
+    gap: 14px;
     width: 100%;
     text-align: left;
-    background: var(--card);
-    border: 1px dashed var(--border);
     border-radius: 14px;
-    padding: 18px 20px;
+    padding: 16px 20px;
     cursor: pointer;
     transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+/* Practice sits under each module; the capstone closes the course, so they get
+   their own colour rather than reading as the same card twice. */
+.openPractice {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(99, 102, 241, 0.04));
+    border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.openCapstone {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.12), rgba(168, 85, 247, 0.04));
+    border: 1px solid rgba(168, 85, 247, 0.3);
 }
 
 .openButton:hover {
     border-color: var(--primary);
     transform: translateY(-1px);
+}
+
+.openIcon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.openPractice .openIcon {
+    background: rgba(99, 102, 241, 0.2);
+    color: #6366f1;
+}
+
+.openCapstone .openIcon {
+    background: rgba(168, 85, 247, 0.2);
+    color: #a855f7;
+}
+
+.openText {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
 }
 
 .openLabel {

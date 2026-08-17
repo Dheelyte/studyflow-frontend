@@ -18,12 +18,17 @@ export default function ContactPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <div>
               <div style={{ fontWeight: '600', marginBottom: '4px' }}>Email Support</div>
-              <a href="mailto:primerly.app@gmail.com" style={{ color: 'var(--primary)', fontSize: '1.1rem', textDecoration: 'none' }}>primerly.app@gmail.com</a>
+              <a href="mailto:hello@primerly.app" style={{ color: 'var(--primary)', fontSize: '1.1rem', textDecoration: 'none' }}>hello@primerly.app</a>
             </div>
 
             <div>
               <div style={{ fontWeight: '600', marginBottom: '4px' }}>Twitter / X</div>
               <a href="https://x.com/primerlyapp" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', fontSize: '1.1rem', textDecoration: 'none' }}>@primerlyapp</a>
+            </div>
+
+            <div>
+              <div style={{ fontWeight: '600', marginBottom: '4px' }}>LinkedIn</div>
+              <a href="https://www.linkedin.com/company/primerly/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', fontSize: '1.1rem', textDecoration: 'none' }}>@primerly</a>
             </div>
           </div>
         </div>

@@ -192,9 +192,11 @@ export const GamifiedMotivation = () => {
   const cam = useCameraPath(
     frame,
     [
+      // Hold until the streak count-up lands at frame 80, then snap out ahead of
+      // the other three tiles springing in at 100/110/120.
       { frame: 0, x: streakTileCenterX, y: statsCenterY, scale: 3.8 },
-      { frame: 90, x: streakTileCenterX, y: statsCenterY, scale: 3.8 },
-      { frame: 140, x: 640, y: 360, scale: 1.0 },
+      { frame: 82, x: streakTileCenterX, y: statsCenterY, scale: 3.8 },
+      { frame: 116, x: 640, y: 360, scale: 1.0 },
       { frame: 390, x: 640, y: 360, scale: 1.0 },
     ],
     { x: 640, y: 360, scale: 1 }

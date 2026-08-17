@@ -165,6 +165,16 @@ export default function DashboardClient() {
                 </div>
             </div>
 
+            {/* The per-card share icons are easy to miss, so say plainly that the
+                stat card can be downloaded. */}
+            <button className={styles.shareStatsButton} onClick={() => setIsShareModalOpen(true)}>
+                <ShareIcon size={18} />
+                <span className={styles.shareStatsText}>
+                    <span className={styles.shareStatsTitle}>Share your achievements</span>
+                    <span className={styles.shareStatsHint}>Download your stat card</span>
+                </span>
+            </button>
+
             {/* Jump Back In Section - Dynamic */}
             <section className={styles.section}>
                 <div className={styles.sectionHeader}>

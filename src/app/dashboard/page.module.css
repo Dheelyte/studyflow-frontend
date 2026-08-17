@@ -93,8 +93,49 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 24px;
-  margin-bottom: 60px;
+  margin-bottom: 20px;
   /* Aligns with other sections */
+}
+
+/* Spells out what the small share icon on each stat card does. */
+.shareStatsButton {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 60px;
+  padding: 14px 20px;
+  text-align: left;
+  font-family: inherit;
+  color: var(--primary);
+  /* background: rgba(99, 102, 241, 0.08); */
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.shareStatsButton:hover {
+  background: rgba(99, 102, 241, 0.14);
+  transform: translateY(-1px);
+}
+
+.shareStatsText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.shareStatsTitle {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--foreground);
+}
+
+.shareStatsHint {
+  font-size: 0.85rem;
+  color: var(--secondary);
 }
 
 .statCard {

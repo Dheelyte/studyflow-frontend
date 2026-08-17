@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { projects, communities, posts } from '@/services/api';
+import { CodeIcon, StarIcon } from '@/components/Icons';
 import styles from './ProjectPanel.module.css';
 
 function ShareToCommunity({ project }) {
@@ -136,14 +137,22 @@ export default function ProjectPanel({ kind = 'practice', load }) {
 
     const saveSubmission = () => persist({ submission_url: url, notes });
 
-    const label = isCapstone ? 'Capstone project' : 'Practice build';
+    const label = isCapstone ? 'Capstone project' : 'Practice project';
 
     if (!open) {
         return (
-            <button className={styles.openButton} onClick={openPanel}>
-                <span className={styles.openLabel}>{label}</span>
-                <span className={styles.openHint}>
-                    {isCapstone ? 'Build something you can show →' : 'Apply what you just learned →'}
+            <button
+                className={`${styles.openButton} ${isCapstone ? styles.openCapstone : styles.openPractice}`}
+                onClick={openPanel}
+            >
+                <span className={styles.openIcon}>
+                    {isCapstone ? <StarIcon size={20} fill="currentColor" /> : <CodeIcon size={20} />}
+                </span>
+                <span className={styles.openText}>
+                    <span className={styles.openLabel}>{label}</span>
+                    <span className={styles.openHint}>
+                        {isCapstone ? 'Build something you can show →' : 'Apply what you just learned →'}
+                    </span>
                 </span>
             </button>
         );

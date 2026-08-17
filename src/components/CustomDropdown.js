@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import styles from './CustomDropdown.module.css';
 import { ChevronDown } from './Icons';
 
-export default function CustomDropdown({ options, value, onChange, placeholder }) {
+export default function CustomDropdown({ options, value, onChange, placeholder, className = '', ariaLabel }) {
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef(null);
 
@@ -28,9 +28,12 @@ export default function CustomDropdown({ options, value, onChange, placeholder }
     };
 
     return (
-        <div className={styles.container} ref={containerRef}>
-            <button 
-                className={`${styles.trigger} ${!selectedOption ? styles.placeholder : ''}`} 
+        <div className={`${styles.container} ${className}`} ref={containerRef}>
+            <button
+                type="button"
+                aria-label={ariaLabel}
+                aria-expanded={isOpen}
+                className={`${styles.trigger} ${!selectedOption ? styles.placeholder : ''}`}
                 onClick={() => setIsOpen(!isOpen)}
             >
                 <span>{selectedOption ? selectedOption.label : placeholder}</span>

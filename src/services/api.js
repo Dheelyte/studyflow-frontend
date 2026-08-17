@@ -426,6 +426,12 @@ export const curriculum = {
     clearChatSession: (topicId) => apiFetch(`/topics/${topicId}/chat`, {
         method: 'DELETE'
     }),
+    // Spoken question -> text for the chat composer. The recording is forwarded
+    // to the model and never stored.
+    transcribeQuestion: (audioDataUrl) => apiFetch('/chat/transcribe', {
+        method: 'POST',
+        body: JSON.stringify({ audio: audioDataUrl }),
+    }),
     getCertificateStatus: (playlistId) =>
         apiFetch(`/playlists/${playlistId}/certificate`),
     issueCertificate: (playlistId) =>

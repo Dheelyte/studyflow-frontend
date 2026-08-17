@@ -8,6 +8,16 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import ScreenTutorPanel from "@/components/ScreenTutorPanel";
 import UpgradeModal from "@/components/UpgradeModal";
+import useAudioRecorder from "@/hooks/useAudioRecorder";
+
+// Microphone
+const MicIcon = ({ size = 20 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+        <line x1="12" y1="19" x2="12" y2="23"></line>
+    </svg>
+);
 
 // Help icon (question mark in circle)
 const HelpIcon = ({ size = 24 }) => (
@@ -54,6 +64,12 @@ export default function TutorClient({ params }) {
     const [loadingOlder, setLoadingOlder] = useState(false);
     const [showClearConfirm, setShowClearConfirm] = useState(false);
     const [chatExpanded, setChatExpanded] = useState(false);
+
+    // Ask by voice: the recording is transcribed into the composer, so the
+    // learner can read it back and edit before sending.
+    const recorder = useAudioRecorder();
+    const [transcribing, setTranscribing] = useState(false);
+    const [voiceError, setVoiceError] = useState(null);
 
     const playerRef = useRef(null);
     const playerContainerRef = useRef(null);
@@ -419,6 +435,39 @@ export default function TutorClient({ params }) {
         });
     };
 
+    const handleVoiceClick = async () => {
+        setVoiceError(null);
+
+        if (!recorder.isRecording) {
+            recorder.start();
+            return;
+        }
+
+        const audio = await recorder.stop();
+        if (!audio) {
+            setVoiceError("Didn't catch that , try again.");
+            return;
+        }
+
+        try {
+            setTranscribing(true);
+            const { text } = await curriculum.transcribeQuestion(audio);
+            const spoken = (text || "").trim();
+            if (!spoken) {
+                setVoiceError("Didn't catch that , try again.");
+                return;
+            }
+            // Append rather than replace, so anything already typed survives.
+            setChatInput((prev) => (prev.trim() ? `${prev.trim()} ${spoken}` : spoken));
+            chatInputRef.current?.focus();
+        } catch (err) {
+            console.error("Failed to transcribe question:", err);
+            setVoiceError(err.message || "Could not transcribe that recording.");
+        } finally {
+            setTranscribing(false);
+        }
+    };
+
     // Mark complete handler
     const handleComplete = async () => {
         if (completing || isCompleted) return;
@@ -685,10 +734,28 @@ export default function TutorClient({ params }) {
                                             handleChatSubmit(e);
                                         }
                                     }}
-                                    placeholder="Ask a follow-up question..."
+                                    placeholder={
+                                        recorder.isRecording
+                                            ? `Listening… ${recorder.seconds}s`
+                                            : "Ask a follow-up question..."
+                                    }
                                     rows={1}
                                     disabled={sending}
                                 />
+                                {recorder.isSupported && (
+                                    <button
+                                        type="button"
+                                        className={`${styles.chatMicButton} ${recorder.isRecording ? styles.chatMicRecording : ""}`}
+                                        onClick={handleVoiceClick}
+                                        disabled={sending || transcribing}
+                                        title={recorder.isRecording ? "Stop and transcribe" : "Ask by voice"}
+                                        aria-label={recorder.isRecording ? "Stop recording and transcribe" : "Ask by voice"}
+                                    >
+                                        {transcribing
+                                            ? <span className={styles.chatMicDots}>•••</span>
+                                            : <MicIcon size={18} />}
+                                    </button>
+                                )}
                                 <button
                                     type="submit"
                                     className={styles.chatSendButton}
@@ -697,6 +764,9 @@ export default function TutorClient({ params }) {
                                     Send
                                 </button>
                             </form>
+                            {(voiceError || recorder.error) && (
+                                <p className={styles.chatVoiceError}>{voiceError || recorder.error}</p>
+                            )}
                         </div>
                     </div>
                 </div>

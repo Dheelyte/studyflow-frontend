@@ -63,7 +63,7 @@ export default function UpgradeModal({ quota, onClose }) {
                     <Link href="/pricing" className={styles.upgradeBtn} onClick={onClose}>
                         {nextTier === 'Pro' ? 'Upgrade to Pro' : 'Go Max'}
                     </Link>
-                    {isGenerations ? (
+                    {/* {isGenerations ? (
                         <Link href="/explore" className={styles.secondaryBtn} onClick={onClose}>
                             Find a ready-made course
                         </Link>
@@ -71,7 +71,7 @@ export default function UpgradeModal({ quota, onClose }) {
                         <button className={styles.secondaryBtn} onClick={onClose}>
                             Maybe later
                         </button>
-                    )}
+                    )} */}
                 </div>
             </div>
         </div>

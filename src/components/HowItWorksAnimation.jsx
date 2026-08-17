@@ -1,9 +1,12 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { Player } from "@remotion/player";
-import { SetYourGoal } from "@/remotion/SetYourGoal";
-import { LearnWithAITutor } from "@/remotion/LearnWithAITutor";
-import { QuizScene } from "@/remotion/QuizScene";
+import { SetYourGoal, SET_YOUR_GOAL_DURATION } from "@/remotion/SetYourGoal";
+import {
+  LearnWithAITutor,
+  LEARN_WITH_AI_TUTOR_DURATION,
+} from "@/remotion/LearnWithAITutor";
+import { QuizScene, QUIZ_SCENE_DURATION } from "@/remotion/QuizScene";
 import { GamifiedMotivation } from "@/remotion/GamifiedMotivation";
 import { CommunityQuestion } from "@/remotion/CommunityQuestion";
 import styles from "./HowItWorksAnimation.module.css";
@@ -11,15 +14,15 @@ import styles from "./HowItWorksAnimation.module.css";
 const SCENES = {
     setYourGoal: {
         component: SetYourGoal,
-        durationInFrames: 512,
+        durationInFrames: SET_YOUR_GOAL_DURATION,
     },
     learnWithAITutor: {
         component: LearnWithAITutor,
-        durationInFrames: 390,
+        durationInFrames: LEARN_WITH_AI_TUTOR_DURATION,
     },
     quiz: {
         component: QuizScene,
-        durationInFrames: 450,
+        durationInFrames: QUIZ_SCENE_DURATION,
     },
     gamifiedMotivation: {
         component: GamifiedMotivation,

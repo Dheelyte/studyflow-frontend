@@ -24,16 +24,19 @@ export default function ClientLayout({ children }) {
     }
   }, [pathname]);
 
-  // Auto-collapse the sidebar by default on the lesson page
-  const hasAutoCollapsedTutor = useRef(false);
+  // Auto-collapse the sidebar by default on the lesson page and the pricing page.
+  // Guarded by a ref so it only collapses on entry, not on every render — a
+  // manual expand while the user stays on the page is respected.
+  const hasAutoCollapsed = useRef(false);
   useEffect(() => {
-    if (pathname?.startsWith('/lesson')) {
-      if (!hasAutoCollapsedTutor.current) {
+    const shouldAutoCollapse = pathname?.startsWith('/lesson') || pathname === '/pricing';
+    if (shouldAutoCollapse) {
+      if (!hasAutoCollapsed.current) {
         setIsSidebarCollapsed(true);
-        hasAutoCollapsedTutor.current = true;
+        hasAutoCollapsed.current = true;
       }
     } else {
-      hasAutoCollapsedTutor.current = false;
+      hasAutoCollapsed.current = false;
     }
   }, [pathname]);
 
@@ -44,7 +47,6 @@ export default function ClientLayout({ children }) {
     pathname?.startsWith('/forgot-password') ||
     pathname?.startsWith('/reset-password') ||
     pathname === '/' ||
-    pathname === '/pricing' ||
     pathname === '/about' ||
     pathname === '/contact' ||
     pathname === '/privacy-policy' ||

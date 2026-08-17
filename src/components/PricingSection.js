@@ -11,8 +11,7 @@ export default function PricingSection() {
 
     return (
         <section id="pricing" className={styles.section}>
-            <span className={styles.eyebrow}>Pricing</span>
-            <h2 className={styles.heading}>Our Pricing Plans</h2>
+            <h2 className={styles.heading}>Pricing Plans</h2>
             <p className={styles.subtitle}>
                 Invest in your learning journey. Choose the plan that fits your learning pace
             </p>

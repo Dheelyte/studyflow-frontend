@@ -35,7 +35,21 @@
     border-radius: 24px;
     font-size: 4rem;
     color: white;
+    overflow: hidden;
     animation: float 6s ease-in-out infinite;
+}
+
+/* The thumbnail carries the course name, same as the curriculum preview.
+   Long single words (e.g. "Programming") have to break rather than spill
+   out of the tile. */
+.courseImageTitle {
+    font-size: 1.4rem;
+    font-weight: 800;
+    text-align: center;
+    line-height: 1.2;
+    padding: 14px;
+    overflow-wrap: anywhere;
+    hyphens: auto;
 }
 
 @keyframes float {
@@ -85,6 +99,27 @@
     font-size: 1.1rem;
     color: var(--secondary);
     line-height: 1.6;
+}
+
+.metaRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.levelBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--primary);
+    background: rgba(99, 102, 241, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.25);
+    padding: 6px 14px;
+    border-radius: 20px;
 }
 
 .meta {
@@ -951,79 +986,6 @@
     .achievementTitle {
         font-size: 1.2rem;
     }
-}
-
-/* Gallery publishing (author only) */
-.publishPanel {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-    flex-wrap: wrap;
-    margin: 24px 0 8px;
-    padding: 20px 24px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-}
-
-.publishText {
-    flex: 1;
-    min-width: 240px;
-}
-
-.publishTitle {
-    font-weight: 700;
-    font-size: 1rem;
-    margin-bottom: 6px;
-}
-
-.publishDescription {
-    color: var(--secondary);
-    font-size: 0.88rem;
-    line-height: 1.55;
-    margin: 0;
-}
-
-.publishLink {
-    display: inline-block;
-    margin-top: 10px;
-    color: var(--primary);
-    font-size: 0.88rem;
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.publishLink:hover {
-    text-decoration: underline;
-}
-
-.publishError {
-    color: #f43f5e;
-    font-size: 0.85rem;
-    margin: 10px 0 0;
-}
-
-.publishButton {
-    background: var(--primary);
-    color: #ffffff;
-    border: none;
-    font-weight: 700;
-    font-size: 0.92rem;
-    padding: 12px 24px;
-    border-radius: 10px;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background 0.2s ease;
-}
-
-.publishButton:hover:not(:disabled) {
-    background: var(--primary-hover);
-}
-
-.publishButton:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
 }
 
 /* Milestone projects */

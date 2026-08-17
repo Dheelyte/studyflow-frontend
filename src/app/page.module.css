@@ -13,7 +13,10 @@
     text-align: center;
     padding: 100px 12px 110px;
     position: relative;
-    overflow: hidden;
+    /* Not clipped: the search bar's duration/level menus drop below the hero.
+       The decorative grid is inset+masked and the marquee clips itself, so
+       nothing else needs the hero to hide overflow. */
+    overflow: visible;
     isolation: isolate;
     background-color: var(--background);
     gap: 32px;
@@ -551,7 +554,7 @@
     .featureCardReverse {
         grid-template-columns: 1fr;
         gap: 24px;
-        padding: 28px;
+        padding: 2px;
     }
 
     .featureCardReverse .featureCardText {
@@ -639,7 +642,7 @@
 
 /* Testimonials */
 .testimonialsSection {
-    padding: 100px 24px;
+    padding: 100px 0px;
     background:
         radial-gradient(circle 1px at 12% 18%, color-mix(in srgb, var(--foreground) 35%, transparent) 1px, transparent 2px),
         radial-gradient(circle 1.5px at 28% 72%, color-mix(in srgb, var(--primary) 55%, transparent) 1.5px, transparent 3px),

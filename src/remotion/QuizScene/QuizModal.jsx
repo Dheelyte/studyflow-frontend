@@ -3,11 +3,15 @@ import { TrophyIcon, XIcon } from "../icons";
 export const MODAL_WIDTH = 640;
 export const MODAL_HEIGHT = 560;
 
+// The shell both module beats live in: the quiz and, after it, the practice
+// project. Title and icon are props so the project reads as the same surface.
 export const QuizModal = ({
   enter = 1,
   progress = 0,
   children,
   hideProgressBar = false,
+  title = "Foundations of Data Analysis Quiz",
+  icon = <TrophyIcon size={22} color="#eab308" fill="#fde68a" />,
 }) => {
   return (
     <div
@@ -37,9 +41,9 @@ export const QuizModal = ({
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <TrophyIcon size={22} color="#eab308" fill="#fde68a" />
+          {icon}
           <span style={{ fontSize: 19, fontWeight: 700, color: "#111827" }}>
-            Foundations of Data Analysis Quiz
+            {title}
           </span>
         </div>
         <div

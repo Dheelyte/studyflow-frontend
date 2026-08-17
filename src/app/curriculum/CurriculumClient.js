@@ -3,53 +3,41 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import GenerationOverlay from '@/components/GenerationOverlay';
 import UpgradeModal from '@/components/UpgradeModal';
-import { curriculum, billing } from "@/services/api";
+import { curriculum } from "@/services/api";
 import styles from "./page.module.css";
 import { useAuth } from "@/context/AuthContext";
 import { useRedirectState } from "@/hooks/useRedirectState";
 import ShareModal from "@/components/ShareModal";
 import Link from "next/link";
-import { PlayIcon, ClockIcon, ChevronDown, ChevronUp, ZapIcon, ShareIcon, CheckCircleIcon, BookOpenIcon, VideoIcon, TrophyIconSimple } from "@/components/Icons";
-
-const DURATION_OPTIONS = [
-    { value: '', label: 'No preference' },
-    { value: '2', label: '~2 weeks' },
-    { value: '4', label: '~4 weeks' },
-    { value: '6', label: '~6 weeks' },
-    { value: '8', label: '~8 weeks' },
-    { value: '12', label: '~12 weeks' },
-];
-
-const LEVEL_OPTIONS = [
-    { value: '', label: 'No preference' },
-    { value: 'beginner', label: 'Beginner' },
-    { value: 'intermediate', label: 'Intermediate' },
-    { value: 'advanced', label: 'Advanced' },
-];
+import { PlayIcon, ClockIcon, ChevronDown, ChevronUp, ZapIcon, ShareIcon, CheckCircleIcon, VideoIcon, TrophyIconSimple, TrendingUpIcon } from "@/components/Icons";
 
 export default function CurriculumClient() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
-    const { user, loading: authLoading } = useAuth();
+    const { user } = useAuth();
     const { saveState, restoreState } = useRedirectState();
 
-    // stage: 'customize' → explicit Generate click → 'generating' → 'preview'
-    const [stage, setStage] = useState('customize');
+    // The course shape is chosen on the search bar; this page only generates.
+    const topic = (searchParams.get('topic') || '').trim();
+    const durationWeeks = searchParams.get('duration_weeks') || '';
+    const level = searchParams.get('level') || '';
+    const [retryCount, setRetryCount] = useState(0);
+    const requestKey = `${topic}|${durationWeeks}|${level}|${retryCount}`;
+
     const [curriculumData, setCurriculumData] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(!!topic);
+    const [overlayDone, setOverlayDone] = useState(false);
     const [error, setError] = useState(null);
     const [quotaError, setQuotaError] = useState(null);
+    const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
     const [expandedModules, setExpandedModules] = useState({});
     const [isCreating, setIsCreating] = useState(false);
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
     const [isGlowing, setIsGlowing] = useState(false);
     const startBtnRef = useRef(null);
-
-    const [topic, setTopic] = useState(searchParams.get('topic') || '');
-    const [durationWeeks, setDurationWeeks] = useState('');
-    const [level, setLevel] = useState('');
-    const [genStatus, setGenStatus] = useState(null); // { used, limit } for custom courses
+    const restoredRef = useRef(false);
+    const generatedKeyRef = useRef(null);
 
     const handleTopicClick = (e) => {
         e.preventDefault();
@@ -62,7 +50,8 @@ export default function CurriculumClient() {
         }
     };
 
-    // Restore a generated curriculum after the login round-trip.
+    // Restore a generated curriculum after the login round-trip (from "Start
+    // Learning" while logged out) instead of paying to generate it again.
     useEffect(() => {
         const restoredState = restoreState('curriculum_data');
         if (restoredState && restoredState.data) {
@@ -71,67 +60,61 @@ export default function CurriculumClient() {
                 const firstId = restoredState.data.modules[0].module_id !== undefined ? restoredState.data.modules[0].module_id : 0;
                 setExpandedModules({ [firstId]: true });
             }
-            setStage('preview');
+            restoredRef.current = true;
+            setLoading(false);
+            setOverlayDone(true);
         }
     }, [restoreState]);
 
-    // Keep the topic field in sync when arriving from the search bar.
+    // Generate as soon as the page opens , logged in or not.
     useEffect(() => {
-        const urlTopic = searchParams.get('topic');
-        if (urlTopic) setTopic(urlTopic);
-    }, [searchParams]);
-
-    // Show remaining custom-course quota on the Generate button.
-    useEffect(() => {
-        if (!user) {
-            setGenStatus(null);
-            return;
-        }
-        billing.status()
-            .then((data) => setGenStatus(data?.usage?.course_generations || null))
-            .catch(() => setGenStatus(null));
-    }, [user]);
-
-    const handleGenerate = async () => {
-        if (!topic.trim()) return;
-
-        if (!authLoading && !user) {
-            const params = new URLSearchParams({ topic: topic.trim() });
-            const redirectUrl = encodeURIComponent(`${pathname}?${params.toString()}`);
-            router.push(`/login?redirect=${redirectUrl}`);
-            return;
-        }
-
-        try {
-            setStage('generating');
-            setLoading(true);
-            setError(null);
-
-            const params = { topic: topic.trim() };
-            if (durationWeeks) params.duration_weeks = durationWeeks;
-            if (level) params.level = level;
-
-            const data = await curriculum.generate(params);
-
-            if (!data || !data.modules || data.modules.length === 0) {
-                throw new Error("Invalid curriculum data format received");
-            }
-
-            setCurriculumData(data);
-            const firstId = data.modules[0].module_id !== undefined ? data.modules[0].module_id : 0;
-            setExpandedModules({ [firstId]: true });
-        } catch (err) {
-            console.error("Failed to generate curriculum:", err);
-            if (err.status === 402 && err.data?.code === 'quota_exceeded') {
-                setQuotaError(err.data);
-                setStage('customize');
-            } else {
-                setError(err.message || "Failed to load curriculum");
-            }
-        } finally {
+        if (restoredRef.current) return;
+        if (!topic) {
             setLoading(false);
+            return;
         }
-    };
+        if (generatedKeyRef.current === requestKey) return;
+        generatedKeyRef.current = requestKey;
+
+        // A response is stale once a newer request has claimed the ref.
+        const isStale = () => generatedKeyRef.current !== requestKey;
+
+        (async () => {
+            try {
+                setLoading(true);
+                setOverlayDone(false);
+                setError(null);
+                setQuotaError(null);
+                setIsUpgradeModalOpen(false);
+
+                const params = { topic };
+                if (durationWeeks) params.duration_weeks = durationWeeks;
+                if (level) params.level = level;
+
+                const data = await curriculum.generate(params);
+                if (isStale()) return;
+
+                if (!data || !data.modules || data.modules.length === 0) {
+                    throw new Error("Invalid curriculum data format received");
+                }
+
+                setCurriculumData(data);
+                const firstId = data.modules[0].module_id !== undefined ? data.modules[0].module_id : 0;
+                setExpandedModules({ [firstId]: true });
+            } catch (err) {
+                if (isStale()) return;
+                console.error("Failed to generate curriculum:", err);
+                if (err.status === 402 && err.data?.code === 'quota_exceeded') {
+                    setQuotaError(err.data);
+                    setIsUpgradeModalOpen(true);
+                } else {
+                    setError(err.message || "Failed to load curriculum");
+                }
+            } finally {
+                if (!isStale()) setLoading(false);
+            }
+        })();
+    }, [topic, durationWeeks, level, requestKey]);
 
     const toggleModule = (id) => {
         setExpandedModules(prev => ({ ...prev, [id]: !prev[id] }));
@@ -157,8 +140,10 @@ export default function CurriculumClient() {
 
             const response = await curriculum.createCourse(payload);
 
-            if (response && response.id) {
-                router.push(`/course/${response.id}`);
+            if (response && (response.slug || response.id)) {
+                // Course URLs are slug-based; the id is only a fallback for
+                // older rows that never got one.
+                router.push(`/course/${response.slug || response.id}`);
             } else {
                 console.error("Created course but got no ID", response);
                 alert("Failed to create course. Please try again.");
@@ -171,12 +156,29 @@ export default function CurriculumClient() {
         }
     };
 
-    if (stage === 'generating') {
+    // What the learner asked for on the search bar, shown back to them.
+    const levelLabel = level ? level.charAt(0).toUpperCase() + level.slice(1) : null;
+    const durationLabel = durationWeeks
+        ? `${durationWeeks} week${durationWeeks === '1' ? '' : 's'}`
+        : null;
+
+    const retry = () => {
+        setError(null);
+        setQuotaError(null);
+        setIsUpgradeModalOpen(false);
+        restoredRef.current = false;
+        setOverlayDone(false);
+        setLoading(!!topic);
+        setRetryCount((c) => c + 1);
+    };
+
+    if (loading || (curriculumData && !overlayDone)) {
         return (
             <GenerationOverlay
                 topic={topic}
+                experience={level}
                 isFinished={!loading && !!curriculumData}
-                onComplete={() => setStage('preview')}
+                onComplete={() => setOverlayDone(true)}
             />
         );
     }
@@ -189,7 +191,7 @@ export default function CurriculumClient() {
                     <p>An error occurred, please try again</p>
                 </div>
                 <button
-                    onClick={() => { setError(null); setStage('customize'); }}
+                    onClick={retry}
                     style={{
                         padding: '12px 24px',
                         background: 'var(--primary)',
@@ -210,91 +212,15 @@ export default function CurriculumClient() {
         );
     }
 
-    if (stage === 'customize') {
-        const remainingText = genStatus
-            ? `${Math.max(0, genStatus.limit - genStatus.used)} of ${genStatus.limit} custom courses left this month`
-            : null;
-
+    if (quotaError && !curriculumData) {
         return (
-            <div className={styles.container}>
-                <div className={styles.headerBg}></div>
-
-                <header className={styles.topNav}>
-                    <div className={styles.navBrand}>
-                        <ZapIcon size={24} fill="var(--primary)" />
-                        <span>Primerly</span>
-                    </div>
-                    {!user && (
-                        <Link href="/login" className={styles.navLoginBtn}>
-                            Log In
-                        </Link>
-                    )}
-                </header>
-
-                <div className={styles.customizeWrapper}>
-                    <div className={styles.customizeCard}>
-                        <h1 className={styles.customizeTitle}>Create a custom course</h1>
-                        <p className={styles.customizeSubtitle}>
-                            Tailor the roadmap to your pace and starting point, then generate it with AI.
-                            Looking for something ready-made? <Link href="/explore">Browse the library</Link> , it&apos;s free and unlimited.
-                        </p>
-
-                        <label className={styles.customizeLabel} htmlFor="customTopic">Topic</label>
-                        <input
-                            id="customTopic"
-                            type="text"
-                            className={styles.customizeInput}
-                            placeholder='e.g. "React", "SQL", "UI/UX design"'
-                            value={topic}
-                            onChange={(e) => setTopic(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && handleGenerate()}
-                        />
-
-                        <div className={styles.customizeRow}>
-                            <div className={styles.customizeField}>
-                                <label className={styles.customizeLabel} htmlFor="customDuration">Duration</label>
-                                <select
-                                    id="customDuration"
-                                    className={styles.customizeSelect}
-                                    value={durationWeeks}
-                                    onChange={(e) => setDurationWeeks(e.target.value)}
-                                >
-                                    {DURATION_OPTIONS.map(opt => (
-                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className={styles.customizeField}>
-                                <label className={styles.customizeLabel} htmlFor="customLevel">Starting level</label>
-                                <select
-                                    id="customLevel"
-                                    className={styles.customizeSelect}
-                                    value={level}
-                                    onChange={(e) => setLevel(e.target.value)}
-                                >
-                                    {LEVEL_OPTIONS.map(opt => (
-                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-
-                        <button
-                            className={styles.customizeGenerateBtn}
-                            onClick={handleGenerate}
-                            disabled={!topic.trim()}
-                        >
-                            <ZapIcon size={20} fill="white" />
-                            {user ? 'Generate my course' : 'Log in to generate'}
-                        </button>
-                        {remainingText && (
-                            <p className={styles.customizeQuota}>{remainingText}</p>
-                        )}
-                    </div>
-                </div>
-
-                {quotaError && (
-                    <UpgradeModal quota={quotaError} onClose={() => setQuotaError(null)} />
+            <div className={styles.container} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px', textAlign: 'center' }}>
+                <h2 style={{ color: 'var(--foreground)' }}>You&apos;ve used this month&apos;s custom courses</h2>
+                <p style={{ color: 'var(--secondary)', maxWidth: '420px' }}>
+                    Upgrade to keep learning.
+                </p>
+                {isUpgradeModalOpen && (
+                    <UpgradeModal quota={quotaError} onClose={() => setIsUpgradeModalOpen(false)} />
                 )}
             </div>
         );
@@ -329,12 +255,28 @@ export default function CurriculumClient() {
 
             <div className={styles.header}>
                 <div className={styles.courseImage}>
-                    <span style={{ fontSize: "1.5rem", fontWeight: "800", textAlign: "center", lineHeight: "1.2", padding: "16px" }}>
+                    <span className={styles.courseImageTitle}>
                         {curriculumData.curriculum_title}
                     </span>
                 </div>
                 <div className={styles.courseInfo}>
                     <h1 className={styles.title}>{curriculumData.curriculum_title}</h1>
+                    {(levelLabel || durationLabel) && (
+                        <div className={styles.metaRow}>
+                            {levelLabel && (
+                                <span className={styles.metaBadge}>
+                                    <TrendingUpIcon size={14} />
+                                    {levelLabel}
+                                </span>
+                            )}
+                            {durationLabel && (
+                                <span className={styles.metaBadge}>
+                                    <ClockIcon size={14} />
+                                    {durationLabel}
+                                </span>
+                            )}
+                        </div>
+                    )}
                     <p className={styles.description}>{curriculumData.overview}</p>
                 </div>
             </div>

@@ -79,7 +79,41 @@
     border-radius: 24px;
     font-size: 4rem;
     color: white;
+    overflow: hidden;
     animation: float 6s ease-in-out infinite;
+}
+
+/* The duration and level the course was generated for. */
+.metaRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.metaBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--primary);
+    background: rgba(99, 102, 241, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.25);
+    padding: 6px 14px;
+    border-radius: 20px;
+}
+
+/* Long single words have to break rather than spill out of the tile. */
+.courseImageTitle {
+    font-size: 1.4rem;
+    font-weight: 800;
+    text-align: center;
+    line-height: 1.2;
+    padding: 14px;
+    overflow-wrap: anywhere;
+    hyphens: auto;
 }
 
 @keyframes float {
@@ -605,134 +639,4 @@
     display: flex;
     align-items: center;
     backdrop-filter: blur(4px);
-}
-/* --- Customize-then-generate card --- */
-
-.customizeWrapper {
-    min-height: calc(100vh - 80px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-}
-
-.customizeCard {
-    width: 100%;
-    max-width: 560px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 32px;
-    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.2);
-}
-
-.customizeTitle {
-    margin: 0 0 8px;
-    font-size: 1.6rem;
-    font-weight: 800;
-    color: var(--foreground);
-}
-
-.customizeSubtitle {
-    margin: 0 0 24px;
-    font-size: 0.95rem;
-    color: var(--secondary);
-    line-height: 1.5;
-}
-
-.customizeSubtitle a {
-    color: var(--primary);
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.customizeSubtitle a:hover {
-    text-decoration: underline;
-}
-
-.customizeLabel {
-    display: block;
-    font-size: 0.8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--secondary);
-    margin-bottom: 8px;
-}
-
-.customizeInput,
-.customizeSelect {
-    width: 100%;
-    background: var(--background);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 13px 16px;
-    font-size: 1rem;
-    color: var(--foreground);
-    outline: none;
-    margin-bottom: 18px;
-    font-family: inherit;
-}
-
-.customizeInput:focus,
-.customizeSelect:focus {
-    border-color: var(--primary);
-}
-
-.customizeRow {
-    display: flex;
-    gap: 16px;
-}
-
-.customizeField {
-    flex: 1;
-    min-width: 0;
-}
-
-.customizeGenerateBtn {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 15px 0;
-    font-size: 1.05rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-    margin-top: 6px;
-    font-family: inherit;
-}
-
-.customizeGenerateBtn:hover:not(:disabled) {
-    background: var(--primary-hover);
-    transform: translateY(-1px);
-}
-
-.customizeGenerateBtn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.customizeQuota {
-    margin: 12px 0 0;
-    text-align: center;
-    font-size: 0.85rem;
-    color: var(--secondary);
-    font-variant-numeric: tabular-nums;
-}
-
-@media (max-width: 600px) {
-    .customizeRow {
-        flex-direction: column;
-        gap: 0;
-    }
-
-    .customizeCard {
-        padding: 24px;
-    }
 }
